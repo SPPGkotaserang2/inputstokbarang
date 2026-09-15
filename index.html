@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=950">
+    <!-- Meta viewport dinamis (Default terkunci untuk login, nanti diubah via JS setelah login) -->
+    <meta name="viewport" id="viewportMeta" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Input Bahan Baku Dapur</title>
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -39,36 +40,39 @@
             min-height: 100vh;
         }
 
-        /* Layar Login */
+        /* Layar Login (Mode Mobile Terkunci) */
         .login-wrapper {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(8px);
+            background: #0f172a;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10000;
+            padding: 1rem;
+            overflow: hidden;
+            touch-action: none;
         }
 
         .login-card {
             background: var(--card-bg);
             width: 100%;
-            max-width: 400px;
-            padding: 2.5rem 2rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            max-width: 360px;
+            padding: 2rem 1.5rem;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             border: 1px solid var(--border-color);
             text-align: center;
+            margin: auto;
         }
 
         .login-logo {
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 1.25rem auto;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem auto;
             border-radius: 50%;
             background: #e0e7ff;
             display: flex;
@@ -86,27 +90,27 @@
         }
 
         .login-logo i {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             color: #4f46e5;
         }
 
         .login-header h2 {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             font-weight: 800;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
         }
 
         .login-header p {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .login-form .form-group {
-            margin-bottom: 1.25rem;
+            margin-bottom: 1rem;
             text-align: left;
         }
 
@@ -581,7 +585,7 @@
 </head>
 <body>
 
-<!-- Layar Login -->
+<!-- Layar Login (Mode Mobile Terkunci) -->
 <div class="login-wrapper" id="loginScreen">
     <div class="login-card">
         <div class="login-logo">
@@ -797,11 +801,17 @@
 
     function checkAuth() {
         const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+        const viewportMeta = document.getElementById('viewportMeta');
+        
         if (isLoggedIn === 'true') {
+            // Setelah Login: Ubah ke mode desktop (lebar 950px) dan izinkan zoom/diperbesar-kecilkan
+            viewportMeta.setAttribute('content', 'width=950');
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('captureArea').style.display = 'block';
             initApp();
         } else {
+            // Saat Login: Paksa mode mobile terkunci & tidak bisa di-zoom
+            viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('captureArea').style.display = 'none';
         }
