@@ -743,7 +743,7 @@
                 <p id="lblPetugasText">Petugas SO</p>
                 <div class="signature-space"></div>
             </div>
-            <div class="signature-line" id="valPetugasText">( M Kemal Pasha )</div>
+            <div class="signature-line" id="valPetugasText">( Riyan )</div>
         </div>
         <div class="signature-box">
             <div>
@@ -1162,7 +1162,7 @@
 
         const dateObj = new Date(selectedDate + 'T00:00:00');
         document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('printTimestamp').innerText = 'Dicetak: ' + new Date().toLocaleString('id-ID');
+        document.getElementById('printTimestamp').innerText = 'Dicetak : ' + new Date().toLocaleString('id-ID');
 
         html2canvas(document.getElementById('captureArea'), {
             scale: 2,
