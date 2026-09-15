@@ -39,7 +39,7 @@
             min-height: 100vh;
         }
 
-        /* Styling Modal & Screen Login */
+        /* Layar Login */
         .login-wrapper {
             position: fixed;
             top: 0;
@@ -60,7 +60,7 @@
             max-width: 400px;
             padding: 2.5rem 2rem;
             border-radius: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--border-color);
             text-align: center;
         }
@@ -152,7 +152,7 @@
             padding: 1.5rem 2rem;
             border-radius: 16px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
         .header-brand {
@@ -185,7 +185,7 @@
         }
 
         .header-title h1 {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             font-weight: 800;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
@@ -194,7 +194,7 @@
         }
 
         .header-title p {
-            font-size: 0.813rem;
+            font-size: 0.775rem;
             color: var(--text-muted);
             margin-top: 0.3rem;
         }
@@ -244,6 +244,43 @@
             cursor: pointer;
         }
 
+        /* Invoice Header khusus Export (Default Disembunyikan di Layar) */
+        .invoice-print-header {
+            display: none;
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .invoice-print-meta {
+            display: none;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .invoice-print-footer {
+            display: none;
+            margin-top: 3rem;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .signature-box {
+            width: 200px;
+        }
+
+        .signature-line {
+            margin-top: 4rem;
+            border-bottom: 1px solid var(--text-main);
+            padding-bottom: 0.25rem;
+            font-weight: 700;
+        }
+
         /* Notice Banner */
         .notice-banner {
             background: #fef3c7;
@@ -256,14 +293,13 @@
             display: none;
             align-items: center;
             gap: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1);
         }
 
         /* Card Form Container */
         .card {
             background: var(--card-bg);
             border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
             padding: 1.75rem;
             margin-bottom: 2rem;
             border: 1px solid var(--border-color);
@@ -340,20 +376,10 @@
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
 
-        .btn-primary:hover {
-            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.5);
-            transform: translateY(-2px);
-        }
-
         .btn-success {
             background: var(--success-gradient);
             color: white;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-success:hover {
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
-            transform: translateY(-2px);
         }
 
         .btn-danger-soft {
@@ -363,11 +389,6 @@
             font-size: 0.875rem;
             border-radius: 8px;
             border: 1px solid #fecaca;
-        }
-
-        .btn-danger-soft:hover {
-            background: var(--danger-color);
-            color: white;
         }
 
         .btn-logout {
@@ -383,14 +404,13 @@
         .btn-logout:hover {
             background: #fee2e2;
             color: var(--danger-color);
-            border-color: #fecaca;
         }
 
         /* Table Container */
         .table-container {
             background: var(--card-bg);
             border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
             overflow: hidden;
             border: 1px solid var(--border-color);
         }
@@ -439,10 +459,6 @@
             border-bottom: none;
         }
 
-        tr:hover td {
-            background-color: #f8fafc;
-        }
-
         .text-center {
             text-align: center;
         }
@@ -453,13 +469,7 @@
             text-align: center;
         }
 
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #cbd5e1;
-        }
-
-        /* Custom Modal Konfirmasi Profesional */
+        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -488,15 +498,9 @@
             max-width: 420px;
             padding: 2rem;
             border-radius: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--border-color);
             text-align: center;
-            transform: scale(0.9);
-            transition: all 0.3s ease;
-        }
-
-        .modal-overlay.active .modal-box {
-            transform: scale(1);
         }
 
         .modal-icon {
@@ -512,23 +516,10 @@
             margin: 0 auto 1.25rem auto;
         }
 
-        .modal-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 0.5rem;
-        }
-
-        .modal-desc {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 1.75rem;
-            line-height: 1.5;
-        }
-
         .modal-actions {
             display: flex;
             gap: 0.75rem;
+            margin-top: 1.5rem;
         }
 
         .modal-actions button {
@@ -536,9 +527,7 @@
             padding: 0.75rem;
             border-radius: 10px;
             font-weight: 600;
-            font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         .btn-cancel-modal {
@@ -547,21 +536,10 @@
             color: var(--text-muted);
         }
 
-        .btn-cancel-modal:hover {
-            background: #e2e8f0;
-            color: var(--text-main);
-        }
-
         .btn-confirm-delete {
             background: var(--danger-color);
             border: none;
             color: white;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        }
-
-        .btn-confirm-delete:hover {
-            background: #dc2626;
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
         }
     </style>
 </head>
@@ -570,21 +548,18 @@
 <!-- Layar Login -->
 <div class="login-wrapper" id="loginScreen">
     <div class="login-card">
-        <!-- Logo Login: Ganti src="logo.png" jika menggunakan file lokal -->
         <div class="login-logo">
             <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.remove(); document.querySelector('.login-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';">
         </div>
-        
         <div class="login-header">
-            <h2>Halaman Login</h2>
-            <p>Masukkan kredensial Anda untuk melanjutkan</p>
+            <h2>INPUT DATA</h2>
+            <h2>STOCK BAHAN BAKU</h2>
+            <p>SPPG KOTA SERANG SERANG SERANG 2</p>
         </div>
-
         <div class="error-alert" id="loginError">
             <i class="fa-solid fa-circle-exclamation"></i>
             <span>Nama Pengguna atau Sandi salah!</span>
         </div>
-
         <form class="login-form" id="loginForm" autocomplete="off">
             <div class="form-group">
                 <label for="username">Nama Pengguna</label>
@@ -605,37 +580,56 @@
 </div>
 
 <!-- Aplikasi Utama -->
-<div class="container" id="captureArea" style="display: none;">
-    <!-- Header Profesional -->
-    <div class="header">
+<div class="container" id="captureArea" style="display: none; background: #ffffff; padding: 2rem; border-radius: 16px;">
+    
+    <!-- Header Khusus Invoice (Hanya Muncul Saat Export JPG) -->
+    <div class="invoice-print-header" id="invoiceHeader">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 70px; height: 70px; border-radius: 12px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--border-color);">
+                    <img src="logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
+                </div>
+                <div>
+                    <h2 style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">SPPG KOTA SERANG 2</h2>
+                    <p style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Banten</p>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <span style="background: #e0e7ff; color: #4f46e5; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;">OFFICIAL INVOICE / LAPORAN</span>
+                <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;" id="printTimestamp">Dicetak: -</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Standar Web -->
+    <div class="header" id="webHeader">
         <div class="header-brand">
-            <!-- Logo Header Aplikasi -->
             <div class="app-logo">
                 <img src="logo.png" alt="Logo Header" onerror="this.onerror=null; this.remove(); document.querySelector('.app-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';">
             </div>
             <div class="header-title">
                 <h1>SPPG KOTA SERANG SERANG SERANG 2</h1>
-                <p>Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten 42116</p>
+                <p>Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Banten</p>
             </div>
         </div>
-        
         <div class="header-controls">
-            <!-- Widget Jam Live -->
             <div class="live-clock" id="liveClock">
                 <i class="fa-regular fa-clock"></i> <span id="clockText">00:00:00</span>
             </div>
-
-            <!-- Fitur Pilih Tanggal -->
             <div class="date-filter-box">
                 <label for="selectedDate"><i class="fa-solid fa-calendar-days"></i></label>
                 <input type="date" id="selectedDate" onchange="onDateChange()">
             </div>
-
-            <!-- Tombol Keluar (Logout) -->
             <button class="btn btn-logout" onclick="logout()" title="Keluar dari sistem" id="logoutBtn">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </button>
         </div>
+    </div>
+
+    <!-- Informasi Ringkasan Tanggal (Khusus Mode Invoice Export) -->
+    <div class="invoice-print-meta" id="invoiceMeta">
+        <div><strong>Periode Tanggal Laporan:</strong> <span id="invoiceDateText">-</span></div>
+        <div><strong>Status Dokumen:</strong> Verified & Validated</div>
     </div>
 
     <!-- Peringatan jika melihat tanggal masa lalu -->
@@ -644,7 +638,7 @@
         <span>Anda sedang melihat data arsip masa lalu. Input data baru hanya aktif untuk hari ini.</span>
     </div>
 
-    <!-- Form Input dengan Autocomplete -->
+    <!-- Form Input -->
     <div class="card" id="formCard">
         <form id="itemForm" autocomplete="off">
             <div class="form-grid">
@@ -653,18 +647,15 @@
                     <input type="text" id="namaBarang" class="form-control" list="listNamaBarang" placeholder="" oninput="onNamaBarangInput()" required>
                     <datalist id="listNamaBarang"></datalist>
                 </div>
-                
                 <div class="form-group">
                     <label for="satuan">Satuan</label>
-                    <input type="text" id="satuan" class="form-control" list="listSatuan" placeholder="Pcs, Kg, Gram, L, Btl, Rcg, dll" required>
+                    <input type="text" id="satuan" class="form-control" list="listSatuan" placeholder="Pcs, Kg, Gram, dll" required>
                     <datalist id="listSatuan"></datalist>
                 </div>
-
                 <div class="form-group">
                     <label for="jumlah">Jumlah Hari Ini</label>
                     <input type="number" id="jumlah" class="form-control" placeholder="0" min="0" required>
                 </div>
-
                 <button type="submit" id="submitBtn" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Simpan
                 </button>
@@ -691,22 +682,31 @@
                         <th style="width: 10%;" class="text-center action-col">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
-                    <!-- Data dimasukkan via Firebase Realtime Database -->
-                </tbody>
+                <tbody id="tableBody"></tbody>
             </table>
         </div>
     </div>
+
+    <!-- Footer Tanda Tangan (Khusus Mode Invoice Export) -->
+    <div class="invoice-print-footer" id="invoiceFooter">
+        <div class="signature-box">
+            <p>Petugas Dapur</p>
+            <div class="signature-line">( ........................................ )</div>
+        </div>
+        <div class="signature-box">
+            <p>Supervisor / Kepala</p>
+            <div class="signature-line">( ........................................ )</div>
+        </div>
+    </div>
+
 </div>
 
-<!-- Custom Modal Konfirmasi Hapus -->
+<!-- Modal Hapus -->
 <div class="modal-overlay" id="deleteModal">
     <div class="modal-box">
-        <div class="modal-icon">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-        </div>
-        <h3 class="modal-title">Hapus Data Barang?</h3>
-        <p class="modal-desc">Apakah Anda yakin akan menghapus data ini dari sistem? Tindakan ini tidak dapat dibatalkan.</p>
+        <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3 style="font-size: 1.25font; margin-bottom: 0.5rem;">Hapus Data Barang?</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Apakah Anda yakin akan menghapus data ini dari sistem?</p>
         <div class="modal-actions">
             <button type="button" class="btn-cancel-modal" onclick="closeDeleteModal()">Batal</button>
             <button type="button" class="btn-confirm-delete" id="confirmDeleteBtn">Ya, Hapus</button>
@@ -714,29 +714,23 @@
     </div>
 </div>
 
-<!-- Firebase SDK Compat Version -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
-    // ==========================================
-    // KONFIGURASI LOGIN (Kredensial)
-    // ==========================================
     const AUTH_USERNAME = "AdminSo";
     const AUTH_PASSWORD = "Admin123";
 
     function checkAuth() {
         const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-        const loginScreen = document.getElementById('loginScreen');
-        const captureArea = document.getElementById('captureArea');
-
         if (isLoggedIn === 'true') {
-            loginScreen.style.display = 'none';
-            captureArea.style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('captureArea').style.display = 'block';
             initApp();
         } else {
-            loginScreen.style.display = 'flex';
-            captureArea.style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('captureArea').style.display = 'none';
         }
     }
 
@@ -744,41 +738,24 @@
         e.preventDefault();
         const user = document.getElementById('username').value.trim();
         const pass = document.getElementById('password').value;
-        const errorAlert = document.getElementById('loginError');
-
         if (user === AUTH_USERNAME && pass === AUTH_PASSWORD) {
             sessionStorage.setItem('isLoggedIn', 'true');
-            errorAlert.style.display = 'none';
             checkAuth();
         } else {
-            errorAlert.style.display = 'flex';
+            document.getElementById('loginError').style.display = 'flex';
         }
     });
 
     function togglePasswordVisibility() {
-        const passwordInput = document.getElementById('password');
-        const toggleIcon = document.getElementById('togglePassword');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
-        }
+        const p = document.getElementById('password');
+        p.type = p.type === 'password' ? 'text' : 'password';
     }
 
     function logout() {
         sessionStorage.removeItem('isLoggedIn');
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
         checkAuth();
     }
 
-    // ==========================================
-    // KONFIGURASI FIREBASE ANDA
-    // ==========================================
     const firebaseConfig = {
         apiKey: "AIzaSyDhlkDv6EgnKv_XCc0PBYgFoDk1riAO5Vg",
         authDomain: "so-bahan-baku.firebaseapp.com",
@@ -786,8 +763,7 @@
         projectId: "so-bahan-baku",
         storageBucket: "so-bahan-baku.firebasestorage.app",
         messagingSenderId: "1072738824834",
-        appId: "1:1072738824834:web:95eedc782711a0f9e73a9b",
-        measurementId: "G-H5TWSB47C0"
+        appId: "1:1072738824834:web:95eedc782711a0f9e73a9b"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -796,21 +772,13 @@
     let itemToSatuanMap = {};
     let itemKeyToDelete = null;
 
-    // Live Clock Function
-    function updateLiveClock() {
+    setInterval(() => {
         const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        document.getElementById('clockText').innerText = `${hours}:${minutes}:${seconds}`;
-    }
-    setInterval(updateLiveClock, 1000);
+        document.getElementById('clockText').innerText = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
+    }, 1000);
 
     function getFormattedDate(date = new Date()) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     }
 
     function getCurrentSelectedDate() {
@@ -818,9 +786,7 @@
     }
 
     function initDatePicker() {
-        const today = getFormattedDate();
-        const dateInput = document.getElementById('selectedDate');
-        dateInput.value = today;
+        document.getElementById('selectedDate').value = getFormattedDate();
     }
 
     function onDateChange() {
@@ -831,38 +797,26 @@
     function renderUIState() {
         const selectedDate = getCurrentSelectedDate();
         const today = getFormattedDate();
-        const formCard = document.getElementById('formCard');
-        const noticeBanner = document.getElementById('pastDateNotice');
-        const tableTitle = document.getElementById('tableTitle');
-
         const dateObj = new Date(selectedDate + 'T00:00:00');
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const formattedName = dateObj.toLocaleDateString('id-ID', options);
+        const formattedName = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-        tableTitle.innerText = `Daftar Stock Barang/Bahan Baku (${formattedName})`;
-
+        document.getElementById('tableTitle').innerText = `Daftar Stock Barang/Bahan Baku (${formattedName})`;
+        
         if (selectedDate !== today) {
-            formCard.style.display = 'none';
-            noticeBanner.style.display = 'flex';
+            document.getElementById('formCard').style.display = 'none';
+            document.getElementById('pastDateNotice').style.display = 'flex';
         } else {
-            formCard.style.display = 'block';
-            noticeBanner.style.display = 'none';
+            document.getElementById('formCard').style.display = 'block';
+            document.getElementById('pastDateNotice').style.display = 'none';
         }
     }
 
     let currentRef = null;
     function listenToDailyData() {
         const selectedDate = getCurrentSelectedDate();
-        
-        if (currentRef) {
-            currentRef.off();
-        }
-
+        if (currentRef) currentRef.off();
         currentRef = db.ref('stock_barang/' + selectedDate);
-        currentRef.on('value', (snapshot) => {
-            const dataObj = snapshot.val();
-            renderTable(dataObj);
-        });
+        currentRef.on('value', (snapshot) => renderTable(snapshot.val()));
     }
 
     function loadMasterDataList() {
@@ -879,12 +833,10 @@
                         Object.keys(itemsOnDate).forEach(itemKey => {
                             const item = itemsOnDate[itemKey];
                             if (item && item.nama) {
-                                const namaTrim = item.nama.trim();
-                                uniqueBarangSet.add(namaTrim);
+                                uniqueBarangSet.add(item.nama.trim());
                                 if (item.satuan) {
-                                    const satuanTrim = item.satuan.trim();
-                                    uniqueSatuanSet.add(satuanTrim);
-                                    itemToSatuanMap[namaTrim] = satuanTrim;
+                                    uniqueSatuanSet.add(item.satuan.trim());
+                                    itemToSatuanMap[item.nama.trim()] = item.satuan.trim();
                                 }
                             }
                         });
@@ -894,47 +846,36 @@
 
             const listNama = document.getElementById('listNamaBarang');
             listNama.innerHTML = '';
-            Array.from(uniqueBarangSet).sort().forEach(nama => {
+            Array.from(uniqueBarangSet).sort().forEach(n => {
                 const opt = document.createElement('option');
-                opt.value = nama;
+                opt.value = n;
                 listNama.appendChild(opt);
             });
 
             const listSatuan = document.getElementById('listSatuan');
             listSatuan.innerHTML = '';
-            Array.from(uniqueSatuanSet).sort().forEach(satuan => {
+            Array.from(uniqueSatuanSet).sort().forEach(s => {
                 const opt = document.createElement('option');
-                opt.value = satuan;
+                opt.value = s;
                 listSatuan.appendChild(opt);
             });
         });
     }
 
     function onNamaBarangInput() {
-        const inputNama = document.getElementById('namaBarang');
-        const inputSatuan = document.getElementById('satuan');
-        const val = inputNama.value.trim();
-
+        const val = document.getElementById('namaBarang').value.trim();
         if (itemToSatuanMap[val]) {
-            inputSatuan.value = itemToSatuanMap[val];
+            document.getElementById('satuan').value = itemToSatuanMap[val];
         }
     }
 
     function renderTable(dataObj) {
         const tbody = document.getElementById('tableBody');
-        const selectedDate = getCurrentSelectedDate();
-        const isToday = (selectedDate === getFormattedDate());
+        const isToday = (getCurrentSelectedDate() === getFormattedDate());
         tbody.innerHTML = '';
 
         if (!dataObj) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="empty-state">
-                        <i class="fa-solid fa-folder-open"></i>
-                        <p>Tidak ada data stock barang untuk tanggal ini.</p>
-                    </td>
-                </tr>
-            `;
+            tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal ini.</td></tr>`;
             return;
         }
 
@@ -942,111 +883,49 @@
         Object.keys(dataObj).forEach(key => {
             const item = dataObj[key];
             index++;
-            const tr = document.createElement('tr');
+            const actionButton = isToday ? `<button class="btn btn-danger-soft" onclick="promptDelete('${key}')"><i class="fa-solid fa-trash"></i></button>` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
             
-            const actionButton = isToday ? `
-                <button class="btn btn-danger-soft" onclick="promptDelete('${key}')" title="Hapus">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            ` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
-
-            tr.innerHTML = `
-                <td>${index}</td>
-                <td><strong>${escapeHtml(item.nama)}</strong></td>
-                <td>${escapeHtml(item.satuan)}</td>
-                <td><strong>${item.jumlah}</strong></td>
-                <td class="text-center action-col">
-                    ${actionButton}
-                </td>
+            tbody.innerHTML += `
+                <tr>
+                    <td>${index}</td>
+                    <td><strong>${escapeHtml(item.nama)}</strong></td>
+                    <td>${escapeHtml(item.satuan)}</td>
+                    <td><strong>${item.jumlah}</strong></td>
+                    <td class="text-center action-col">${actionButton}</td>
+                </tr>
             `;
-            tbody.appendChild(tr);
         });
     }
 
     document.getElementById('itemForm').addEventListener('submit', function(e) {
         e.preventDefault();
-
         const selectedDate = getCurrentSelectedDate();
-        const today = getFormattedDate();
-
-        if (selectedDate !== today) {
-            alert('Anda hanya dapat menginput data untuk hari ini!');
-            return;
-        }
+        if (selectedDate !== getFormattedDate()) return;
 
         const nama = document.getElementById('namaBarang').value.trim();
         const satuan = document.getElementById('satuan').value.trim();
         const jumlah = parseInt(document.getElementById('jumlah').value);
-
         if (!nama || !satuan || isNaN(jumlah)) return;
-
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
-
-        let isCompleted = false;
-        const timeoutTimer = setTimeout(() => {
-            if (!isCompleted) {
-                isCompleted = true;
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
-                alert("Koneksi ke server lambat atau terhalang.");
-            }
-        }, 7000);
 
         const ref = db.ref('stock_barang/' + selectedDate);
         ref.orderByChild('nama').equalTo(nama).once('value', (snapshot) => {
-            if (isCompleted) return;
-            isCompleted = true;
-            clearTimeout(timeoutTimer);
-
             if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    const existingKey = childSnapshot.key;
-                    const existingData = childSnapshot.val();
-                    const newJumlah = parseInt(existingData.jumlah) + jumlah;
-                    
-                    ref.child(existingKey).update({
-                        jumlah: newJumlah,
-                        satuan: satuan
-                    });
+                snapshot.forEach((child) => {
+                    ref.child(child.key).update({ jumlah: parseInt(child.val().jumlah) + jumlah, satuan: satuan });
                 });
             } else {
-                ref.push({
-                    nama: nama,
-                    satuan: satuan,
-                    jumlah: jumlah
-                });
+                ref.push({ nama, satuan, jumlah });
             }
-
             document.getElementById('itemForm').reset();
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
             loadMasterDataList();
-        }, (error) => {
-            if (isCompleted) return;
-            isCompleted = true;
-            clearTimeout(timeoutTimer);
-            alert("Gagal menyimpan data! Error: " + error.message);
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
         });
     });
 
-    window.promptDelete = function(key) {
-        itemKeyToDelete = key;
-        document.getElementById('deleteModal').classList.add('active');
-    };
-
-    window.closeDeleteModal = function() {
-        itemKeyToDelete = null;
-        document.getElementById('deleteModal').classList.remove('active');
-    };
-
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    window.promptDelete = (key) => { itemKeyToDelete = key; document.getElementById('deleteModal').classList.add('active'); };
+    window.closeDeleteModal = () => { itemKeyToDelete = null; document.getElementById('deleteModal').classList.remove('active'); };
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
         if (itemKeyToDelete) {
-            const selectedDate = getCurrentSelectedDate();
-            db.ref('stock_barang/' + selectedDate + '/' + itemKeyToDelete).remove().then(() => {
+            db.ref('stock_barang/' + getCurrentSelectedDate() + '/' + itemKeyToDelete).remove().then(() => {
                 loadMasterDataList();
                 closeDeleteModal();
             });
@@ -1057,24 +936,33 @@
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // Fungsi Export JPG (Dilengkapi penanganan Gambar Lokal & Tombol Logout)
     window.exportToJPG = function() {
         const formCard = document.getElementById('formCard');
         const actionCols = document.querySelectorAll('.action-col');
         const exportBtn = document.getElementById('exportBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
+        const webHeader = document.getElementById('webHeader');
+        const invoiceHeader = document.getElementById('invoiceHeader');
+        const invoiceMeta = document.getElementById('invoiceMeta');
+        const invoiceFooter = document.getElementById('invoiceFooter');
         const noticeBanner = document.getElementById('pastDateNotice');
-
-        if (formCard) formCard.style.display = 'none';
-        if (noticeBanner) noticeBanner.style.display = 'none';
-        if (logoutBtn) logoutBtn.style.display = 'none';
-        actionCols.forEach(el => el.style.display = 'none');
-        exportBtn.style.display = 'none';
-
-        const captureArea = document.getElementById('captureArea');
         const selectedDate = getCurrentSelectedDate();
 
-        html2canvas(captureArea, {
+        // Ubah tampilan ke mode Invoice Profesional
+        if (formCard) formCard.style.display = 'none';
+        if (noticeBanner) noticeBanner.style.display = 'none';
+        actionCols.forEach(el => el.style.display = 'none');
+        exportBtn.style.display = 'none';
+        webHeader.style.display = 'none';
+
+        invoiceHeader.style.display = 'block';
+        invoiceMeta.style.display = 'flex';
+        invoiceFooter.style.display = 'flex';
+
+        const dateObj = new Date(selectedDate + 'T00:00:00');
+        document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('printTimestamp').innerText = 'Dicetak: ' + new Date().toLocaleString('id-ID');
+
+        html2canvas(document.getElementById('captureArea'), {
             scale: 2,
             windowWidth: 950,
             width: 950,
@@ -1083,36 +971,40 @@
             useCORS: true,
             allowTaint: true
         }).then(canvas => {
+            // Kembalikan tampilan normal
             renderUIState();
             actionCols.forEach(el => el.style.display = '');
             exportBtn.style.display = 'inline-flex';
-            if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+            webHeader.style.display = 'flex';
+            invoiceHeader.style.display = 'none';
+            invoiceMeta.style.display = 'none';
+            invoiceFooter.style.display = 'none';
 
             const link = document.createElement('a');
-            link.download = `Laporan-Stock-${selectedDate}.jpg`;
+            link.download = `Invoice-Stock-${selectedDate}.jpg`;
             link.href = canvas.toDataURL('image/jpeg', 0.95);
             link.click();
         }).catch(err => {
-            console.error('Gagal export gambar:', err);
+            console.error('Gagal export:', err);
             renderUIState();
             actionCols.forEach(el => el.style.display = '');
             exportBtn.style.display = 'inline-flex';
-            if (logoutBtn) logoutBtn.style.display = 'inline-flex';
+            webHeader.style.display = 'flex';
+            invoiceHeader.style.display = 'none';
+            invoiceMeta.style.display = 'none';
+            invoiceFooter.style.display = 'none';
             alert('Terjadi kesalahan saat mengeksport gambar.');
         });
     };
 
     function initApp() {
         initDatePicker();
-        updateLiveClock();
         renderUIState();
         listenToDailyData();
         loadMasterDataList();
     }
 
-    window.onload = function() {
-        checkAuth();
-    };
+    window.onload = checkAuth;
 </script>
 
 </body>
