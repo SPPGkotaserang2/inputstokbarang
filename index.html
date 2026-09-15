@@ -37,11 +37,99 @@
             color: var(--text-main);
             padding: 2rem 1rem;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        /* Login Container Styling */
+        .login-wrapper {
+            width: 100%;
+            max-width: 440px;
+            margin: auto;
+            display: block;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin: 0 auto 1.25rem auto;
+            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
+        }
+
+        .login-header h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .login-header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+        }
+
+        .input-password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-password-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px;
+        }
+
+        .toggle-password-btn:hover {
+            color: var(--text-main);
+        }
+
+        .error-alert {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: var(--danger-color);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            margin-bottom: 1.25rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* App Main Container */
         .container {
             max-width: 950px;
+            width: 100%;
             margin: 0 auto;
+            display: none; /* Hidden by default until login */
         }
 
         /* Header Cerah & Berwarna */
@@ -160,6 +248,11 @@
         .form-group {
             display: flex;
             flex-direction: column;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
         }
 
         .form-group label {
@@ -170,6 +263,7 @@
         }
 
         .form-control {
+            width: 100%;
             padding: 0.85rem 1rem;
             border: 1px solid var(--border-color);
             border-radius: 10px;
@@ -203,6 +297,10 @@
             font-size: 0.95rem;
         }
 
+        .btn-full {
+            width: 100%;
+        }
+
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -228,6 +326,26 @@
         .btn-success:hover {
             box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
             transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            background: #fee2e2;
+            color: var(--danger-color);
+            border: 1px solid #fecaca;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger-color);
+            color: white;
         }
 
         .btn-danger-soft {
@@ -317,7 +435,7 @@
             color: #cbd5e1;
         }
 
-        /* Custom Modal Konfirmasi Profesional */
+        /* Custom Modal Konfirmasi */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -425,6 +543,46 @@
 </head>
 <body>
 
+<!-- LOGIN SCREEN -->
+<div class="login-wrapper" id="loginScreen">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="fa-solid fa-kitchen-set"></i>
+            </div>
+            <h3>Input Data Stock Bahan Baku</h3>
+            <p>SPPG KOTA SERANG SERANG SERANG 2</p>
+        </div>
+
+        <div class="error-alert" id="loginError">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="loginErrorMsg">Username atau Password salah!</span>
+        </div>
+
+        <form id="loginForm" autocomplete="off">
+            <div class="form-group">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" class="form-control" placeholder="Masukkan Username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="loginPassword">Kata Sandi</label>
+                <div class="input-password-wrapper">
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan Kata Sandi" required>
+                    <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility()">
+                        <i class="fa-regular fa-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" style="margin-top: 1.5rem;">
+                <i class="fa-solid fa-right-to-bracket"></i> Masuk
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- MAIN APP VIEW -->
 <div class="container" id="captureArea">
     <!-- Header Profesional -->
     <div class="header">
@@ -446,6 +604,11 @@
                 <label for="selectedDate"><i class="fa-solid fa-calendar-days"></i></label>
                 <input type="date" id="selectedDate" onchange="onDateChange()">
             </div>
+
+            <!-- Tombol Logout -->
+            <button class="btn-logout" id="logoutBtn" onclick="handleLogout()" title="Keluar">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </button>
         </div>
     </div>
 
@@ -455,23 +618,23 @@
         <span>Anda sedang melihat data arsip masa lalu. Input data baru hanya aktif untuk hari ini.</span>
     </div>
 
-    <!-- Form Input dengan Autocomplete (Bisa Ketik Manual atau Pilih Riwayat) -->
+    <!-- Form Input dengan Autocomplete -->
     <div class="card" id="formCard">
         <form id="itemForm" autocomplete="off">
             <div class="form-grid">
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom:0;">
                     <label for="namaBarang">Nama Barang/Bahan Baku</label>
                     <input type="text" id="namaBarang" class="form-control" list="listNamaBarang" placeholder="" oninput="onNamaBarangInput()" required>
                     <datalist id="listNamaBarang"></datalist>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom:0;">
                     <label for="satuan">Satuan</label>
                     <input type="text" id="satuan" class="form-control" list="listSatuan" placeholder="Pcs, Kg, Gram, L, Btl, Rcg, dll" required>
                     <datalist id="listSatuan"></datalist>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom:0;">
                     <label for="jumlah">Jumlah Hari Ini</label>
                     <input type="number" id="jumlah" class="form-control" placeholder="0" min="0" required>
                 </div>
@@ -547,6 +710,61 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // ==========================================
+    // LOGIKA LOGIN & AKSES APLIKASI
+    // ==========================================
+    const CRED_USER = "AdminSo";
+    const CRED_PASS = "Admin123";
+
+    function checkAuthSession() {
+        const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+        const loginScreen = document.getElementById('loginScreen');
+        const mainApp = document.getElementById('captureArea');
+
+        if (isLoggedIn === 'true') {
+            loginScreen.style.display = 'none';
+            mainApp.style.display = 'block';
+            initMainApp();
+        } else {
+            loginScreen.style.display = 'block';
+            mainApp.style.display = 'none';
+        }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const userInput = document.getElementById('loginUsername').value.trim();
+        const passInput = document.getElementById('loginPassword').value.trim();
+        const errorAlert = document.getElementById('loginError');
+
+        if (userInput === CRED_USER && passInput === CRED_PASS) {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            errorAlert.style.display = 'none';
+            checkAuthSession();
+        } else {
+            errorAlert.style.display = 'flex';
+        }
+    });
+
+    function togglePasswordVisibility() {
+        const passInput = document.getElementById('loginPassword');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        if (passInput.type === 'password') {
+            passInput.type = 'text';
+            toggleIcon.className = 'fa-regular fa-eye-slash';
+        } else {
+            passInput.type = 'password';
+            toggleIcon.className = 'fa-regular fa-eye';
+        }
+    }
+
+    function handleLogout() {
+        sessionStorage.removeItem('isLoggedIn');
+        document.getElementById('loginForm').reset();
+        checkAuthSession();
+    }
+
     // Menyimpan mapping riwayat barang ke satuan terakhirnya
     let itemToSatuanMap = {};
     let itemKeyToDelete = null; // Menyimpan ID data yang akan dihapus
@@ -557,7 +775,10 @@
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
-        document.getElementById('clockText').innerText = `${hours}:${minutes}:${seconds}`;
+        const clockEl = document.getElementById('clockText');
+        if (clockEl) {
+            clockEl.innerText = `${hours}:${minutes}:${seconds}`;
+        }
     }
     setInterval(updateLiveClock, 1000);
 
@@ -575,7 +796,9 @@
     function initDatePicker() {
         const today = getFormattedDate();
         const dateInput = document.getElementById('selectedDate');
-        dateInput.value = today;
+        if (dateInput) {
+            dateInput.value = today;
+        }
     }
 
     function onDateChange() {
@@ -594,14 +817,16 @@
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const formattedName = dateObj.toLocaleDateString('id-ID', options);
 
-        tableTitle.innerText = `Daftar Stock Barang/Bahan Baku (${formattedName})`;
+        if (tableTitle) {
+            tableTitle.innerText = `Daftar Stock Barang/Bahan Baku (${formattedName})`;
+        }
 
         if (selectedDate !== today) {
-            formCard.style.display = 'none';
-            noticeBanner.style.display = 'flex';
+            if (formCard) formCard.style.display = 'none';
+            if (noticeBanner) noticeBanner.style.display = 'flex';
         } else {
-            formCard.style.display = 'block';
-            noticeBanner.style.display = 'none';
+            if (formCard) formCard.style.display = 'block';
+            if (noticeBanner) noticeBanner.style.display = 'none';
         }
     }
 
@@ -650,21 +875,25 @@
 
             // Populate Datalist Nama Barang
             const listNama = document.getElementById('listNamaBarang');
-            listNama.innerHTML = '';
-            Array.from(uniqueBarangSet).sort().forEach(nama => {
-                const opt = document.createElement('option');
-                opt.value = nama;
-                listNama.appendChild(opt);
-            });
+            if (listNama) {
+                listNama.innerHTML = '';
+                Array.from(uniqueBarangSet).sort().forEach(nama => {
+                    const opt = document.createElement('option');
+                    opt.value = nama;
+                    listNama.appendChild(opt);
+                });
+            }
 
             // Populate Datalist Satuan
             const listSatuan = document.getElementById('listSatuan');
-            listSatuan.innerHTML = '';
-            Array.from(uniqueSatuanSet).sort().forEach(satuan => {
-                const opt = document.createElement('option');
-                opt.value = satuan;
-                listSatuan.appendChild(opt);
-            });
+            if (listSatuan) {
+                listSatuan.innerHTML = '';
+                Array.from(uniqueSatuanSet).sort().forEach(satuan => {
+                    const opt = document.createElement('option');
+                    opt.value = satuan;
+                    listSatuan.appendChild(opt);
+                });
+            }
         });
     }
 
@@ -683,6 +912,8 @@
         const tbody = document.getElementById('tableBody');
         const selectedDate = getCurrentSelectedDate();
         const isToday = (selectedDate === getFormattedDate());
+        if (!tbody) return;
+        
         tbody.innerHTML = '';
 
         if (!dataObj) {
@@ -827,9 +1058,11 @@
         const actionCols = document.querySelectorAll('.action-col');
         const exportBtn = document.getElementById('exportBtn');
         const noticeBanner = document.getElementById('pastDateNotice');
+        const logoutBtn = document.getElementById('logoutBtn');
 
         if (formCard) formCard.style.display = 'none';
         if (noticeBanner) noticeBanner.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'none';
         actionCols.forEach(el => el.style.display = 'none');
         exportBtn.style.display = 'none';
 
@@ -847,6 +1080,7 @@
             renderUIState();
             actionCols.forEach(el => el.style.display = '');
             exportBtn.style.display = 'inline-flex';
+            if (logoutBtn) logoutBtn.style.display = 'inline-flex';
 
             const link = document.createElement('a');
             link.download = `Laporan-Stock-${selectedDate}.jpg`;
@@ -857,16 +1091,21 @@
             renderUIState();
             actionCols.forEach(el => el.style.display = '');
             exportBtn.style.display = 'inline-flex';
+            if (logoutBtn) logoutBtn.style.display = 'inline-flex';
             alert('Terjadi kesalahan saat mengeksport gambar.');
         });
     };
 
-    window.onload = function() {
+    function initMainApp() {
         initDatePicker();
         updateLiveClock();
         renderUIState();
         listenToDailyData();
         loadMasterDataList();
+    }
+
+    window.onload = function() {
+        checkAuthSession();
     };
 </script>
 
