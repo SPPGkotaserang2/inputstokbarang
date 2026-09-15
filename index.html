@@ -394,6 +394,12 @@
             box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
         }
 
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
         .btn-danger-soft {
             background: #fee2e2;
             color: var(--danger-color);
@@ -643,7 +649,7 @@
                 </div>
             </div>
             <div style="text-align: right;">
-                <span style="background: #e0e7ff; color: #4f46e5; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;">LAPORAN HARIAN</span>
+                <span style="background: #e0e7ff; color: #4f46e5; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;" id="badgeReportType">LAPORAN HARIAN</span>
                 <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;" id="printTimestamp">Dicetak: -</p>
             </div>
         </div>
@@ -676,7 +682,7 @@
 
     <!-- Informasi Ringkasan Tanggal (Khusus Mode Invoice Preview/Export) -->
     <div class="invoice-print-meta" id="invoiceMeta">
-        <div><strong>Periode Tanggal Laporan:</strong> <span id="invoiceDateText">-</span></div>
+        <div><strong>Periode Laporan:</strong> <span id="invoiceDateText">-</span></div>
         <div><strong>Status Dokumen:</strong> Verified & Validated</div>
     </div>
 
@@ -716,11 +722,17 @@
         <div class="table-header-bar">
             <h2 id="tableTitle">Daftar Stock Bahan Baku</h2>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-warning" id="rangeExportBtn" onclick="openRangeModal()" style="display:none;">
+                    <i class="fa-solid fa-calendar-week"></i> Rekap Rentang Tanggal
+                </button>
                 <button type="button" class="btn btn-info" id="previewBtn" onclick="openCodeModal()">
                     <i class="fa-solid fa-eye"></i> Admin
                 </button>
                 <button type="button" class="btn btn-success" id="exportBtn" onclick="exportToJPG()">
                     <i class="fa-solid fa-file-image"></i> Export ke JPG
+                </button>
+                <button type="button" class="btn btn-primary" id="backToNormalBtn" onclick="backToNormalView()" style="display:none;">
+                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Harian
                 </button>
             </div>
         </div>
@@ -729,10 +741,10 @@
                 <thead>
                     <tr>
                         <th style="width: 10%;">No</th>
-                        <th>Nama Barang/Bahan Baku</th>
+                        <th id="thNamaCol">Nama Barang/Bahan Baku</th>
                         <th style="width: 20%;">Satuan</th>
-                        <th style="width: 20%;">Jumlah</th>
-                        <th style="width: 10%;" class="text-center action-col">Aksi</th>
+                        <th style="width: 20%;" id="thJumlahCol">Jumlah</th>
+                        <th style="width: 10%;" class="text-center action-col" id="thAksiCol">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -778,6 +790,29 @@
     </div>
 </div>
 
+<!-- Modal Pilih Rentang Tanggal Rekap -->
+<div class="modal-overlay" id="rangeModal">
+    <div class="modal-box" style="max-width: 460px; text-align: left;">
+        <div class="modal-icon" style="background: #fef3c7; color: #d97706; margin: 0 auto 1rem auto;"><i class="fa-solid fa-calendar-days"></i></div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center;">Rekap Laporan Multi-Tanggal</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;">Pilih rentang tanggal rekap (misal tgl 1 s/d 30). Data barang yang sama dari semua tanggal akan otomatis dijumlahkan.</p>
+        
+        <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="startDateRange">Dari Tanggal:</label>
+            <input type="date" id="startDateRange" class="form-control">
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="endDateRange">Sampai Tanggal:</label>
+            <input type="date" id="endDateRange" class="form-control">
+        </div>
+
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel-modal" onclick="closeRangeModal()">Batal</button>
+            <button type="button" class="btn btn-warning" onclick="generateRangeReport()" style="flex: 1; color: white;">Buat Rekap & Export</button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal Hapus -->
 <div class="modal-overlay" id="deleteModal">
     <div class="modal-box">
@@ -798,19 +833,18 @@
 <script>
     const AUTH_USERNAME = "AdminSo";
     const AUTH_PASSWORD = "Admin123";
+    let isRangeReportMode = false;
 
     function checkAuth() {
         const isLoggedIn = sessionStorage.getItem('isLoggedIn');
         const viewportMeta = document.getElementById('viewportMeta');
         
         if (isLoggedIn === 'true') {
-            // Setelah Login: Ubah ke mode desktop (lebar 950px) dan izinkan zoom/diperbesar-kecilkan
             viewportMeta.setAttribute('content', 'width=950');
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('captureArea').style.display = 'block';
             initApp();
         } else {
-            // Saat Login: Paksa mode mobile terkunci & tidak bisa di-zoom
             viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('captureArea').style.display = 'none';
@@ -869,15 +903,20 @@
     }
 
     function initDatePicker() {
-        document.getElementById('selectedDate').value = getFormattedDate();
+        const todayStr = getFormattedDate();
+        document.getElementById('selectedDate').value = todayStr;
+        document.getElementById('startDateRange').value = todayStr;
+        document.getElementById('endDateRange').value = todayStr;
     }
 
     function onDateChange() {
+        if (isRangeReportMode) return;
         renderUIState();
         listenToDailyData();
     }
 
     function renderUIState() {
+        if (isRangeReportMode) return;
         const selectedDate = getCurrentSelectedDate();
         const today = getFormattedDate();
         const dateObj = new Date(selectedDate + 'T00:00:00');
@@ -896,6 +935,7 @@
 
     let currentRef = null;
     function listenToDailyData() {
+        if (isRangeReportMode) return;
         const selectedDate = getCurrentSelectedDate();
         if (currentRef) currentRef.off();
         currentRef = db.ref('stock_barang/' + selectedDate);
@@ -1086,12 +1126,146 @@
         }
     };
 
-    // Fungsi untuk mengaktifkan tampilan preview dan mengizinkan edit langsung di layar
+    // Modal Rentang Tanggal
+    window.openRangeModal = function() {
+        document.getElementById('rangeModal').classList.add('active');
+    };
+    window.closeRangeModal = function() {
+        document.getElementById('rangeModal').classList.remove('active');
+    };
+
+    // Fungsi membuat laporan rekap multi-tanggal
+    window.generateRangeReport = function() {
+        const startStr = document.getElementById('startDateRange').value;
+        const endStr = document.getElementById('endDateRange').value;
+
+        if (!startStr || !endStr) {
+            alert('Silakan tentukan tanggal awal dan tanggal akhir dengan lengkap.');
+            return;
+        }
+
+        if (startStr > endStr) {
+            alert('Tanggal awal tidak boleh lebih besar dari tanggal akhir.');
+            return;
+        }
+
+        closeRangeModal();
+
+        db.ref('stock_barang').once('value', (snapshot) => {
+            const allData = snapshot.val() || {};
+            const aggregatedMap = {}; // key: namaBarangLower, val: {nama, satuan, jumlah}
+
+            let curr = new Date(startStr);
+            const last = new Date(endStr);
+
+            while (curr <= last) {
+                const dateKey = getFormattedDate(curr);
+                const dayData = allData[dateKey];
+                if (dayData && typeof dayData === 'object') {
+                    Object.keys(dayData).forEach(k => {
+                        const item = dayData[k];
+                        if (item && item.nama) {
+                            const cleanName = item.nama.trim();
+                            const mapKey = cleanName.toLowerCase();
+                            const qty = parseInt(item.jumlah) || 0;
+                            const sat = item.satuan ? item.satuan.trim() : '';
+
+                            if (!aggregatedMap[mapKey]) {
+                                aggregatedMap[mapKey] = { nama: cleanName, satuan: sat, jumlah: 0 };
+                            }
+                            aggregatedMap[mapKey].jumlah += qty;
+                            if (sat) aggregatedMap[mapKey].satuan = sat; // update satuan terakhir jika ada
+                        }
+                    });
+                }
+                curr.setDate(curr.getDate() + 1);
+            }
+
+            // Ubah ke array dan urutkan abjad nama barang
+            const aggregatedList = Object.values(aggregatedMap).sort((a, b) => a.nama.localeCompare(b.nama));
+            
+            // Aktifkan mode rekap multi-tanggal tampilan invoice
+            isRangeReportMode = true;
+            renderRangeReportUI(startStr, endStr, aggregatedList);
+        });
+    };
+
+    function renderRangeReportUI(startStr, endStr, listData) {
+        const formCard = document.getElementById('formCard');
+        const actionCols = document.querySelectorAll('.action-col');
+        const previewBtn = document.getElementById('previewBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const rangeExportBtn = document.getElementById('rangeExportBtn');
+        const backToNormalBtn = document.getElementById('backToNormalBtn');
+        const webHeader = document.getElementById('webHeader');
+        const invoiceHeader = document.getElementById('invoiceHeader');
+        const invoiceMeta = document.getElementById('invoiceMeta');
+        const invoiceFooter = document.getElementById('invoiceFooter');
+        const noticeBanner = document.getElementById('pastDateNotice');
+        const floatingBar = document.getElementById('floatingEditBar');
+
+        if (formCard) formCard.style.display = 'none';
+        if (noticeBanner) noticeBanner.style.display = 'none';
+        actionCols.forEach(el => el.style.display = 'none');
+        if (previewBtn) previewBtn.style.display = 'none';
+        webHeader.style.display = 'none';
+
+        invoiceHeader.style.display = 'block';
+        invoiceMeta.style.display = 'flex';
+        invoiceFooter.style.display = 'flex';
+        if (floatingBar) floatingBar.style.display = 'flex';
+        if (rangeExportBtn) rangeExportBtn.style.display = 'none';
+        if (backToNormalBtn) backToNormalBtn.style.display = 'inline-flex';
+
+        document.getElementById('badgeReportType').innerText = 'REKAP LAPORAN BULANAN/RENTANG';
+
+        const dStart = new Date(startStr + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        const dEnd = new Date(endStr + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('invoiceDateText').innerText = `${dStart} s/d ${dEnd}`;
+        document.getElementById('printTimestamp').innerText = 'Di Cetak Tanggal : ' + new Date().toLocaleString('id-ID');
+
+        document.getElementById('tableTitle').innerText = `Rekap Total Stock Bahan Baku (${dStart} s/d ${dEnd})`;
+
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        if (listData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock pada rentang tanggal tersebut.</td></tr>`;
+        } else {
+            listData.forEach((item, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td><strong>${escapeHtml(item.nama)}</strong></td>
+                        <td>${escapeHtml(item.satuan)}</td>
+                        <td><strong>${item.jumlah}</strong></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Sesuaikan header kolom tabel (hapus kolom aksi untuk rekap)
+        document.getElementById('thAksiCol').style.display = 'none';
+        document.querySelectorAll('tr').forEach(row => {
+            const cells = row.children;
+            if (cells.length === 5) {
+                cells[4].style.display = 'none';
+            }
+        });
+    }
+
+    window.backToNormalView = function() {
+        isRangeReportMode = false;
+        location.reload();
+    };
+
+    // Fungsi untuk mengaktifkan tampilan preview dan mengizinkan edit langsung di layar (Mode Harian)
     window.enableInvoicePreviewMode = function() {
         const formCard = document.getElementById('formCard');
         const actionCols = document.querySelectorAll('.action-col');
         const previewBtn = document.getElementById('previewBtn');
         const exportBtn = document.getElementById('exportBtn');
+        const rangeExportBtn = document.getElementById('rangeExportBtn');
         const webHeader = document.getElementById('webHeader');
         const invoiceHeader = document.getElementById('invoiceHeader');
         const invoiceMeta = document.getElementById('invoiceMeta');
@@ -1110,6 +1284,7 @@
         invoiceMeta.style.display = 'flex';
         invoiceFooter.style.display = 'flex';
         floatingBar.style.display = 'flex';
+        if (rangeExportBtn) rangeExportBtn.style.display = 'inline-flex';
 
         const dateObj = new Date(selectedDate + 'T00:00:00');
         document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -1126,8 +1301,10 @@
             document.getElementById('valMengetahuiName')
         ];
 
-        // Tambahkan juga elemen baris tabel
-        document.querySelectorAll('.editable-item-text').forEach(el => editableElements.push(el));
+        // Tambahkan juga elemen baris tabel jika bukan mode rekap range
+        if (!isRangeReportMode) {
+            document.querySelectorAll('.editable-item-text').forEach(el => editableElements.push(el));
+        }
 
         editableElements.forEach(el => {
             if(el) {
@@ -1146,6 +1323,8 @@
         const actionCols = document.querySelectorAll('.action-col');
         const previewBtn = document.getElementById('previewBtn');
         const exportBtn = document.getElementById('exportBtn');
+        const rangeExportBtn = document.getElementById('rangeExportBtn');
+        const backToNormalBtn = document.getElementById('backToNormalBtn');
         const webHeader = document.getElementById('webHeader');
         const invoiceHeader = document.getElementById('invoiceHeader');
         const invoiceMeta = document.getElementById('invoiceMeta');
@@ -1160,6 +1339,8 @@
         actionCols.forEach(el => el.style.display = 'none');
         if (previewBtn) previewBtn.style.display = 'none';
         exportBtn.style.display = 'none';
+        if (rangeExportBtn) rangeExportBtn.style.display = 'none';
+        if (backToNormalBtn) backToNormalBtn.style.display = 'none';
         webHeader.style.display = 'none';
         if (floatingBar) floatingBar.style.display = 'none';
 
@@ -1170,8 +1351,10 @@
         // Nonaktifkan atribut contenteditable saat render gambar agar garis batas edit hilang
         document.querySelectorAll('[contenteditable="true"]').forEach(el => el.removeAttribute('contenteditable'));
 
-        const dateObj = new Date(selectedDate + 'T00:00:00');
-        document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        if (!isRangeReportMode) {
+            const dateObj = new Date(selectedDate + 'T00:00:00');
+            document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
         document.getElementById('printTimestamp').innerText = 'Dicetak : ' + new Date().toLocaleString('id-ID');
 
         html2canvas(document.getElementById('captureArea'), {
@@ -1183,24 +1366,33 @@
             useCORS: true,
             allowTaint: true
         }).then(canvas => {
-            renderUIState();
-            actionCols.forEach(el => el.style.display = '');
-            if (previewBtn) previewBtn.style.display = 'inline-flex';
+            if (!isRangeReportMode) {
+                renderUIState();
+                actionCols.forEach(el => el.style.display = '');
+                if (previewBtn) previewBtn.style.display = 'inline-flex';
+            } else {
+                if (backToNormalBtn) backToNormalBtn.style.display = 'inline-flex';
+            }
             exportBtn.style.display = 'inline-flex';
             webHeader.style.display = 'flex';
             invoiceHeader.style.display = 'none';
             invoiceMeta.style.display = 'none';
             invoiceFooter.style.display = 'none';
 
+            const fileName = isRangeReportMode ? `Rekap-Stock-MultiTanggal.jpg` : `Invoice-Stock-${selectedDate}.jpg`;
             const link = document.createElement('a');
-            link.download = `Invoice-Stock-${selectedDate}.jpg`;
+            link.download = fileName;
             link.href = canvas.toDataURL('image/jpeg', 0.95);
             link.click();
         }).catch(err => {
             console.error('Gagal export:', err);
-            renderUIState();
-            actionCols.forEach(el => el.style.display = '');
-            if (previewBtn) previewBtn.style.display = 'inline-flex';
+            if (!isRangeReportMode) {
+                renderUIState();
+                actionCols.forEach(el => el.style.display = '');
+                if (previewBtn) previewBtn.style.display = 'inline-flex';
+            } else {
+                if (backToNormalBtn) backToNormalBtn.style.display = 'inline-flex';
+            }
             exportBtn.style.display = 'inline-flex';
             webHeader.style.display = 'flex';
             invoiceHeader.style.display = 'none';
