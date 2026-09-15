@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Input Data Barang Harian</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas untuk export ke JPG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Header Profesional */
+        .header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: white;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-title h1 i {
+            color: var(--primary-color);
+        }
+
+        .header-title p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Jam Live & Filter Tanggal Container */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .live-clock {
+            background: #f1f5f9;
+            padding: 0.5rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .date-filter-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f1f5f9;
+            padding: 0.4rem 0.875rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .date-filter-box label {
+            font-size: 0.813rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .date-filter-box input[type="date"] {
+            border: none;
+            outline: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            background: transparent;
+            cursor: pointer;
+        }
+
+        /* Card / Form Container */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .form-control {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+        }
+
+        .btn-danger-soft {
+            background-color: #fee2e2;
+            color: var(--danger-color);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 6px;
+        }
+
+        .btn-danger-soft:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        /* Table Styling */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .table-header-bar {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-header-bar h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .empty-state {
+            padding: 3rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+        }
+
+        .notice-banner {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="captureArea">
+    <!-- Header Profesional dengan Jam Live -->
+    <div class="header">
+        <div class="header-title">
+            <h1><i class="fa-solid fa-boxes-stacked"></i> Laporan Stock Bahan Baku</h1>
+            <p>SPPG KOTA SERANG SERANG SERANG 2</p>
+        </div>
+        
+        <div class="header-controls">
+            <!-- Widget Jam Live -->
+            <div class="live-clock" id="liveClock">
+                <i class="fa-regular fa-clock"></i> <span id="clockText">00:00:00</span>
+            </div>
+
+            <!-- Fitur Cari / Pilih Tanggal -->
+            <div class="date-filter-box">
+                <label for="selectedDate"><i class="fa-solid fa-calendar-days"></i></label>
+                <input type="date" id="selectedDate" onchange="onDateChange()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Peringatan jika melihat tanggal masa lalu -->
+    <div class="notice-banner" id="pastDateNotice">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>Anda sedang melihat data arsip masa lalu. Input data baru hanya aktif untuk hari ini.</span>
+    </div>
+
+    <!-- Form Input -->
+    <div class="card" id="formCard">
+        <form id="itemForm" autocomplete="off">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="namaBarang">Nama Bahan Baku</label>
+                    <input type="text" id="namaBarang" class="form-control" placeholder="Ketik atau pilih nama barang..." list="savedItemsList" required>
+                    <datalist id="savedItemsList"></datalist>
+                </div>
+                
+                <div class="form-group">
+                    <label for="satuan">Satuan</label>
+                    <input type="text" id="satuan" class="form-control" placeholder="Pcs, Kg, Box, dll" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="jumlah">Jumlah Hari Ini</label>
+                    <input type="number" id="jumlah" class="form-control" placeholder="0" min="0" required>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabel Data -->
+    <div class="table-container">
+        <div class="table-header-bar">
+            <h2 id="tableTitle">Daftar Stock Bahan Baku</h2>
+            <button type="button" class="btn btn-success" id="exportBtn" onclick="exportToJPG()">
+                <i class="fa-solid fa-file-image"></i> Export ke JPG
+            </button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">No</th>
+                        <th>Nama Bahan Baku</th>
+                        <th style="width: 20%;">Satuan</th>
+                        <th style="width: 20%;">Jumlah</th>
+                        <th style="width: 10%;" class="text-center action-col">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data dimasukkan lewat JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const MASTER_ITEMS_KEY = 'master_saved_items';
+
+    // Live Clock Function
+    function updateLiveClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('clockText').innerText = `${hours}:${minutes}:${seconds}`;
+    }
+    setInterval(updateLiveClock, 1000);
+
+    function getFormattedDate(date = new Date()) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function getCurrentSelectedDate() {
+        return document.getElementById('selectedDate').value || getFormattedDate();
+    }
+
+    function initDatePicker() {
+        const today = getFormattedDate();
+        const dateInput = document.getElementById('selectedDate');
+        dateInput.value = today;
+    }
+
+    function getMasterItems() {
+        return JSON.parse(localStorage.getItem(MASTER_ITEMS_KEY)) || [];
+    }
+
+    function saveMasterItem(nama, satuan) {
+        let master = getMasterItems();
+        const index = master.findIndex(item => item.nama.toLowerCase() === nama.toLowerCase());
+        
+        if (index !== -1) {
+            master[index].satuan = satuan;
+        } else {
+            master.push({ nama, satuan });
+        }
+        localStorage.setItem(MASTER_ITEMS_KEY, JSON.stringify(master));
+        updateDatalist();
+    }
+
+    function updateDatalist() {
+        const master = getMasterItems();
+        const datalist = document.getElementById('savedItemsList');
+        datalist.innerHTML = '';
+        master.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.nama;
+            datalist.appendChild(option);
+        });
+    }
+
+    function getDailyData(dateStr) {
+        const key = `daily_stock_data_${dateStr}`;
+        return JSON.parse(localStorage.getItem(key)) || [];
+    }
+
+    function saveDailyData(dateStr, data) {
+        const key = `daily_stock_data_${dateStr}`;
+        localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    function onDateChange() {
+        renderUIState();
+        renderTable();
+    }
+
+    function renderUIState() {
+        const selectedDate = getCurrentSelectedDate();
+        const today = getFormattedDate();
+        const formCard = document.getElementById('formCard');
+        const noticeBanner = document.getElementById('pastDateNotice');
+        const tableTitle = document.getElementById('tableTitle');
+
+        const dateObj = new Date(selectedDate + 'T00:00:00');
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedName = dateObj.toLocaleDateString('id-ID', options);
+
+        tableTitle.innerText = `Daftar Stock Bahan Baku (${formattedName})`;
+
+        if (selectedDate !== today) {
+            formCard.style.display = 'none';
+            noticeBanner.style.display = 'flex';
+        } else {
+            formCard.style.display = 'block';
+            noticeBanner.style.display = 'none';
+        }
+    }
+
+    function renderTable() {
+        const selectedDate = getCurrentSelectedDate();
+        const data = getDailyData(selectedDate);
+        const tbody = document.getElementById('tableBody');
+        const isToday = (selectedDate === getFormattedDate());
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <p>Tidak ada data stock barang untuk tanggal ini.</p>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        data.forEach((item, index) => {
+            const tr = document.createElement('tr');
+            const actionButton = isToday ? `
+                <button class="btn btn-danger-soft" onclick="deleteItem(${index})" title="Hapus">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            ` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
+
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td><strong>${escapeHtml(item.nama)}</strong></td>
+                <td>${escapeHtml(item.satuan)}</td>
+                <td><strong>${item.jumlah}</strong></td>
+                <td class="text-center action-col">
+                    ${actionButton}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.getElementById('namaBarang').addEventListener('input', function(e) {
+        const val = e.target.value;
+        const master = getMasterItems();
+        const found = master.find(item => item.nama.toLowerCase() === val.toLowerCase());
+        if (found) {
+            document.getElementById('satuan').value = found.satuan;
+        }
+    });
+
+    document.getElementById('itemForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const selectedDate = getCurrentSelectedDate();
+        const today = getFormattedDate();
+
+        if (selectedDate !== today) {
+            alert('Anda hanya dapat menginput data untuk hari ini!');
+            return;
+        }
+
+        const nama = document.getElementById('namaBarang').value.trim();
+        const satuan = document.getElementById('satuan').value.trim();
+        const jumlah = parseInt(document.getElementById('jumlah').value);
+
+        if (!nama || !satuan || isNaN(jumlah)) return;
+
+        saveMasterItem(nama, satuan);
+
+        let dailyData = getDailyData(selectedDate);
+        const existingIndex = dailyData.findIndex(item => item.nama.toLowerCase() === nama.toLowerCase());
+        
+        if (existingIndex !== -1) {
+            dailyData[existingIndex].jumlah += jumlah;
+            dailyData[existingIndex].satuan = satuan;
+        } else {
+            dailyData.push({ nama, satuan, jumlah });
+        }
+
+        saveDailyData(selectedDate, dailyData);
+
+        document.getElementById('itemForm').reset();
+        document.getElementById('namaBarang').focus();
+        renderTable();
+    });
+
+    window.deleteItem = function(index) {
+        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+            const selectedDate = getCurrentSelectedDate();
+            let dailyData = getDailyData(selectedDate);
+            dailyData.splice(index, 1);
+            saveDailyData(selectedDate, dailyData);
+            renderTable();
+        }
+    };
+
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    window.exportToJPG = function() {
+        const formCard = document.getElementById('formCard');
+        const actionCols = document.querySelectorAll('.action-col');
+        const exportBtn = document.getElementById('exportBtn');
+        const noticeBanner = document.getElementById('pastDateNotice');
+
+        if (formCard) formCard.style.display = 'none';
+        if (noticeBanner) noticeBanner.style.display = 'none';
+        actionCols.forEach(el => el.style.display = 'none');
+        exportBtn.style.display = 'none';
+
+        const captureArea = document.getElementById('captureArea');
+        const selectedDate = getCurrentSelectedDate();
+
+        html2canvas(captureArea, {
+            scale: 2,
+            backgroundColor: '#f8fafc',
+            logging: false
+        }).then(canvas => {
+            renderUIState();
+            actionCols.forEach(el => el.style.display = '');
+            exportBtn.style.display = 'inline-flex';
+
+            const link = document.createElement('a');
+            link.download = `Laporan-Stock-${selectedDate}.jpg`;
+            link.href = canvas.toDataURL('image/jpeg', 0.95);
+            link.click();
+        }).catch(err => {
+            console.error('Gagal export gambar:', err);
+            renderUIState();
+            actionCols.forEach(el => el.style.display = '');
+            exportBtn.style.display = 'inline-flex';
+            alert('Terjadi kesalahan saat mengeksport gambar.');
+        });
+    };
+
+    window.onload = function() {
+        initDatePicker();
+        updateLiveClock();
+        renderUIState();
+        updateDatalist();
+        renderTable();
+    };
+</script>
+
+</body>
+</html>
