@@ -244,7 +244,7 @@
             cursor: pointer;
         }
 
-        /* Invoice Header khusus Export (Default Disembunyikan di Layar) */
+        /* Invoice Header khusus Export/Preview */
         .invoice-print-header {
             display: none;
             border-bottom: 2px solid #4f46e5;
@@ -267,12 +267,19 @@
             display: none;
             margin-top: 3rem;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: flex-end;
             text-align: center;
         }
 
         .signature-box {
             width: 240px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .signature-space {
+            min-height: 2.5rem;
         }
 
         .signature-line {
@@ -377,6 +384,12 @@
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
+        .btn-info {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: white;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+
         .btn-danger-soft {
             background: #fee2e2;
             color: var(--danger-color);
@@ -464,7 +477,35 @@
             text-align: center;
         }
 
-        /* Modal */
+        /* Kelas untuk mode Edit Langsung */
+        .editable-active {
+            outline: 2px dashed #4f46e5 !important;
+            background-color: #e0e7ff33 !important;
+            cursor: text !important;
+            border-radius: 4px;
+            padding: 2px 4px;
+        }
+
+        /* Panel Floating Simpan Perubahan Preview */
+        .floating-edit-bar {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 0.875rem 1.75rem;
+            border-radius: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: none;
+            align-items: center;
+            gap: 1.25rem;
+            z-index: 9999;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Modal Umum */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -574,10 +615,18 @@
     </div>
 </div>
 
+<!-- Floating Bar Simpan Perubahan Saat Mode Preview -->
+<div class="floating-edit-bar" id="floatingEditBar">
+    <span><i class="fa-solid fa-pen-to-square"></i> Mode Edit Invoice Aktif: Klik teks mana saja untuk mengubahnya!</span>
+    <button type="button" class="btn btn-success" onclick="saveEditedInvoiceConfig()" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+        <i class="fa-solid fa-floppy-disk"></i> Simpan & Terapkan Permanen
+    </button>
+</div>
+
 <!-- Aplikasi Utama -->
 <div class="container" id="captureArea" style="display: none; background: #ffffff; padding: 2rem; border-radius: 16px;">
     
-    <!-- Header Khusus Invoice (Hanya Muncul Saat Export JPG) -->
+    <!-- Header Khusus Invoice (Hanya Muncul Saat Preview/Export JPG) -->
     <div class="invoice-print-header" id="invoiceHeader">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 1rem;">
@@ -585,8 +634,8 @@
                     <img src="logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
                 </div>
                 <div>
-                    <h2 style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">SPPG KOTA SERANG SERANG SERANG 2</h2>
-                    <p style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten</p>
+                    <h2 id="invTitleHeader" style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">SPPG KOTA SERANG SERANG SERANG 2</h2>
+                    <p id="invSubHeader" style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten</p>
                 </div>
             </div>
             <div style="text-align: right;">
@@ -621,7 +670,7 @@
         </div>
     </div>
 
-    <!-- Informasi Ringkasan Tanggal (Khusus Mode Invoice Export) -->
+    <!-- Informasi Ringkasan Tanggal (Khusus Mode Invoice Preview/Export) -->
     <div class="invoice-print-meta" id="invoiceMeta">
         <div><strong>Periode Tanggal Laporan:</strong> <span id="invoiceDateText">-</span></div>
         <div><strong>Status Dokumen:</strong> Verified & Validated</div>
@@ -662,9 +711,14 @@
     <div class="table-container">
         <div class="table-header-bar">
             <h2 id="tableTitle">Daftar Stock Bahan Baku</h2>
-            <button type="button" class="btn btn-success" id="exportBtn" onclick="exportToJPG()">
-                <i class="fa-solid fa-file-image"></i> Export ke JPG
-            </button>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-info" id="previewBtn" onclick="openCodeModal()">
+                    <i class="fa-solid fa-eye"></i> Admin
+                </button>
+                <button type="button" class="btn btn-success" id="exportBtn" onclick="exportToJPG()">
+                    <i class="fa-solid fa-file-image"></i> Export ke JPG
+                </button>
+            </div>
         </div>
         <div style="overflow-x: auto;">
             <table>
@@ -682,26 +736,49 @@
         </div>
     </div>
 
-    <!-- Footer Tanda Tangan (Khusus Mode Invoice Export) -->
+    <!-- Footer Tanda Tangan (Khusus Mode Invoice / Preview / Export) -->
     <div class="invoice-print-footer" id="invoiceFooter">
         <div class="signature-box">
-            <p>Petugas SO</p>
-            <div class="signature-line">(            )</div>
+            <div>
+                <p id="lblPetugasText">Petugas SO</p>
+                <div class="signature-space"></div>
+            </div>
+            <div class="signature-line" id="valPetugasText">( M Kemal Pasha )</div>
         </div>
         <div class="signature-box">
-            <p>Mengetahui</p>
-            <p>Kepala SPPG Kota Serang Serang Serang 2</p>
-            <div class="signature-line">( Mohamad Fakhrurozi )</div>
+            <div>
+                <p id="lblMengetahuiText">Mengetahui</p>
+                <p id="lblJabatanText">Kepala SPPG Kota Serang Serang Serang 2</p>
+            </div>
+            <div class="signature-line" id="valMengetahuiName">( Mohamad Fakhrurozi )</div>
         </div>
     </div>
 
+</div>
+
+<!-- Modal Input Kode Rahasia (071001) -->
+<div class="modal-overlay" id="codeModal">
+    <div class="modal-box">
+        <div class="modal-icon" style="background: #e0e7ff; color: #4f46e5;"><i class="fa-solid fa-lock"></i></div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Admin</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Masukkan :</p>
+        <div class="error-alert" id="codeError" style="margin-bottom: 0.75rem;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>Kode akses salah!</span>
+        </div>
+        <input type="password" id="secretCodeInput" class="form-control" placeholder="" style="text-align: center; letter-spacing: 2px; font-weight: 700;" autocomplete="off">
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel-modal" onclick="closeCodeModal()">Batal</button>
+            <button type="button" class="btn btn-primary" onclick="verifySecretCode()" style="flex: 1; padding: 0.75rem;">Masuk</button>
+        </div>
+    </div>
 </div>
 
 <!-- Modal Hapus -->
 <div class="modal-overlay" id="deleteModal">
     <div class="modal-box">
         <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-        <h3 style="font-size: 1.25font; margin-bottom: 0.5rem;">Hapus Data Barang?</h3>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Hapus Data Barang?</h3>
         <p style="font-size: 0.9rem; color: var(--text-muted);">Apakah Anda yakin akan menghapus data ini dari sistem?</p>
         <div class="modal-actions">
             <button type="button" class="btn-cancel-modal" onclick="closeDeleteModal()">Batal</button>
@@ -825,7 +902,7 @@
             if (allDatesData) {
                 Object.keys(allDatesData).forEach(dateKey => {
                     const itemsOnDate = allDatesData[dateKey];
-                    if (itemsOnDate) {
+                    if (itemsOnDate && typeof itemsOnDate === 'object') {
                         Object.keys(itemsOnDate).forEach(itemKey => {
                             const item = itemsOnDate[itemKey];
                             if (item && item.nama) {
@@ -858,6 +935,50 @@
         });
     }
 
+    function loadGlobalSignatureConfig() {
+        db.ref('settings/signature').on('value', (snapshot) => {
+            const data = snapshot.val();
+            const def = {
+                headerTitle: "SPPG KOTA SERANG SERANG SERANG 2",
+                headerSub: "Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten",
+                petugasLabel: "Petugas SO",
+                petugasName: "M Kemal Pasha",
+                mengetahuiLabel: "Mengetahui",
+                jabatanLabel: "Kepala SPPG Kota Serang Serang Serang 2",
+                mengetahuiName: "Mohamad Fakhrurozi"
+            };
+            const cfg = data || def;
+
+            document.getElementById('invTitleHeader').innerText = cfg.headerTitle;
+            document.getElementById('invSubHeader').innerText = cfg.headerSub;
+            document.getElementById('lblPetugasText').innerText = cfg.petugasLabel;
+            document.getElementById('valPetugasText').innerText = `( ${cfg.petugasName} )`;
+            document.getElementById('lblMengetahuiText').innerText = cfg.mengetahuiLabel;
+            document.getElementById('lblJabatanText').innerText = cfg.jabatanLabel;
+            document.getElementById('valMengetahuiName').innerText = `( ${cfg.mengetahuiName} )`;
+        });
+    }
+
+    window.saveEditedInvoiceConfig = function() {
+        const cfg = {
+            headerTitle: document.getElementById('invTitleHeader').innerText.trim(),
+            headerSub: document.getElementById('invSubHeader').innerText.trim(),
+            petugasLabel: document.getElementById('lblPetugasText').innerText.trim(),
+            petugasName: document.getElementById('valPetugasText').innerText.replace(/[()]/g, '').trim(),
+            mengetahuiLabel: document.getElementById('lblMengetahuiText').innerText.trim(),
+            jabatanLabel: document.getElementById('lblJabatanText').innerText.trim(),
+            mengetahuiName: document.getElementById('valMengetahuiName').innerText.replace(/[()]/g, '').trim()
+        };
+
+        db.ref('settings/signature').set(cfg).then(() => {
+            alert('Perubahan berhasil disimpan permanen ke database dan diterapkan ke semua invoice!');
+            location.reload();
+        }).catch(err => {
+            console.error('Gagal menyimpan:', err);
+            alert('Terjadi kesalahan saat menyimpan pengaturan.');
+        });
+    };
+
     function onNamaBarangInput() {
         const val = document.getElementById('namaBarang').value.trim();
         if (itemToSatuanMap[val]) {
@@ -870,7 +991,7 @@
         const isToday = (getCurrentSelectedDate() === getFormattedDate());
         tbody.innerHTML = '';
 
-        if (!dataObj) {
+        if (!dataObj || typeof dataObj !== 'object') {
             tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal ini.</td></tr>`;
             return;
         }
@@ -878,19 +999,24 @@
         let index = 0;
         Object.keys(dataObj).forEach(key => {
             const item = dataObj[key];
-            index++;
-            const actionButton = isToday ? `<button class="btn btn-danger-soft" onclick="promptDelete('${key}')"><i class="fa-solid fa-trash"></i></button>` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
-            
-            tbody.innerHTML += `
-                <tr>
-                    <td>${index}</td>
-                    <td><strong>${escapeHtml(item.nama)}</strong></td>
-                    <td>${escapeHtml(item.satuan)}</td>
-                    <td><strong>${item.jumlah}</strong></td>
-                    <td class="text-center action-col">${actionButton}</td>
-                </tr>
-            `;
+            if (item && typeof item === 'object') {
+                index++;
+                const actionButton = isToday ? `<button class="btn btn-danger-soft" onclick="promptDelete('${key}')"><i class="fa-solid fa-trash"></i></button>` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${index}</td>
+                        <td><strong class="editable-item-text" data-key="${key}" data-field="nama">${escapeHtml(item.nama || '')}</strong></td>
+                        <td><span class="editable-item-text" data-key="${key}" data-field="satuan">${escapeHtml(item.satuan || '')}</span></td>
+                        <td><strong class="editable-item-text" data-key="${key}" data-field="jumlah">${item.jumlah || 0}</strong></td>
+                        <td class="text-center action-col">${actionButton}</td>
+                    </tr>
+                `;
+            }
         });
+        if (index === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal ini.</td></tr>`;
+        }
     }
 
     document.getElementById('itemForm').addEventListener('submit', function(e) {
@@ -928,6 +1054,79 @@
         }
     });
 
+    // Kontrol Modal Kode Rahasia (071001)
+    window.openCodeModal = function() {
+        document.getElementById('secretCodeInput').value = '';
+        document.getElementById('codeError').style.display = 'none';
+        document.getElementById('codeModal').classList.add('active');
+        document.getElementById('secretCodeInput').focus();
+    };
+
+    window.closeCodeModal = function() {
+        document.getElementById('codeModal').classList.remove('active');
+    };
+
+    window.verifySecretCode = function() {
+        const code = document.getElementById('secretCodeInput').value.trim();
+        if (code === "071001") {
+            closeCodeModal();
+            enableInvoicePreviewMode();
+        } else {
+            document.getElementById('codeError').style.display = 'flex';
+        }
+    };
+
+    // Fungsi untuk mengaktifkan tampilan preview dan mengizinkan edit langsung di layar
+    window.enableInvoicePreviewMode = function() {
+        const formCard = document.getElementById('formCard');
+        const actionCols = document.querySelectorAll('.action-col');
+        const previewBtn = document.getElementById('previewBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const webHeader = document.getElementById('webHeader');
+        const invoiceHeader = document.getElementById('invoiceHeader');
+        const invoiceMeta = document.getElementById('invoiceMeta');
+        const invoiceFooter = document.getElementById('invoiceFooter');
+        const noticeBanner = document.getElementById('pastDateNotice');
+        const floatingBar = document.getElementById('floatingEditBar');
+        const selectedDate = getCurrentSelectedDate();
+
+        if (formCard) formCard.style.display = 'none';
+        if (noticeBanner) noticeBanner.style.display = 'none';
+        actionCols.forEach(el => el.style.display = 'none');
+        if (previewBtn) previewBtn.style.display = 'none';
+        webHeader.style.display = 'none';
+
+        invoiceHeader.style.display = 'block';
+        invoiceMeta.style.display = 'flex';
+        invoiceFooter.style.display = 'flex';
+        floatingBar.style.display = 'flex';
+
+        const dateObj = new Date(selectedDate + 'T00:00:00');
+        document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('printTimestamp').innerText = 'Di Cetak Tanggal : ' + new Date().toLocaleString('id-ID');
+
+        // Jadikan elemen teks dapat diklik dan diedit langsung (contenteditable)
+        const editableElements = [
+            document.getElementById('invTitleHeader'),
+            document.getElementById('invSubHeader'),
+            document.getElementById('lblPetugasText'),
+            document.getElementById('valPetugasText'),
+            document.getElementById('lblMengetahuiText'),
+            document.getElementById('lblJabatanText'),
+            document.getElementById('valMengetahuiName')
+        ];
+
+        // Tambahkan juga elemen baris tabel
+        document.querySelectorAll('.editable-item-text').forEach(el => editableElements.push(el));
+
+        editableElements.forEach(el => {
+            if(el) {
+                el.setAttribute('contenteditable', 'true');
+                el.classList.add('editable-active');
+            }
+        });
+    };
+
     function escapeHtml(str) {
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
@@ -935,24 +1134,31 @@
     window.exportToJPG = function() {
         const formCard = document.getElementById('formCard');
         const actionCols = document.querySelectorAll('.action-col');
+        const previewBtn = document.getElementById('previewBtn');
         const exportBtn = document.getElementById('exportBtn');
         const webHeader = document.getElementById('webHeader');
         const invoiceHeader = document.getElementById('invoiceHeader');
         const invoiceMeta = document.getElementById('invoiceMeta');
         const invoiceFooter = document.getElementById('invoiceFooter');
         const noticeBanner = document.getElementById('pastDateNotice');
+        const floatingBar = document.getElementById('floatingEditBar');
         const selectedDate = getCurrentSelectedDate();
 
-        // Ubah tampilan ke mode Invoice Profesional
+        // Sembunyikan elemen non-cetak sementara
         if (formCard) formCard.style.display = 'none';
         if (noticeBanner) noticeBanner.style.display = 'none';
         actionCols.forEach(el => el.style.display = 'none');
+        if (previewBtn) previewBtn.style.display = 'none';
         exportBtn.style.display = 'none';
         webHeader.style.display = 'none';
+        if (floatingBar) floatingBar.style.display = 'none';
 
         invoiceHeader.style.display = 'block';
         invoiceMeta.style.display = 'flex';
         invoiceFooter.style.display = 'flex';
+
+        // Nonaktifkan atribut contenteditable saat render gambar agar garis batas edit hilang
+        document.querySelectorAll('[contenteditable="true"]').forEach(el => el.removeAttribute('contenteditable'));
 
         const dateObj = new Date(selectedDate + 'T00:00:00');
         document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -967,9 +1173,9 @@
             useCORS: true,
             allowTaint: true
         }).then(canvas => {
-            // Kembalikan tampilan normal
             renderUIState();
             actionCols.forEach(el => el.style.display = '');
+            if (previewBtn) previewBtn.style.display = 'inline-flex';
             exportBtn.style.display = 'inline-flex';
             webHeader.style.display = 'flex';
             invoiceHeader.style.display = 'none';
@@ -984,6 +1190,7 @@
             console.error('Gagal export:', err);
             renderUIState();
             actionCols.forEach(el => el.style.display = '');
+            if (previewBtn) previewBtn.style.display = 'inline-flex';
             exportBtn.style.display = 'inline-flex';
             webHeader.style.display = 'flex';
             invoiceHeader.style.display = 'none';
@@ -998,6 +1205,7 @@
         renderUIState();
         listenToDailyData();
         loadMasterDataList();
+        loadGlobalSignatureConfig();
     }
 
     window.onload = checkAuth;
