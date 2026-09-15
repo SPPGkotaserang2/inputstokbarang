@@ -316,6 +316,111 @@
             margin-bottom: 1rem;
             color: #cbd5e1;
         }
+
+        /* Custom Modal Konfirmasi Profesional */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 420px;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            background: #fee2e2;
+            color: var(--danger-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1.25rem auto;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.75rem;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel-modal {
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .btn-cancel-modal:hover {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .btn-confirm-delete {
+            background: var(--danger-color);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-confirm-delete:hover {
+            background: #dc2626;
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -405,6 +510,21 @@
     </div>
 </div>
 
+<!-- Custom Modal Konfirmasi Hapus -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <div class="modal-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h3 class="modal-title">Hapus Data Barang?</h3>
+        <p class="modal-desc">Apakah Anda yakin akan menghapus data ini dari sistem? Tindakan ini tidak dapat dibatalkan.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel-modal" onclick="closeDeleteModal()">Batal</button>
+            <button type="button" class="btn-confirm-delete" id="confirmDeleteBtn">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
 <!-- Firebase SDK Compat Version -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -429,6 +549,7 @@
 
     // Menyimpan mapping riwayat barang ke satuan terakhirnya
     let itemToSatuanMap = {};
+    let itemKeyToDelete = null; // Menyimpan ID data yang akan dihapus
 
     // Live Clock Function
     function updateLiveClock() {
@@ -583,7 +704,7 @@
             const tr = document.createElement('tr');
             
             const actionButton = isToday ? `
-                <button class="btn btn-danger-soft" onclick="deleteItem('${key}')" title="Hapus">
+                <button class="btn btn-danger-soft" onclick="promptDelete('${key}')" title="Hapus">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             ` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
@@ -674,14 +795,28 @@
         });
     });
 
-    window.deleteItem = function(key) {
-        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+    // Fungsi membuka Modal Konfirmasi Hapus
+    window.promptDelete = function(key) {
+        itemKeyToDelete = key;
+        document.getElementById('deleteModal').classList.add('active');
+    };
+
+    // Fungsi menutup Modal Konfirmasi Hapus
+    window.closeDeleteModal = function() {
+        itemKeyToDelete = null;
+        document.getElementById('deleteModal').classList.remove('active');
+    };
+
+    // Event ketika tombol "Ya, Hapus" di dalam modal diklik
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (itemKeyToDelete) {
             const selectedDate = getCurrentSelectedDate();
-            db.ref('stock_barang/' + selectedDate + '/' + key).remove().then(() => {
+            db.ref('stock_barang/' + selectedDate + '/' + itemKeyToDelete).remove().then(() => {
                 loadMasterDataList();
+                closeDeleteModal();
             });
         }
-    };
+    });
 
     function escapeHtml(str) {
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
