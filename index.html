@@ -3,26 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Input Data Barang Harian</title>
+    <title>Sistem Input Bahan Baku Dapur</title>
     <!-- Google Fonts & FontAwesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- html2canvas untuk export ke JPG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-color: #f8fafc;
+            --bg-color: #f1f5f9;
             --card-bg: #ffffff;
-            --text-main: #1e293b;
+            --border-color: #cbd5e1;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --border-color: #e2e8f0;
+            --primary-gradient: linear-gradient(135deg, #4f46e5, #06b6d4);
+            --success-gradient: linear-gradient(135deg, #10b981, #059669);
             --danger-color: #ef4444;
-            --danger-hover: #dc2626;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
         }
 
         * {
@@ -34,16 +31,20 @@
 
         body {
             background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(79, 70, 229, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(6, 182, 212, 0.08) 0%, transparent 40%);
             color: var(--text-main);
             padding: 2rem 1rem;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
         }
 
-        /* Header Profesional */
+        /* Header Cerah & Berwarna */
         .header {
             margin-bottom: 2rem;
             display: flex;
@@ -51,33 +52,28 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            background: white;
-            padding: 1.25rem 1.5rem;
-            border-radius: 12px;
+            background: var(--card-bg);
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
         }
 
         .header-title h1 {
             font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .header-title h1 i {
-            color: var(--primary-color);
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
         }
 
         .header-title p {
-            font-size: 0.875rem;
+            font-size: 0.813rem;
             color: var(--text-muted);
-            margin-top: 0.2rem;
+            margin-top: 0.3rem;
         }
 
-        /* Jam Live & Filter Tanggal Container */
         .header-controls {
             display: flex;
             align-items: center;
@@ -86,50 +82,64 @@
         }
 
         .live-clock {
-            background: #f1f5f9;
-            padding: 0.5rem 0.875rem;
-            border-radius: 8px;
+            background: rgba(79, 70, 229, 0.08);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
             font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--primary-color);
+            font-weight: 700;
+            color: #4f46e5;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(79, 70, 229, 0.2);
         }
 
         .date-filter-box {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background: #f1f5f9;
-            padding: 0.4rem 0.875rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            background: rgba(6, 182, 212, 0.08);
+            padding: 0.4rem 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(6, 182, 212, 0.2);
         }
 
         .date-filter-box label {
-            font-size: 0.813rem;
-            font-weight: 600;
-            color: var(--text-muted);
+            font-size: 0.875rem;
+            color: #0891b2;
         }
 
         .date-filter-box input[type="date"] {
             border: none;
             outline: none;
             font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--primary-color);
+            font-weight: 700;
+            color: var(--text-main);
             background: transparent;
             cursor: pointer;
         }
 
-        /* Card / Form Container */
+        /* Notice Banner */
+        .notice-banner {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #b45309;
+            padding: 0.875rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1);
+        }
+
+        /* Card Form Container */
         .card {
             background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            padding: 1.75rem;
             margin-bottom: 2rem;
             border: 1px solid var(--border-color);
         }
@@ -137,7 +147,7 @@
         .form-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr auto;
-            gap: 1rem;
+            gap: 1.25rem;
             align-items: flex-end;
         }
 
@@ -154,81 +164,97 @@
 
         .form-group label {
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 0.5rem;
-            color: var(--text-main);
+            color: var(--text-muted);
         }
 
         .form-control {
-            padding: 0.75rem;
+            padding: 0.85rem 1rem;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #ffffff;
+            color: var(--text-main);
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+
+        select.form-control {
+            cursor: pointer;
         }
 
         .btn {
-            padding: 0.75rem 1.5rem;
+            padding: 0.85rem 1.75rem;
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 10px;
+            font-weight: 700;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
             font-size: 0.95rem;
         }
 
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .btn-primary {
-            background-color: var(--primary-color);
+            background: var(--primary-gradient);
             color: white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
 
         .btn-primary:hover {
-            background-color: var(--primary-hover);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.5);
+            transform: translateY(-2px);
         }
 
         .btn-success {
-            background-color: var(--success-color);
+            background: var(--success-gradient);
             color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .btn-success:hover {
-            background-color: #059669;
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+            transform: translateY(-2px);
         }
 
         .btn-danger-soft {
-            background-color: #fee2e2;
+            background: #fee2e2;
             color: var(--danger-color);
-            padding: 0.5rem 0.75rem;
+            padding: 0.5rem 0.875rem;
             font-size: 0.875rem;
-            border-radius: 6px;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
         }
 
         .btn-danger-soft:hover {
-            background-color: var(--danger-color);
+            background: var(--danger-color);
             color: white;
         }
 
-        /* Table Styling */
+        /* Table Container */
         .table-container {
             background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
             overflow: hidden;
             border: 1px solid var(--border-color);
         }
 
         .table-header-bar {
-            padding: 1.25rem 1.5rem;
+            padding: 1.5rem 2rem;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
@@ -238,8 +264,9 @@
         }
 
         .table-header-bar h2 {
-            font-size: 1.15rem;
-            font-weight: 600;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
         }
 
         table {
@@ -249,15 +276,16 @@
         }
 
         th, td {
-            padding: 1rem 1.5rem;
+            padding: 1.125rem 2rem;
             font-size: 0.95rem;
         }
 
         th {
             background-color: #f8fafc;
-            color: var(--text-muted);
-            font-weight: 600;
+            color: #4f46e5;
+            font-weight: 700;
             border-bottom: 1px solid var(--border-color);
+            letter-spacing: 0.5px;
         }
 
         td {
@@ -284,33 +312,22 @@
         }
 
         .empty-state i {
-            font-size: 2.5rem;
+            font-size: 3rem;
             margin-bottom: 1rem;
             color: #cbd5e1;
-        }
-
-        .notice-banner {
-            background-color: #fef3c7;
-            border: 1px solid #f59e0b;
-            color: #92400e;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            margin-bottom: 1.5rem;
-            display: none;
-            align-items: center;
-            gap: 0.5rem;
         }
     </style>
 </head>
 <body>
 
 <div class="container" id="captureArea">
-    <!-- Header Profesional dengan Jam Live -->
+    <!-- Header Profesional -->
     <div class="header">
-        <div class="header-title">
-            <h1><i class="fa-solid fa-boxes-stacked"></i> Laporan Stock Bahan Baku</h1>
-            <p>SPPG KOTA SERANG SERANG SERANG 2</p>
+        <div class="header-brand">
+            <div class="header-title">
+                <h1>SPPG KOTA SERANG SERANG SERANG 2</h1>
+                <p>Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten 42116</p>
+            </div>
         </div>
         
         <div class="header-controls">
@@ -319,7 +336,7 @@
                 <i class="fa-regular fa-clock"></i> <span id="clockText">00:00:00</span>
             </div>
 
-            <!-- Fitur Cari / Pilih Tanggal -->
+            <!-- Fitur Pilih Tanggal -->
             <div class="date-filter-box">
                 <label for="selectedDate"><i class="fa-solid fa-calendar-days"></i></label>
                 <input type="date" id="selectedDate" onchange="onDateChange()">
@@ -333,19 +350,20 @@
         <span>Anda sedang melihat data arsip masa lalu. Input data baru hanya aktif untuk hari ini.</span>
     </div>
 
-    <!-- Form Input -->
+    <!-- Form Input dengan Autocomplete (Bisa Ketik Manual atau Pilih Riwayat) -->
     <div class="card" id="formCard">
         <form id="itemForm" autocomplete="off">
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="namaBarang">Nama Bahan Baku</label>
-                    <input type="text" id="namaBarang" class="form-control" placeholder="Ketik atau pilih nama barang..." list="savedItemsList" required>
-                    <datalist id="savedItemsList"></datalist>
+                    <label for="namaBarang">Nama Barang/Bahan Baku</label>
+                    <input type="text" id="namaBarang" class="form-control" list="listNamaBarang" placeholder="" oninput="onNamaBarangInput()" required>
+                    <datalist id="listNamaBarang"></datalist>
                 </div>
                 
                 <div class="form-group">
                     <label for="satuan">Satuan</label>
-                    <input type="text" id="satuan" class="form-control" placeholder="Pcs, Kg, Box, dll" required>
+                    <input type="text" id="satuan" class="form-control" list="listSatuan" placeholder="Pcs, Kg, Box, dll" required>
+                    <datalist id="listSatuan"></datalist>
                 </div>
 
                 <div class="form-group">
@@ -373,22 +391,44 @@
                 <thead>
                     <tr>
                         <th style="width: 10%;">No</th>
-                        <th>Nama Bahan Baku</th>
+                        <th>Nama Barang/Bahan Baku</th>
                         <th style="width: 20%;">Satuan</th>
                         <th style="width: 20%;">Jumlah</th>
                         <th style="width: 10%;" class="text-center action-col">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <!-- Data dimasukkan lewat JS -->
+                    <!-- Data dimasukkan lewat Firebase Realtime listener -->
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
+<!-- Firebase SDK Compat Version -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
 <script>
-    const MASTER_ITEMS_KEY = 'master_saved_items';
+    // ==========================================
+    // KONFIGURASI FIREBASE ANDA
+    // ==========================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDhlkDv6EgnKv_XCc0PBYgFoDk1riAO5Vg",
+        authDomain: "so-bahan-baku.firebaseapp.com",
+        databaseURL: "https://so-bahan-baku-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "so-bahan-baku",
+        storageBucket: "so-bahan-baku.firebasestorage.app",
+        messagingSenderId: "1072738824834",
+        appId: "1:1072738824834:web:95eedc782711a0f9e73a9b",
+        measurementId: "G-H5TWSB47C0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Menyimpan mapping riwayat barang ke satuan terakhirnya
+    let itemToSatuanMap = {};
 
     // Live Clock Function
     function updateLiveClock() {
@@ -417,47 +457,9 @@
         dateInput.value = today;
     }
 
-    function getMasterItems() {
-        return JSON.parse(localStorage.getItem(MASTER_ITEMS_KEY)) || [];
-    }
-
-    function saveMasterItem(nama, satuan) {
-        let master = getMasterItems();
-        const index = master.findIndex(item => item.nama.toLowerCase() === nama.toLowerCase());
-        
-        if (index !== -1) {
-            master[index].satuan = satuan;
-        } else {
-            master.push({ nama, satuan });
-        }
-        localStorage.setItem(MASTER_ITEMS_KEY, JSON.stringify(master));
-        updateDatalist();
-    }
-
-    function updateDatalist() {
-        const master = getMasterItems();
-        const datalist = document.getElementById('savedItemsList');
-        datalist.innerHTML = '';
-        master.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.nama;
-            datalist.appendChild(option);
-        });
-    }
-
-    function getDailyData(dateStr) {
-        const key = `daily_stock_data_${dateStr}`;
-        return JSON.parse(localStorage.getItem(key)) || [];
-    }
-
-    function saveDailyData(dateStr, data) {
-        const key = `daily_stock_data_${dateStr}`;
-        localStorage.setItem(key, JSON.stringify(data));
-    }
-
     function onDateChange() {
         renderUIState();
-        renderTable();
+        listenToDailyData();
     }
 
     function renderUIState() {
@@ -471,7 +473,7 @@
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const formattedName = dateObj.toLocaleDateString('id-ID', options);
 
-        tableTitle.innerText = `Daftar Stock Bahan Baku (${formattedName})`;
+        tableTitle.innerText = `Daftar Stock Barang/Bahan Baku (${formattedName})`;
 
         if (selectedDate !== today) {
             formCard.style.display = 'none';
@@ -482,14 +484,87 @@
         }
     }
 
-    function renderTable() {
+    let currentRef = null;
+    function listenToDailyData() {
         const selectedDate = getCurrentSelectedDate();
-        const data = getDailyData(selectedDate);
+        
+        if (currentRef) {
+            currentRef.off();
+        }
+
+        currentRef = db.ref('stock_barang/' + selectedDate);
+        currentRef.on('value', (snapshot) => {
+            const dataObj = snapshot.val();
+            renderTable(dataObj);
+        });
+    }
+
+    // Mengambil data riwayat untuk Datalist (bisa ketik manual / autocomplete)
+    function loadMasterDataList() {
+        db.ref('stock_barang').once('value', (snapshot) => {
+            const allDatesData = snapshot.val();
+            const uniqueBarangSet = new Set();
+            const uniqueSatuanSet = new Set();
+            itemToSatuanMap = {};
+
+            if (allDatesData) {
+                Object.keys(allDatesData).forEach(dateKey => {
+                    const itemsOnDate = allDatesData[dateKey];
+                    if (itemsOnDate) {
+                        Object.keys(itemsOnDate).forEach(itemKey => {
+                            const item = itemsOnDate[itemKey];
+                            if (item && item.nama) {
+                                const namaTrim = item.nama.trim();
+                                uniqueBarangSet.add(namaTrim);
+                                if (item.satuan) {
+                                    const satuanTrim = item.satuan.trim();
+                                    uniqueSatuanSet.add(satuanTrim);
+                                    itemToSatuanMap[namaTrim] = satuanTrim;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Populate Datalist Nama Barang
+            const listNama = document.getElementById('listNamaBarang');
+            listNama.innerHTML = '';
+            Array.from(uniqueBarangSet).sort().forEach(nama => {
+                const opt = document.createElement('option');
+                opt.value = nama;
+                listNama.appendChild(opt);
+            });
+
+            // Populate Datalist Satuan
+            const listSatuan = document.getElementById('listSatuan');
+            listSatuan.innerHTML = '';
+            Array.from(uniqueSatuanSet).sort().forEach(satuan => {
+                const opt = document.createElement('option');
+                opt.value = satuan;
+                listSatuan.appendChild(opt);
+            });
+        });
+    }
+
+    // Otomatis mengisi satuan jika nama barang yang diketik sama dengan riwayat sebelumnya
+    function onNamaBarangInput() {
+        const inputNama = document.getElementById('namaBarang');
+        const inputSatuan = document.getElementById('satuan');
+        const val = inputNama.value.trim();
+
+        if (itemToSatuanMap[val]) {
+            inputSatuan.value = itemToSatuanMap[val];
+        }
+    }
+
+    function renderTable(dataObj) {
         const tbody = document.getElementById('tableBody');
+        const selectedDate = getCurrentSelectedDate();
         const isToday = (selectedDate === getFormattedDate());
         tbody.innerHTML = '';
 
-        if (data.length === 0) {
+        if (!dataObj) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="5" class="empty-state">
@@ -501,16 +576,20 @@
             return;
         }
 
-        data.forEach((item, index) => {
+        let index = 0;
+        Object.keys(dataObj).forEach(key => {
+            const item = dataObj[key];
+            index++;
             const tr = document.createElement('tr');
+            
             const actionButton = isToday ? `
-                <button class="btn btn-danger-soft" onclick="deleteItem(${index})" title="Hapus">
+                <button class="btn btn-danger-soft" onclick="deleteItem('${key}')" title="Hapus">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             ` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
 
             tr.innerHTML = `
-                <td>${index + 1}</td>
+                <td>${index}</td>
                 <td><strong>${escapeHtml(item.nama)}</strong></td>
                 <td>${escapeHtml(item.satuan)}</td>
                 <td><strong>${item.jumlah}</strong></td>
@@ -521,15 +600,6 @@
             tbody.appendChild(tr);
         });
     }
-
-    document.getElementById('namaBarang').addEventListener('input', function(e) {
-        const val = e.target.value;
-        const master = getMasterItems();
-        const found = master.find(item => item.nama.toLowerCase() === val.toLowerCase());
-        if (found) {
-            document.getElementById('satuan').value = found.satuan;
-        }
-    });
 
     document.getElementById('itemForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -548,32 +618,68 @@
 
         if (!nama || !satuan || isNaN(jumlah)) return;
 
-        saveMasterItem(nama, satuan);
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...`;
 
-        let dailyData = getDailyData(selectedDate);
-        const existingIndex = dailyData.findIndex(item => item.nama.toLowerCase() === nama.toLowerCase());
-        
-        if (existingIndex !== -1) {
-            dailyData[existingIndex].jumlah += jumlah;
-            dailyData[existingIndex].satuan = satuan;
-        } else {
-            dailyData.push({ nama, satuan, jumlah });
-        }
+        let isCompleted = false;
+        const timeoutTimer = setTimeout(() => {
+            if (!isCompleted) {
+                isCompleted = true;
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
+                alert("Koneksi ke server lambat atau terhalang. Periksa kembali aturan Rules Firebase Anda.");
+            }
+        }, 7000);
 
-        saveDailyData(selectedDate, dailyData);
+        const ref = db.ref('stock_barang/' + selectedDate);
+        ref.orderByChild('nama').equalTo(nama).once('value', (snapshot) => {
+            if (isCompleted) return;
+            isCompleted = true;
+            clearTimeout(timeoutTimer);
 
-        document.getElementById('itemForm').reset();
-        document.getElementById('namaBarang').focus();
-        renderTable();
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const existingKey = childSnapshot.key;
+                    const existingData = childSnapshot.val();
+                    const newJumlah = parseInt(existingData.jumlah) + jumlah;
+                    
+                    ref.child(existingKey).update({
+                        jumlah: newJumlah,
+                        satuan: satuan
+                    });
+                });
+            } else {
+                ref.push({
+                    nama: nama,
+                    satuan: satuan,
+                    jumlah: jumlah
+                });
+            }
+
+            document.getElementById('itemForm').reset();
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
+            
+            loadMasterDataList();
+        }, (error) => {
+            if (isCompleted) return;
+            isCompleted = true;
+            clearTimeout(timeoutTimer);
+
+            console.error("Gagal menyimpan data:", error);
+            alert("Gagal menyimpan data! Error: " + error.message);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
+        });
     });
 
-    window.deleteItem = function(index) {
+    window.deleteItem = function(key) {
         if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
             const selectedDate = getCurrentSelectedDate();
-            let dailyData = getDailyData(selectedDate);
-            dailyData.splice(index, 1);
-            saveDailyData(selectedDate, dailyData);
-            renderTable();
+            db.ref('stock_barang/' + selectedDate + '/' + key).remove().then(() => {
+                loadMasterDataList();
+            });
         }
     };
 
@@ -597,8 +703,9 @@
 
         html2canvas(captureArea, {
             scale: 2,
-            backgroundColor: '#f8fafc',
-            logging: false
+            backgroundColor: '#ffffff',
+            logging: false,
+            useCORS: true
         }).then(canvas => {
             renderUIState();
             actionCols.forEach(el => el.style.display = '');
@@ -621,8 +728,8 @@
         initDatePicker();
         updateLiveClock();
         renderUIState();
-        updateDatalist();
-        renderTable();
+        listenToDailyData();
+        loadMasterDataList();
     };
 </script>
 
