@@ -37,99 +37,107 @@
             color: var(--text-main);
             padding: 2rem 1rem;
             min-height: 100vh;
+        }
+
+        /* Styling Modal & Screen Login */
+        .login-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        /* Login Container Styling */
-        .login-wrapper {
-            width: 100%;
-            max-width: 440px;
-            margin: auto;
-            display: block;
+            z-index: 10000;
         }
 
         .login-card {
             background: var(--card-bg);
-            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
             padding: 2.5rem 2rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             border: 1px solid var(--border-color);
-        }
-
-        .login-header {
             text-align: center;
-            margin-bottom: 2rem;
         }
 
-        .login-icon {
-            width: 64px;
-            height: 64px;
-            background: var(--primary-gradient);
-            color: white;
-            border-radius: 16px;
+        .login-logo {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 1.25rem auto;
+            border-radius: 50%;
+            background: #e0e7ff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.75rem;
-            margin: 0 auto 1.25rem auto;
-            box-shadow: 0 8px 16px rgba(79, 70, 229, 0.3);
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+            border: 3px solid #ffffff;
+        }
+
+        .login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .login-logo i {
+            font-size: 2.5rem;
+            color: #4f46e5;
         }
 
         .login-header h2 {
             font-size: 1.5rem;
             font-weight: 800;
-            color: var(--text-main);
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.25rem;
         }
 
         .login-header p {
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-top: 0.35rem;
+            margin-bottom: 1.5rem;
         }
 
-        .input-password-wrapper {
+        .login-form .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+        }
+
+        .password-input-wrapper {
             position: relative;
-            display: flex;
-            align-items: center;
         }
 
-        .toggle-password-btn {
+        .toggle-password {
             position: absolute;
             right: 12px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
+            top: 50%;
+            transform: translateY(-50%);
             cursor: pointer;
-            font-size: 1rem;
-            padding: 4px;
-        }
-
-        .toggle-password-btn:hover {
-            color: var(--text-main);
+            color: var(--text-muted);
         }
 
         .error-alert {
             background: #fee2e2;
-            border: 1px solid #fecaca;
             color: var(--danger-color);
-            padding: 0.75rem 1rem;
-            border-radius: 10px;
-            font-size: 0.875rem;
-            margin-bottom: 1.25rem;
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.825rem;
+            margin-bottom: 1rem;
             display: none;
             align-items: center;
             gap: 0.5rem;
-            font-weight: 500;
         }
 
-        /* App Main Container */
         .container {
             max-width: 950px;
-            width: 100%;
             margin: 0 auto;
-            display: none; /* Hidden by default until login */
         }
 
         /* Header Cerah & Berwarna */
@@ -145,6 +153,35 @@
             border-radius: 16px;
             border: 1px solid var(--border-color);
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .app-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: rgba(79, 70, 229, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .app-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .app-logo i {
+            font-size: 1.75rem;
+            color: #4f46e5;
         }
 
         .header-title h1 {
@@ -248,11 +285,6 @@
         .form-group {
             display: flex;
             flex-direction: column;
-            margin-bottom: 1.25rem;
-        }
-
-        .form-group:last-child {
-            margin-bottom: 0;
         }
 
         .form-group label {
@@ -297,10 +329,6 @@
             font-size: 0.95rem;
         }
 
-        .btn-full {
-            width: 100%;
-        }
-
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -328,26 +356,6 @@
             transform: translateY(-2px);
         }
 
-        .btn-logout {
-            background: #fee2e2;
-            color: var(--danger-color);
-            border: 1px solid #fecaca;
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
-            font-size: 0.875rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-logout:hover {
-            background: var(--danger-color);
-            color: white;
-        }
-
         .btn-danger-soft {
             background: #fee2e2;
             color: var(--danger-color);
@@ -360,6 +368,22 @@
         .btn-danger-soft:hover {
             background: var(--danger-color);
             color: white;
+        }
+
+        .btn-logout {
+            background: #f1f5f9;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .btn-logout:hover {
+            background: #fee2e2;
+            color: var(--danger-color);
+            border-color: #fecaca;
         }
 
         /* Table Container */
@@ -435,7 +459,7 @@
             color: #cbd5e1;
         }
 
-        /* Custom Modal Konfirmasi */
+        /* Custom Modal Konfirmasi Profesional */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -543,50 +567,52 @@
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
+<!-- Layar Login -->
 <div class="login-wrapper" id="loginScreen">
     <div class="login-card">
+        <!-- Logo Login: Ganti src="logo.png" jika menggunakan file lokal -->
+        <div class="login-logo">
+            <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.remove(); document.querySelector('.login-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';">
+        </div>
+        
         <div class="login-header">
-            <div class="login-icon">
-                <i class="fa-solid fa-kitchen-set"></i>
-            </div>
-            <h3>Input Data Stock Bahan Baku</h3>
-            <p>SPPG KOTA SERANG SERANG SERANG 2</p>
+            <h2>Halaman Login</h2>
+            <p>Masukkan kredensial Anda untuk melanjutkan</p>
         </div>
 
         <div class="error-alert" id="loginError">
             <i class="fa-solid fa-circle-exclamation"></i>
-            <span id="loginErrorMsg">Username atau Password salah!</span>
+            <span>Nama Pengguna atau Sandi salah!</span>
         </div>
 
-        <form id="loginForm" autocomplete="off">
+        <form class="login-form" id="loginForm" autocomplete="off">
             <div class="form-group">
-                <label for="loginUsername">Username</label>
-                <input type="text" id="loginUsername" class="form-control" placeholder="Masukkan Username" required>
+                <label for="username">Nama Pengguna</label>
+                <input type="text" id="username" class="form-control" placeholder="Masukkan Username" required>
             </div>
-
             <div class="form-group">
-                <label for="loginPassword">Kata Sandi</label>
-                <div class="input-password-wrapper">
-                    <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan Kata Sandi" required>
-                    <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility()">
-                        <i class="fa-regular fa-eye" id="toggleIcon"></i>
-                    </button>
+                <label for="password">Kata Sandi</label>
+                <div class="password-input-wrapper">
+                    <input type="password" id="password" class="form-control" placeholder="Masukkan Kata Sandi" required>
+                    <i class="fa-regular fa-eye toggle-password" id="togglePassword" onclick="togglePasswordVisibility()"></i>
                 </div>
             </div>
-
-            <button type="submit" class="btn btn-primary btn-full" style="margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
                 <i class="fa-solid fa-right-to-bracket"></i> Masuk
             </button>
         </form>
     </div>
 </div>
 
-<!-- MAIN APP VIEW -->
-<div class="container" id="captureArea">
+<!-- Aplikasi Utama -->
+<div class="container" id="captureArea" style="display: none;">
     <!-- Header Profesional -->
     <div class="header">
         <div class="header-brand">
+            <!-- Logo Header Aplikasi -->
+            <div class="app-logo">
+                <img src="logo.png" alt="Logo Header" onerror="this.onerror=null; this.remove(); document.querySelector('.app-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';">
+            </div>
             <div class="header-title">
                 <h1>SPPG KOTA SERANG SERANG SERANG 2</h1>
                 <p>Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten 42116</p>
@@ -605,8 +631,8 @@
                 <input type="date" id="selectedDate" onchange="onDateChange()">
             </div>
 
-            <!-- Tombol Logout -->
-            <button class="btn-logout" id="logoutBtn" onclick="handleLogout()" title="Keluar">
+            <!-- Tombol Keluar (Logout) -->
+            <button class="btn btn-logout" onclick="logout()" title="Keluar dari sistem" id="logoutBtn">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </button>
         </div>
@@ -622,19 +648,19 @@
     <div class="card" id="formCard">
         <form id="itemForm" autocomplete="off">
             <div class="form-grid">
-                <div class="form-group" style="margin-bottom:0;">
+                <div class="form-group">
                     <label for="namaBarang">Nama Barang/Bahan Baku</label>
                     <input type="text" id="namaBarang" class="form-control" list="listNamaBarang" placeholder="" oninput="onNamaBarangInput()" required>
                     <datalist id="listNamaBarang"></datalist>
                 </div>
                 
-                <div class="form-group" style="margin-bottom:0;">
+                <div class="form-group">
                     <label for="satuan">Satuan</label>
                     <input type="text" id="satuan" class="form-control" list="listSatuan" placeholder="Pcs, Kg, Gram, L, Btl, Rcg, dll" required>
                     <datalist id="listSatuan"></datalist>
                 </div>
 
-                <div class="form-group" style="margin-bottom:0;">
+                <div class="form-group">
                     <label for="jumlah">Jumlah Hari Ini</label>
                     <input type="number" id="jumlah" class="form-control" placeholder="0" min="0" required>
                 </div>
@@ -666,7 +692,7 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <!-- Data dimasukkan lewat Firebase Realtime listener -->
+                    <!-- Data dimasukkan via Firebase Realtime Database -->
                 </tbody>
             </table>
         </div>
@@ -694,6 +720,63 @@
 
 <script>
     // ==========================================
+    // KONFIGURASI LOGIN (Kredensial)
+    // ==========================================
+    const AUTH_USERNAME = "AdminSo";
+    const AUTH_PASSWORD = "Admin123";
+
+    function checkAuth() {
+        const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+        const loginScreen = document.getElementById('loginScreen');
+        const captureArea = document.getElementById('captureArea');
+
+        if (isLoggedIn === 'true') {
+            loginScreen.style.display = 'none';
+            captureArea.style.display = 'block';
+            initApp();
+        } else {
+            loginScreen.style.display = 'flex';
+            captureArea.style.display = 'none';
+        }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value;
+        const errorAlert = document.getElementById('loginError');
+
+        if (user === AUTH_USERNAME && pass === AUTH_PASSWORD) {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            errorAlert.style.display = 'none';
+            checkAuth();
+        } else {
+            errorAlert.style.display = 'flex';
+        }
+    });
+
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('togglePassword');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+
+    function logout() {
+        sessionStorage.removeItem('isLoggedIn');
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        checkAuth();
+    }
+
+    // ==========================================
     // KONFIGURASI FIREBASE ANDA
     // ==========================================
     const firebaseConfig = {
@@ -710,64 +793,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ==========================================
-    // LOGIKA LOGIN & AKSES APLIKASI
-    // ==========================================
-    const CRED_USER = "AdminSo";
-    const CRED_PASS = "Admin123";
-
-    function checkAuthSession() {
-        const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-        const loginScreen = document.getElementById('loginScreen');
-        const mainApp = document.getElementById('captureArea');
-
-        if (isLoggedIn === 'true') {
-            loginScreen.style.display = 'none';
-            mainApp.style.display = 'block';
-            initMainApp();
-        } else {
-            loginScreen.style.display = 'block';
-            mainApp.style.display = 'none';
-        }
-    }
-
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const userInput = document.getElementById('loginUsername').value.trim();
-        const passInput = document.getElementById('loginPassword').value.trim();
-        const errorAlert = document.getElementById('loginError');
-
-        if (userInput === CRED_USER && passInput === CRED_PASS) {
-            sessionStorage.setItem('isLoggedIn', 'true');
-            errorAlert.style.display = 'none';
-            checkAuthSession();
-        } else {
-            errorAlert.style.display = 'flex';
-        }
-    });
-
-    function togglePasswordVisibility() {
-        const passInput = document.getElementById('loginPassword');
-        const toggleIcon = document.getElementById('toggleIcon');
-        
-        if (passInput.type === 'password') {
-            passInput.type = 'text';
-            toggleIcon.className = 'fa-regular fa-eye-slash';
-        } else {
-            passInput.type = 'password';
-            toggleIcon.className = 'fa-regular fa-eye';
-        }
-    }
-
-    function handleLogout() {
-        sessionStorage.removeItem('isLoggedIn');
-        document.getElementById('loginForm').reset();
-        checkAuthSession();
-    }
-
-    // Menyimpan mapping riwayat barang ke satuan terakhirnya
     let itemToSatuanMap = {};
-    let itemKeyToDelete = null; // Menyimpan ID data yang akan dihapus
+    let itemKeyToDelete = null;
 
     // Live Clock Function
     function updateLiveClock() {
@@ -775,10 +802,7 @@
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
-        const clockEl = document.getElementById('clockText');
-        if (clockEl) {
-            clockEl.innerText = `${hours}:${minutes}:${seconds}`;
-        }
+        document.getElementById('clockText').innerText = `${hours}:${minutes}:${seconds}`;
     }
     setInterval(updateLiveClock, 1000);
 
@@ -796,9 +820,7 @@
     function initDatePicker() {
         const today = getFormattedDate();
         const dateInput = document.getElementById('selectedDate');
-        if (dateInput) {
-            dateInput.value = today;
-        }
+        dateInput.value = today;
     }
 
     function onDateChange() {
@@ -817,16 +839,14 @@
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const formattedName = dateObj.toLocaleDateString('id-ID', options);
 
-        if (tableTitle) {
-            tableTitle.innerText = `Daftar Stock Barang/Bahan Baku (${formattedName})`;
-        }
+        tableTitle.innerText = `Daftar Stock Barang/Bahan Baku (${formattedName})`;
 
         if (selectedDate !== today) {
-            if (formCard) formCard.style.display = 'none';
-            if (noticeBanner) noticeBanner.style.display = 'flex';
+            formCard.style.display = 'none';
+            noticeBanner.style.display = 'flex';
         } else {
-            if (formCard) formCard.style.display = 'block';
-            if (noticeBanner) noticeBanner.style.display = 'none';
+            formCard.style.display = 'block';
+            noticeBanner.style.display = 'none';
         }
     }
 
@@ -845,7 +865,6 @@
         });
     }
 
-    // Mengambil data riwayat untuk Datalist (bisa ketik manual / autocomplete)
     function loadMasterDataList() {
         db.ref('stock_barang').once('value', (snapshot) => {
             const allDatesData = snapshot.val();
@@ -873,31 +892,24 @@
                 });
             }
 
-            // Populate Datalist Nama Barang
             const listNama = document.getElementById('listNamaBarang');
-            if (listNama) {
-                listNama.innerHTML = '';
-                Array.from(uniqueBarangSet).sort().forEach(nama => {
-                    const opt = document.createElement('option');
-                    opt.value = nama;
-                    listNama.appendChild(opt);
-                });
-            }
+            listNama.innerHTML = '';
+            Array.from(uniqueBarangSet).sort().forEach(nama => {
+                const opt = document.createElement('option');
+                opt.value = nama;
+                listNama.appendChild(opt);
+            });
 
-            // Populate Datalist Satuan
             const listSatuan = document.getElementById('listSatuan');
-            if (listSatuan) {
-                listSatuan.innerHTML = '';
-                Array.from(uniqueSatuanSet).sort().forEach(satuan => {
-                    const opt = document.createElement('option');
-                    opt.value = satuan;
-                    listSatuan.appendChild(opt);
-                });
-            }
+            listSatuan.innerHTML = '';
+            Array.from(uniqueSatuanSet).sort().forEach(satuan => {
+                const opt = document.createElement('option');
+                opt.value = satuan;
+                listSatuan.appendChild(opt);
+            });
         });
     }
 
-    // Otomatis mengisi satuan jika nama barang yang diketik sama dengan riwayat sebelumnya
     function onNamaBarangInput() {
         const inputNama = document.getElementById('namaBarang');
         const inputSatuan = document.getElementById('satuan');
@@ -912,8 +924,6 @@
         const tbody = document.getElementById('tableBody');
         const selectedDate = getCurrentSelectedDate();
         const isToday = (selectedDate === getFormattedDate());
-        if (!tbody) return;
-        
         tbody.innerHTML = '';
 
         if (!dataObj) {
@@ -980,7 +990,7 @@
                 isCompleted = true;
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
-                alert("Koneksi ke server lambat atau terhalang. Periksa kembali aturan Rules Firebase Anda.");
+                alert("Koneksi ke server lambat atau terhalang.");
             }
         }, 7000);
 
@@ -1012,33 +1022,27 @@
             document.getElementById('itemForm').reset();
             submitBtn.disabled = false;
             submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
-            
             loadMasterDataList();
         }, (error) => {
             if (isCompleted) return;
             isCompleted = true;
             clearTimeout(timeoutTimer);
-
-            console.error("Gagal menyimpan data:", error);
             alert("Gagal menyimpan data! Error: " + error.message);
             submitBtn.disabled = false;
             submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
         });
     });
 
-    // Fungsi membuka Modal Konfirmasi Hapus
     window.promptDelete = function(key) {
         itemKeyToDelete = key;
         document.getElementById('deleteModal').classList.add('active');
     };
 
-    // Fungsi menutup Modal Konfirmasi Hapus
     window.closeDeleteModal = function() {
         itemKeyToDelete = null;
         document.getElementById('deleteModal').classList.remove('active');
     };
 
-    // Event ketika tombol "Ya, Hapus" di dalam modal diklik
     document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
         if (itemKeyToDelete) {
             const selectedDate = getCurrentSelectedDate();
@@ -1053,12 +1057,13 @@
         return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
+    // Fungsi Export JPG (Dilengkapi penanganan Gambar Lokal & Tombol Logout)
     window.exportToJPG = function() {
         const formCard = document.getElementById('formCard');
         const actionCols = document.querySelectorAll('.action-col');
         const exportBtn = document.getElementById('exportBtn');
-        const noticeBanner = document.getElementById('pastDateNotice');
         const logoutBtn = document.getElementById('logoutBtn');
+        const noticeBanner = document.getElementById('pastDateNotice');
 
         if (formCard) formCard.style.display = 'none';
         if (noticeBanner) noticeBanner.style.display = 'none';
@@ -1075,7 +1080,8 @@
             width: 950,
             backgroundColor: '#ffffff',
             logging: false,
-            useCORS: true
+            useCORS: true,
+            allowTaint: true
         }).then(canvas => {
             renderUIState();
             actionCols.forEach(el => el.style.display = '');
@@ -1096,7 +1102,7 @@
         });
     };
 
-    function initMainApp() {
+    function initApp() {
         initDatePicker();
         updateLiveClock();
         renderUIState();
@@ -1105,7 +1111,7 @@
     }
 
     window.onload = function() {
-        checkAuthSession();
+        checkAuth();
     };
 </script>
 
