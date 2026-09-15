@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- Meta viewport dinamis (Default terkunci untuk login, nanti diubah via JS setelah login) -->
     <meta name="viewport" id="viewportMeta" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Input Bahan Baku Dapur</title>
     <!-- Google Fonts & FontAwesome -->
@@ -142,6 +141,12 @@
         .container {
             width: 950px;
             margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+        .container.range-mode {
+            width: 100% !important;
+            max-width: 98vw;
         }
 
         /* Header Cerah & Berwarna */
@@ -456,8 +461,8 @@
         }
 
         th, td {
-            padding: 1.125rem 2rem;
-            font-size: 0.95rem;
+            padding: 1.125rem 1.5rem;
+            font-size: 0.925rem;
         }
 
         th {
@@ -466,6 +471,7 @@
             font-weight: 700;
             border-bottom: 1px solid var(--border-color);
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         td {
@@ -737,13 +743,13 @@
             </div>
         </div>
         <div style="overflow-x: auto;">
-            <table>
+            <table id="mainTable">
                 <thead>
-                    <tr>
-                        <th style="width: 10%;">No</th>
+                    <tr id="tableHeadRow">
+                        <th style="width: 8%;">No</th>
                         <th id="thNamaCol">Nama Barang/Bahan Baku</th>
-                        <th style="width: 20%;">Satuan</th>
-                        <th style="width: 20%;" id="thJumlahCol">Jumlah</th>
+                        <th style="width: 15%;">Satuan</th>
+                        <th style="width: 15%;" id="thJumlahCol">Jumlah</th>
                         <th style="width: 10%;" class="text-center action-col" id="thAksiCol">Aksi</th>
                     </tr>
                 </thead>
@@ -794,8 +800,8 @@
 <div class="modal-overlay" id="rangeModal">
     <div class="modal-box" style="max-width: 460px; text-align: left;">
         <div class="modal-icon" style="background: #fef3c7; color: #d97706; margin: 0 auto 1rem auto;"><i class="fa-solid fa-calendar-days"></i></div>
-        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center;">Rekap Laporan Multi-Tanggal</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;">Pilih rentang tanggal rekap (misal tgl 1 s/d 30). Data barang yang sama dari semua tanggal akan otomatis dijumlahkan.</p>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center;">Rekap Laporan Multi-Tanggal (Matriks)</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;">Pilih rentang tanggal (misal tanggal 1 s/d 30). Kolom tanggal akan berjejer ke samping dan jumlah per hari tampil di bawahnya.</p>
         
         <div class="form-group" style="margin-bottom: 1rem;">
             <label for="startDateRange">Dari Tanggal:</label>
@@ -834,6 +840,8 @@
     const AUTH_USERNAME = "AdminSo";
     const AUTH_PASSWORD = "Admin123";
     let isRangeReportMode = false;
+    let cachedDatesList = [];
+    let cachedAggregatedData = [];
 
     function checkAuth() {
         const isLoggedIn = sessionStorage.getItem('isLoggedIn');
@@ -939,7 +947,7 @@
         const selectedDate = getCurrentSelectedDate();
         if (currentRef) currentRef.off();
         currentRef = db.ref('stock_barang/' + selectedDate);
-        currentRef.on('value', (snapshot) => renderTable(snapshot.val()));
+        currentRef.on('value', (snapshot) => renderTableDaily(snapshot.val()));
     }
 
     function loadMasterDataList() {
@@ -1036,7 +1044,16 @@
         }
     }
 
-    function renderTable(dataObj) {
+    function renderTableDaily(dataObj) {
+        const headRow = document.getElementById('tableHeadRow');
+        headRow.innerHTML = `
+            <th style="width: 8%;">No</th>
+            <th>Nama Barang/Bahan Baku</th>
+            <th style="width: 15%;">Satuan</th>
+            <th style="width: 15%;">Jumlah</th>
+            <th style="width: 10%;" class="text-center action-col">Aksi</th>
+        `;
+
         const tbody = document.getElementById('tableBody');
         const isToday = (getCurrentSelectedDate() === getFormattedDate());
         tbody.innerHTML = '';
@@ -1134,7 +1151,7 @@
         document.getElementById('rangeModal').classList.remove('active');
     };
 
-    // Fungsi membuat laporan rekap multi-tanggal
+    // Fungsi membuat laporan rekap multi-tanggal bentuk Matriks Tanggal ke Samping
     window.generateRangeReport = function() {
         const startStr = document.getElementById('startDateRange').value;
         const endStr = document.getElementById('endDateRange').value;
@@ -1153,13 +1170,19 @@
 
         db.ref('stock_barang').once('value', (snapshot) => {
             const allData = snapshot.val() || {};
-            const aggregatedMap = {}; // key: namaBarangLower, val: {nama, satuan, jumlah}
+            const datesList = [];
+            const aggregatedMap = {}; // key: namaBarangLower, val: {nama, satuan, daily: {dateStr: qty}}
 
-            let curr = new Date(startStr);
-            const last = new Date(endStr);
+            let curr = new Date(startStr + 'T00:00:00');
+            const last = new Date(endStr + 'T00:00:00');
 
             while (curr <= last) {
-                const dateKey = getFormattedDate(curr);
+                datesList.push(getFormattedDate(curr));
+                curr.setDate(curr.getDate() + 1);
+            }
+
+            // Kumpulkan data per tanggal
+            datesList.forEach(dateKey => {
                 const dayData = allData[dateKey];
                 if (dayData && typeof dayData === 'object') {
                     Object.keys(dayData).forEach(k => {
@@ -1171,28 +1194,25 @@
                             const sat = item.satuan ? item.satuan.trim() : '';
 
                             if (!aggregatedMap[mapKey]) {
-                                aggregatedMap[mapKey] = { nama: cleanName, satuan: sat, jumlah: 0 };
+                                aggregatedMap[mapKey] = { nama: cleanName, satuan: sat, daily: {} };
                             }
-                            aggregatedMap[mapKey].jumlah += qty;
-                            if (sat) aggregatedMap[mapKey].satuan = sat; // update satuan terakhir jika ada
+                            aggregatedMap[mapKey].daily[dateKey] = (aggregatedMap[mapKey].daily[dateKey] || 0) + qty;
+                            if (sat) aggregatedMap[mapKey].satuan = sat;
                         }
                     });
                 }
-                curr.setDate(curr.getDate() + 1);
-            }
+            });
 
-            // Ubah ke array dan urutkan abjad nama barang
-            const aggregatedList = Object.values(aggregatedMap).sort((a, b) => a.nama.localeCompare(b.nama));
+            cachedDatesList = datesList;
+            cachedAggregatedData = Object.values(aggregatedMap).sort((a, b) => a.nama.localeCompare(b.nama));
             
-            // Aktifkan mode rekap multi-tanggal tampilan invoice
             isRangeReportMode = true;
-            renderRangeReportUI(startStr, endStr, aggregatedList);
+            renderRangeReportMatrix(startStr, endStr, cachedDatesList, cachedAggregatedData);
         });
     };
 
-    function renderRangeReportUI(startStr, endStr, listData) {
+    function renderRangeReportMatrix(startStr, endStr, datesList, listData) {
         const formCard = document.getElementById('formCard');
-        const actionCols = document.querySelectorAll('.action-col');
         const previewBtn = document.getElementById('previewBtn');
         const exportBtn = document.getElementById('exportBtn');
         const rangeExportBtn = document.getElementById('rangeExportBtn');
@@ -1203,12 +1223,13 @@
         const invoiceFooter = document.getElementById('invoiceFooter');
         const noticeBanner = document.getElementById('pastDateNotice');
         const floatingBar = document.getElementById('floatingEditBar');
+        const container = document.getElementById('captureArea');
 
         if (formCard) formCard.style.display = 'none';
         if (noticeBanner) noticeBanner.style.display = 'none';
-        actionCols.forEach(el => el.style.display = 'none');
         if (previewBtn) previewBtn.style.display = 'none';
         webHeader.style.display = 'none';
+        container.classList.add('range-mode');
 
         invoiceHeader.style.display = 'block';
         invoiceMeta.style.display = 'flex';
@@ -1217,45 +1238,64 @@
         if (rangeExportBtn) rangeExportBtn.style.display = 'none';
         if (backToNormalBtn) backToNormalBtn.style.display = 'inline-flex';
 
-        document.getElementById('badgeReportType').innerText = 'REKAP LAPORAN BULANAN/RENTANG';
+        document.getElementById('badgeReportType').innerText = 'REKAP LAPORAN MATRIKS TANGGAL';
 
         const dStart = new Date(startStr + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
         const dEnd = new Date(endStr + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
         document.getElementById('invoiceDateText').innerText = `${dStart} s/d ${dEnd}`;
         document.getElementById('printTimestamp').innerText = 'Di Cetak Tanggal : ' + new Date().toLocaleString('id-ID');
 
-        document.getElementById('tableTitle').innerText = `Rekap Total Stock Bahan Baku (${dStart} s/d ${dEnd})`;
+        // Judul tabel rekap diubah tanpa menyertakan keterangan tanggal dalam kurung di atasnya
+        document.getElementById('tableTitle').innerText = `Rekap Stock Bahan Baku`;
 
+        // Rancang Header Tabel Berjejer ke Samping
+        const headRow = document.getElementById('tableHeadRow');
+        let headHTML = `
+            <th style="width: 5%;">No</th>
+            <th style="min-width: 160px;">Nama Barang/Bahan Baku</th>
+            <th style="width: 90px;">Satuan</th>
+        `;
+
+        datesList.forEach(dKey => {
+            const dayNum = dKey.split('-')[2]; // Ambil tanggalnya saja (01, 02, dst)
+            headHTML += `<th class="text-center" style="min-width: 55px;">${dayNum}</th>`;
+        });
+        headHTML += `<th class="text-center" style="min-width: 75px; background: #e0e7ff; color: #4f46e5;">Total</th>`;
+        headRow.innerHTML = headHTML;
+
+        // Rancang Body Tabel Matriks
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
 
         if (listData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock pada rentang tanggal tersebut.</td></tr>`;
+            const totalCols = 4 + datesList.length;
+            tbody.innerHTML = `<tr><td colspan="${totalCols}" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock pada rentang tanggal tersebut.</td></tr>`;
         } else {
             listData.forEach((item, idx) => {
-                tbody.innerHTML += `
+                let rowHTML = `
                     <tr>
                         <td>${idx + 1}</td>
                         <td><strong>${escapeHtml(item.nama)}</strong></td>
                         <td>${escapeHtml(item.satuan)}</td>
-                        <td><strong>${item.jumlah}</strong></td>
-                    </tr>
                 `;
+
+                let rowTotal = 0;
+                datesList.forEach(dKey => {
+                    const qty = item.daily[dKey] || 0;
+                    rowTotal += qty;
+                    rowHTML += `<td class="text-center">${qty > 0 ? qty : '-'}</td>`;
+                });
+
+                rowHTML += `<td class="text-center" style="font-weight: 800; background: #f8fafc; color: #4f46e5;">${rowTotal}</td>`;
+                rowHTML += `</tr>`;
+                tbody.innerHTML += rowHTML;
             });
         }
-
-        // Sesuaikan header kolom tabel (hapus kolom aksi untuk rekap)
-        document.getElementById('thAksiCol').style.display = 'none';
-        document.querySelectorAll('tr').forEach(row => {
-            const cells = row.children;
-            if (cells.length === 5) {
-                cells[4].style.display = 'none';
-            }
-        });
     }
 
     window.backToNormalView = function() {
         isRangeReportMode = false;
+        document.getElementById('captureArea').classList.remove('range-mode');
         location.reload();
     };
 
@@ -1290,7 +1330,6 @@
         document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         document.getElementById('printTimestamp').innerText = 'Di Cetak Tanggal : ' + new Date().toLocaleString('id-ID');
 
-        // Jadikan elemen teks dapat diklik dan diedit langsung (contenteditable)
         const editableElements = [
             document.getElementById('invTitleHeader'),
             document.getElementById('invSubHeader'),
@@ -1301,7 +1340,6 @@
             document.getElementById('valMengetahuiName')
         ];
 
-        // Tambahkan juga elemen baris tabel jika bukan mode rekap range
         if (!isRangeReportMode) {
             document.querySelectorAll('.editable-item-text').forEach(el => editableElements.push(el));
         }
@@ -1331,9 +1369,9 @@
         const invoiceFooter = document.getElementById('invoiceFooter');
         const noticeBanner = document.getElementById('pastDateNotice');
         const floatingBar = document.getElementById('floatingEditBar');
+        const container = document.getElementById('captureArea');
         const selectedDate = getCurrentSelectedDate();
 
-        // Sembunyikan elemen non-cetak sementara
         if (formCard) formCard.style.display = 'none';
         if (noticeBanner) noticeBanner.style.display = 'none';
         actionCols.forEach(el => el.style.display = 'none');
@@ -1348,7 +1386,6 @@
         invoiceMeta.style.display = 'flex';
         invoiceFooter.style.display = 'flex';
 
-        // Nonaktifkan atribut contenteditable saat render gambar agar garis batas edit hilang
         document.querySelectorAll('[contenteditable="true"]').forEach(el => el.removeAttribute('contenteditable'));
 
         if (!isRangeReportMode) {
@@ -1357,10 +1394,12 @@
         }
         document.getElementById('printTimestamp').innerText = 'Dicetak : ' + new Date().toLocaleString('id-ID');
 
-        html2canvas(document.getElementById('captureArea'), {
+        const targetWidth = isRangeReportMode ? Math.max(950, 600 + (cachedDatesList.length * 55)) : 950;
+
+        html2canvas(container, {
             scale: 2,
-            windowWidth: 950,
-            width: 950,
+            windowWidth: targetWidth,
+            width: targetWidth,
             backgroundColor: '#ffffff',
             logging: false,
             useCORS: true,
@@ -1379,7 +1418,7 @@
             invoiceMeta.style.display = 'none';
             invoiceFooter.style.display = 'none';
 
-            const fileName = isRangeReportMode ? `Rekap-Stock-MultiTanggal.jpg` : `Invoice-Stock-${selectedDate}.jpg`;
+            const fileName = isRangeReportMode ? `Rekap-Matriks-Stock.jpg` : `Invoice-Stock-${selectedDate}.jpg`;
             const link = document.createElement('a');
             link.download = fileName;
             link.href = canvas.toDataURL('image/jpeg', 0.95);
