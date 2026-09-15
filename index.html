@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=950">
     <title>Sistem Input Bahan Baku Dapur</title>
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -136,7 +136,7 @@
         }
 
         .container {
-            max-width: 950px;
+            width: 950px;
             margin: 0 auto;
         }
 
@@ -267,11 +267,12 @@
             display: none;
             margin-top: 3rem;
             justify-content: space-between;
+            align-items: flex-start;
             text-align: center;
         }
 
         .signature-box {
-            width: 200px;
+            width: 240px;
         }
 
         .signature-line {
@@ -310,12 +311,6 @@
             grid-template-columns: 2fr 1fr 1fr auto;
             gap: 1.25rem;
             align-items: flex-end;
-        }
-
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         .form-group {
@@ -691,7 +686,7 @@
     <div class="invoice-print-footer" id="invoiceFooter">
         <div class="signature-box">
             <p>Petugas SO</p>
-            <div class="signature-line">( M Kemal Pasha )</div>
+            <div class="signature-line">(            )</div>
         </div>
         <div class="signature-box">
             <p>Mengetahui</p>
