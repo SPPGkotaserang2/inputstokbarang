@@ -20,6 +20,7 @@
             --primary-gradient: linear-gradient(135deg, #4f46e5, #06b6d4);
             --success-gradient: linear-gradient(135deg, #10b981, #059669);
             --danger-color: #ef4444;
+            --warning-color: #f59e0b;
         }
 
         * {
@@ -405,6 +406,19 @@
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
 
+        .btn-edit-soft {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 0.5rem 0.875rem;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            border: 1px solid #fde68a;
+        }
+
+        .btn-edit-soft:hover {
+            background: #fde68a;
+        }
+
         .btn-danger-soft {
             background: #fee2e2;
             color: var(--danger-color);
@@ -750,7 +764,7 @@
                         <th id="thNamaCol">Nama Barang/Bahan Baku</th>
                         <th style="width: 15%;">Satuan</th>
                         <th style="width: 15%;" id="thJumlahCol">Jumlah</th>
-                        <th style="width: 10%;" class="text-center action-col" id="thAksiCol">Aksi</th>
+                        <th style="width: 15%;" class="text-center action-col" id="thAksiCol">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -792,6 +806,31 @@
         <div class="modal-actions">
             <button type="button" class="btn-cancel-modal" onclick="closeCodeModal()">Batal</button>
             <button type="button" class="btn btn-primary" onclick="verifySecretCode()" style="flex: 1; padding: 0.75rem;">Masuk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Barang -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box" style="max-width: 400px; text-align: left;">
+        <div class="modal-icon" style="background: #fef3c7; color: #d97706; margin: 0 auto 1rem auto;"><i class="fa-solid fa-pen-to-square"></i></div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; text-align: center;">Edit Data Barang</h3>
+        <input type="hidden" id="editItemKey">
+        <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="editNamaBarang">Nama Barang/Bahan Baku</label>
+            <input type="text" id="editNamaBarang" class="form-control" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="editSatuan">Satuan</label>
+            <input type="text" id="editSatuan" class="form-control" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="editJumlah">Jumlah</label>
+            <input type="number" id="editJumlah" class="form-control" min="0" required>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel-modal" onclick="closeEditModal()">Batal</button>
+            <button type="button" class="btn btn-warning" onclick="submitEditData()" style="flex: 1; color: white;">Simpan Perubahan</button>
         </div>
     </div>
 </div>
@@ -1051,7 +1090,7 @@
             <th>Nama Barang/Bahan Baku</th>
             <th style="width: 15%;">Satuan</th>
             <th style="width: 15%;">Jumlah</th>
-            <th style="width: 10%;" class="text-center action-col">Aksi</th>
+            <th style="width: 15%;" class="text-center action-col">Aksi</th>
         `;
 
         const tbody = document.getElementById('tableBody');
@@ -1068,7 +1107,11 @@
             const item = dataObj[key];
             if (item && typeof item === 'object') {
                 index++;
-                const actionButton = isToday ? `<button class="btn btn-danger-soft" onclick="promptDelete('${key}')"><i class="fa-solid fa-trash"></i></button>` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
+                const actionButton = isToday ? `
+                    <div style="display: flex; gap: 0.4rem; justify-content: center;">
+                        <button class="btn btn-edit-soft" onclick="openEditModal('${key}', '${encodeURIComponent(item.nama || '')}', '${encodeURIComponent(item.satuan || '')}', ${item.jumlah || 0})" title="Edit Barang"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-danger-soft" onclick="promptDelete('${key}')" title="Hapus Barang"><i class="fa-solid fa-trash"></i></button>
+                    </div>` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
                 
                 tbody.innerHTML += `
                     <tr>
@@ -1109,6 +1152,44 @@
             loadMasterDataList();
         });
     });
+
+    // Kontrol Modal Edit Data
+    window.openEditModal = function(key, encodedNama, encodedSatuan, jumlah) {
+        document.getElementById('editItemKey').value = key;
+        document.getElementById('editNamaBarang').value = decodeURIComponent(encodedNama);
+        document.getElementById('editSatuan').value = decodeURIComponent(encodedSatuan);
+        document.getElementById('editJumlah').value = jumlah;
+        document.getElementById('editModal').classList.add('active');
+    };
+
+    window.closeEditModal = function() {
+        document.getElementById('editModal').classList.remove('active');
+    };
+
+    window.submitEditData = function() {
+        const key = document.getElementById('editItemKey').value;
+        const nama = document.getElementById('editNamaBarang').value.trim();
+        const satuan = document.getElementById('editSatuan').value.trim();
+        const jumlah = parseInt(document.getElementById('editJumlah').value);
+
+        if (!nama || !satuan || isNaN(jumlah)) {
+            alert('Mohon isi semua data dengan benar.');
+            return;
+        }
+
+        const selectedDate = getCurrentSelectedDate();
+        db.ref('stock_barang/' + selectedDate + '/' + key).update({
+            nama: nama,
+            satuan: satuan,
+            jumlah: jumlah
+        }).then(() => {
+            closeEditModal();
+            loadMasterDataList();
+        }).catch(err => {
+            console.error('Gagal memperbarui data:', err);
+            alert('Terjadi kesalahan saat memperbarui data.');
+        });
+    };
 
     window.promptDelete = (key) => { itemKeyToDelete = key; document.getElementById('deleteModal').classList.add('active'); };
     window.closeDeleteModal = () => { itemKeyToDelete = null; document.getElementById('deleteModal').classList.remove('active'); };
@@ -1245,10 +1326,8 @@
         document.getElementById('invoiceDateText').innerText = `${dStart} s/d ${dEnd}`;
         document.getElementById('printTimestamp').innerText = 'Di Cetak Tanggal : ' + new Date().toLocaleString('id-ID');
 
-        // Judul tabel rekap diubah tanpa menyertakan keterangan tanggal dalam kurung di atasnya
         document.getElementById('tableTitle').innerText = `Rekap Stock Bahan Baku`;
 
-        // Rancang Header Tabel Berjejer ke Samping
         const headRow = document.getElementById('tableHeadRow');
         let headHTML = `
             <th style="width: 5%;">No</th>
@@ -1257,13 +1336,12 @@
         `;
 
         datesList.forEach(dKey => {
-            const dayNum = dKey.split('-')[2]; // Ambil tanggalnya saja (01, 02, dst)
+            const dayNum = dKey.split('-')[2];
             headHTML += `<th class="text-center" style="min-width: 55px;">${dayNum}</th>`;
         });
         headHTML += `<th class="text-center" style="min-width: 75px; background: #e0e7ff; color: #4f46e5;">Total</th>`;
         headRow.innerHTML = headHTML;
 
-        // Rancang Body Tabel Matriks
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
 
@@ -1299,7 +1377,6 @@
         location.reload();
     };
 
-    // Fungsi untuk mengaktifkan tampilan preview dan mengizinkan edit langsung di layar (Mode Harian)
     window.enableInvoicePreviewMode = function() {
         const formCard = document.getElementById('formCard');
         const actionCols = document.querySelectorAll('.action-col');
