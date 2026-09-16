@@ -615,7 +615,7 @@
 <div class="login-wrapper" id="loginScreen">
     <div class="login-card">
         <div class="login-logo">
-            <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.remove(); document.querySelector('.login-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';">
+            <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.remove(); document.querySelector('.login-logo').innerHTML='<i class='fa-solid fa-utensils'></i>';">
         </div>
         <div class="login-header">
             <h2>INPUT DATA</h2>
@@ -656,7 +656,7 @@
 <!-- Aplikasi Utama -->
 <div class="container" id="captureArea" style="display: none; background: #ffffff; padding: 2rem; border-radius: 16px;">
     
-    <!-- Header Khusus Invoice (Hanya Muncul Saat Preview/Export JPG) -->
+    <!-- Header Khusus Invoice (Hanya Muncul Saat Preview/Export PNG) -->
     <div class="invoice-print-header" id="invoiceHeader">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 1rem;">
@@ -679,7 +679,7 @@
     <div class="header" id="webHeader">
         <div class="header-brand">
             <div class="app-logo">
-                <img src="logo.png" alt="Logo Header" onerror="this.onerror=null; this.remove(); document.querySelector('.app-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';">
+                <img src="logo.png" alt="Logo Header" onerror="this.onerror=null; this.remove(); document.querySelector('.app-logo').innerHTML='<i class='fa-solid fa-utensils'></i>';">
             </div>
             <div class="header-title">
                 <h1>SPPG KOTA SERANG SERANG SERANG 2</h1>
@@ -727,8 +727,8 @@
                     <datalist id="listSatuan"></datalist>
                 </div>
                 <div class="form-group">
-                    <label for="jumlah">Jumlah Hari Ini</label>
-                    <input type="number" id="jumlah" class="form-control" placeholder="0" min="0" required>
+                    <label for="jumlah">Jumlah Hari Ini </label>
+                    <input type="text" id="jumlah" class="form-control" placeholder="0 atau 0.5 atau 1,5" required>
                 </div>
                 <button type="submit" id="submitBtn" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Simpan
@@ -748,8 +748,8 @@
                 <button type="button" class="btn btn-info" id="previewBtn" onclick="openCodeModal()">
                     <i class="fa-solid fa-eye"></i> Admin
                 </button>
-                <button type="button" class="btn btn-success" id="exportBtn" onclick="exportToJPG()">
-                    <i class="fa-solid fa-file-image"></i> Export ke JPG
+                <button type="button" class="btn btn-success" id="exportBtn" onclick="promptPetugasBeforeExport()">
+                    <i class="fa-solid fa-file-image"></i> Export ke PNG
                 </button>
                 <button type="button" class="btn btn-primary" id="backToNormalBtn" onclick="backToNormalView()" style="display:none;">
                     <i class="fa-solid fa-arrow-left"></i> Kembali ke Harian
@@ -796,7 +796,7 @@
 <div class="modal-overlay" id="codeModal">
     <div class="modal-box">
         <div class="modal-icon" style="background: #e0e7ff; color: #4f46e5;"><i class="fa-solid fa-lock"></i></div>
-        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;"></h3>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Admin</h3>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;"></p>
         <div class="error-alert" id="codeError" style="margin-bottom: 0.75rem;">
             <i class="fa-solid fa-circle-exclamation"></i>
@@ -806,6 +806,23 @@
         <div class="modal-actions">
             <button type="button" class="btn-cancel-modal" onclick="closeCodeModal()">Batal</button>
             <button type="button" class="btn btn-primary" onclick="verifySecretCode()" style="flex: 1; padding: 0.75rem;">Masuk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pemberitahuan / Pengisian Nama Petugas SO Sebelum Export PNG -->
+<div class="modal-overlay" id="petugasModal">
+    <div class="modal-box" style="max-width: 400px; text-align: left;">
+        <div class="modal-icon" style="background: #e0e7ff; color: #4f46e5; margin: 0 auto 1rem auto;"><i class="fa-solid fa-user-pen"></i></div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center;">Konfirmasi Nama Petugas SO</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;">Silakan isi nama Petugas SO yang bertugas sebelum melakukan export gambar PNG beresolusi tinggi.</p>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label for="inputNamaPetugasSO">Nama Petugas SO</label>
+            <input type="text" id="inputNamaPetugasSO" class="form-control" placeholder="Contoh:" required>
+        </div>
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel-modal" onclick="closePetugasModal()">Batal</button>
+            <button type="button" class="btn btn-success" onclick="proceedExportToPNG()" style="flex: 1; color: white;">Lanjutkan Export PNG</button>
         </div>
     </div>
 </div>
@@ -826,7 +843,7 @@
         </div>
         <div class="form-group" style="margin-bottom: 1.5rem;">
             <label for="editJumlah">Jumlah</label>
-            <input type="number" id="editJumlah" class="form-control" min="0" required>
+            <input type="text" id="editJumlah" class="form-control" required>
         </div>
         <div class="modal-actions">
             <button type="button" class="btn-cancel-modal" onclick="closeEditModal()">Batal</button>
@@ -1039,7 +1056,7 @@
                 headerTitle: "SPPG KOTA SERANG SERANG SERANG 2",
                 headerSub: "Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten",
                 petugasLabel: "Petugas SO",
-                petugasName: "M Kemal Pasha",
+                petugasName: "Riyan",
                 mengetahuiLabel: "Mengetahui",
                 jabatanLabel: "Kepala SPPG Kota Serang Serang Serang 2",
                 mengetahuiName: "Mohamad Fakhrurozi"
@@ -1053,6 +1070,11 @@
             document.getElementById('lblMengetahuiText').innerText = cfg.mengetahuiLabel;
             document.getElementById('lblJabatanText').innerText = cfg.jabatanLabel;
             document.getElementById('valMengetahuiName').innerText = `( ${cfg.mengetahuiName} )`;
+            
+            // Set default input di modal petugas
+            if(document.getElementById('inputNamaPetugasSO')) {
+                document.getElementById('inputNamaPetugasSO').value = cfg.petugasName;
+            }
         });
     }
 
@@ -1083,6 +1105,15 @@
         }
     }
 
+    // Fungsi helper parse jumlah untuk menerima titik (.) dan koma (,)
+    function parseJumlahInput(valStr) {
+        if (!valStr) return 0;
+        // Ganti koma dengan titik supaya bisa di-parseFloat
+        let normalized = String(valStr).trim().replace(',', '.');
+        let num = parseFloat(normalized);
+        return isNaN(num) ? 0 : num;
+    }
+
     function renderTableDaily(dataObj) {
         const headRow = document.getElementById('tableHeadRow');
         headRow.innerHTML = `
@@ -1109,7 +1140,7 @@
                 index++;
                 const actionButton = isToday ? `
                     <div style="display: flex; gap: 0.4rem; justify-content: center;">
-                        <button class="btn btn-edit-soft" onclick="openEditModal('${key}', '${encodeURIComponent(item.nama || '')}', '${encodeURIComponent(item.satuan || '')}', ${item.jumlah || 0})" title="Edit Barang"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-edit-soft" onclick="openEditModal('${key}', '${encodeURIComponent(item.nama || '')}', '${encodeURIComponent(item.satuan || '')}', '${item.jumlah || 0}')" title="Edit Barang"><i class="fa-solid fa-pen"></i></button>
                         <button class="btn btn-danger-soft" onclick="promptDelete('${key}')" title="Hapus Barang"><i class="fa-solid fa-trash"></i></button>
                     </div>` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
                 
@@ -1118,7 +1149,7 @@
                         <td>${index}</td>
                         <td><strong class="editable-item-text" data-key="${key}" data-field="nama">${escapeHtml(item.nama || '')}</strong></td>
                         <td><span class="editable-item-text" data-key="${key}" data-field="satuan">${escapeHtml(item.satuan || '')}</span></td>
-                        <td><strong class="editable-item-text" data-key="${key}" data-field="jumlah">${item.jumlah || 0}</strong></td>
+                        <td><strong class="editable-item-text" data-key="${key}" data-field="jumlah">${item.jumlah !== undefined ? item.jumlah : 0}</strong></td>
                         <td class="text-center action-col">${actionButton}</td>
                     </tr>
                 `;
@@ -1136,17 +1167,20 @@
 
         const nama = document.getElementById('namaBarang').value.trim();
         const satuan = document.getElementById('satuan').value.trim();
-        const jumlah = parseInt(document.getElementById('jumlah').value);
+        const rawJumlah = document.getElementById('jumlah').value;
+        const jumlah = parseJumlahInput(rawJumlah);
+        
         if (!nama || !satuan || isNaN(jumlah)) return;
 
         const ref = db.ref('stock_barang/' + selectedDate);
         ref.orderByChild('nama').equalTo(nama).once('value', (snapshot) => {
             if (snapshot.exists()) {
                 snapshot.forEach((child) => {
-                    ref.child(child.key).update({ jumlah: parseInt(child.val().jumlah) + jumlah, satuan: satuan });
+                    let existingVal = parseJumlahInput(child.val().jumlah);
+                    ref.child(child.key).update({ jumlah: existingVal + jumlah, satuan: satuan });
                 });
             } else {
-                ref.push({ nama, satuan, jumlah });
+                ref.push({ nama, satuan, jumlah: rawJumlah.trim() });
             }
             document.getElementById('itemForm').reset();
             loadMasterDataList();
@@ -1170,9 +1204,10 @@
         const key = document.getElementById('editItemKey').value;
         const nama = document.getElementById('editNamaBarang').value.trim();
         const satuan = document.getElementById('editSatuan').value.trim();
-        const jumlah = parseInt(document.getElementById('editJumlah').value);
+        const rawJumlah = document.getElementById('editJumlah').value;
+        const jumlahNum = parseJumlahInput(rawJumlah);
 
-        if (!nama || !satuan || isNaN(jumlah)) {
+        if (!nama || !satuan || isNaN(jumlahNum)) {
             alert('Mohon isi semua data dengan benar.');
             return;
         }
@@ -1181,7 +1216,7 @@
         db.ref('stock_barang/' + selectedDate + '/' + key).update({
             nama: nama,
             satuan: satuan,
-            jumlah: jumlah
+            jumlah: rawJumlah.trim()
         }).then(() => {
             closeEditModal();
             loadMasterDataList();
@@ -1222,6 +1257,28 @@
         } else {
             document.getElementById('codeError').style.display = 'flex';
         }
+    };
+
+    // Modal Pemberitahuan Nama Petugas Sebelum Export
+    window.promptPetugasBeforeExport = function() {
+        document.getElementById('petugasModal').classList.add('active');
+        document.getElementById('inputNamaPetugasSO').focus();
+    };
+
+    window.closePetugasModal = function() {
+        document.getElementById('petugasModal').classList.remove('active');
+    };
+
+    window.proceedExportToPNG = function() {
+        const namaPetugas = document.getElementById('inputNamaPetugasSO').value.trim();
+        if (!namaPetugas) {
+            alert('Nama Petugas SO harus diisi!');
+            return;
+        }
+        // Update teks tanda tangan petugas di layar secara live sebelum export
+        document.getElementById('valPetugasText').innerText = `( ${namaPetugas} )`;
+        closePetugasModal();
+        exportToPNG();
     };
 
     // Modal Rentang Tanggal
@@ -1271,7 +1328,7 @@
                         if (item && item.nama) {
                             const cleanName = item.nama.trim();
                             const mapKey = cleanName.toLowerCase();
-                            const qty = parseInt(item.jumlah) || 0;
+                            const qty = parseJumlahInput(item.jumlah);
                             const sat = item.satuan ? item.satuan.trim() : '';
 
                             if (!aggregatedMap[mapKey]) {
@@ -1361,10 +1418,10 @@
                 datesList.forEach(dKey => {
                     const qty = item.daily[dKey] || 0;
                     rowTotal += qty;
-                    rowHTML += `<td class="text-center">${qty > 0 ? qty : '-'}</td>`;
+                    rowHTML += `<td class="text-center">${qty > 0 ? (Number.isInteger(qty) ? qty : qty.toFixed(2).replace(/\.?0+$/, '')) : '-'}</td>`;
                 });
 
-                rowHTML += `<td class="text-center" style="font-weight: 800; background: #f8fafc; color: #4f46e5;">${rowTotal}</td>`;
+                rowHTML += `<td class="text-center" style="font-weight: 800; background: #f8fafc; color: #4f46e5;">${Number.isInteger(rowTotal) ? rowTotal : rowTotal.toFixed(2).replace(/\.?0+$/, '')}</td>`;
                 rowHTML += `</tr>`;
                 tbody.innerHTML += rowHTML;
             });
@@ -1430,10 +1487,10 @@
     };
 
     function escapeHtml(str) {
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    window.exportToJPG = function() {
+    window.exportToPNG = function() {
         const formCard = document.getElementById('formCard');
         const actionCols = document.querySelectorAll('.action-col');
         const previewBtn = document.getElementById('previewBtn');
@@ -1473,8 +1530,9 @@
 
         const targetWidth = isRangeReportMode ? Math.max(950, 600 + (cachedDatesList.length * 55)) : 950;
 
+        // Menggunakan scale: 3 untuk resolusi tajam tinggi dan format PNG
         html2canvas(container, {
-            scale: 2,
+            scale: 3,
             windowWidth: targetWidth,
             width: targetWidth,
             backgroundColor: '#ffffff',
@@ -1495,10 +1553,10 @@
             invoiceMeta.style.display = 'none';
             invoiceFooter.style.display = 'none';
 
-            const fileName = isRangeReportMode ? `Rekap-Matriks-Stock.jpg` : `Invoice-Stock-${selectedDate}.jpg`;
+            const fileName = isRangeReportMode ? `Rekap-Matriks-Stock.png` : `Invoice-Stock-${selectedDate}.png`;
             const link = document.createElement('a');
             link.download = fileName;
-            link.href = canvas.toDataURL('image/jpeg', 0.95);
+            link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
         }).catch(err => {
             console.error('Gagal export:', err);
@@ -1514,7 +1572,7 @@
             invoiceHeader.style.display = 'none';
             invoiceMeta.style.display = 'none';
             invoiceFooter.style.display = 'none';
-            alert('Terjadi kesalahan saat mengeksport gambar.');
+            alert('Terjadi kesalahan saat mengeksport gambar PNG.');
         });
     };
 
