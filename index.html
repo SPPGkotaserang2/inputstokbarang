@@ -615,7 +615,7 @@
 <div class="login-wrapper" id="loginScreen">
     <div class="login-card">
         <div class="login-logo">
-            <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.remove(); document.querySelector('.login-logo').innerHTML='<i class='fa-solid fa-utensils'></i>';">
+            <img src="logo.png" alt="Logo" onerror="this.onerror=null; this.remove(); document.querySelector('.login-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';">
         </div>
         <div class="login-header">
             <h2>INPUT DATA</h2>
@@ -679,7 +679,7 @@
     <div class="header" id="webHeader">
         <div class="header-brand">
             <div class="app-logo">
-                <img src="logo.png" alt="Logo Header" onerror="this.onerror=null; this.remove(); document.querySelector('.app-logo').innerHTML='<i class='fa-solid fa-utensils'></i>';">
+                <img src="logo.png" alt="Logo Header" onerror="this.onerror=null; this.remove(); document.querySelector('.app-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';">
             </div>
             <div class="header-title">
                 <h1>SPPG KOTA SERANG SERANG SERANG 2</h1>
@@ -899,6 +899,38 @@
     let cachedDatesList = [];
     let cachedAggregatedData = [];
 
+    // Konfigurasi WhatsApp API
+    const WA_PHONE = "6283111399112";
+    const WA_TOKEN = "uJ8CF79nyQaJbPrVGeeE";
+
+    function sendWhatsAppNotification(message) {
+        const data = new URLSearchParams();
+        data.append('target', WA_PHONE);
+        data.append('message', message);
+        data.append('token', WA_TOKEN);
+
+        fetch('https://api.fonnte.com/send', {
+            method: 'POST',
+            headers: {
+                'Authorization': WA_TOKEN
+            },
+            body: data
+        })
+        .then(response => response.json())
+        .then(result => console.log('WA Notif Response:', result))
+        .catch(error => console.error('Gagal kirim WA:', error));
+    }
+
+    let logoutTimer = null;
+
+    function resetLogoutTimer() {
+        if (logoutTimer) clearTimeout(logoutTimer);
+        // 1 Jam = 3600000 milidetik
+        logoutTimer = setTimeout(() => {
+            logout(true); // Parameter true menandakan logout otomatis karena durasi 1 jam
+        }, 3600000);
+    }
+
     function checkAuth() {
         const isLoggedIn = sessionStorage.getItem('isLoggedIn');
         const viewportMeta = document.getElementById('viewportMeta');
@@ -907,11 +939,13 @@
             viewportMeta.setAttribute('content', 'width=950');
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('captureArea').style.display = 'block';
+            resetLogoutTimer();
             initApp();
         } else {
             viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('captureArea').style.display = 'none';
+            if (logoutTimer) clearTimeout(logoutTimer);
         }
     }
 
@@ -921,6 +955,8 @@
         const pass = document.getElementById('password').value;
         if (user === AUTH_USERNAME && pass === AUTH_PASSWORD) {
             sessionStorage.setItem('isLoggedIn', 'true');
+            // Kirim pesan WhatsApp Berhasil Login
+            sendWhatsAppNotification("🔔 *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nPengguna berhasil *LOGIN* ke Sistem Input Stock Bahan Baku SPPG Kota Serang 2.");
             checkAuth();
         } else {
             document.getElementById('loginError').style.display = 'flex';
@@ -932,8 +968,16 @@
         p.type = p.type === 'password' ? 'text' : 'password';
     }
 
-    function logout() {
+    function logout(isAuto = false) {
         sessionStorage.removeItem('isLoggedIn');
+        if (logoutTimer) clearTimeout(logoutTimer);
+        
+        if (isAuto) {
+            sendWhatsAppNotification("⏰ *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nSistem telah melakukan *LOGOUT OTOMATIS* karena sesi telah melewati batas waktu 1 jam.");
+        } else {
+            sendWhatsAppNotification("🔒 *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nPengguna telah melakukan *LOGOUT* (keluar) dari sistem.");
+        }
+        
         checkAuth();
     }
 
@@ -1071,7 +1115,6 @@
             document.getElementById('lblJabatanText').innerText = cfg.jabatanLabel;
             document.getElementById('valMengetahuiName').innerText = `( ${cfg.mengetahuiName} )`;
             
-            // Set default input di modal petugas
             if(document.getElementById('inputNamaPetugasSO')) {
                 document.getElementById('inputNamaPetugasSO').value = cfg.petugasName;
             }
@@ -1105,10 +1148,8 @@
         }
     }
 
-    // Fungsi helper parse jumlah untuk menerima titik (.) dan koma (,)
     function parseJumlahInput(valStr) {
         if (!valStr) return 0;
-        // Ganti koma dengan titik supaya bisa di-parseFloat
         let normalized = String(valStr).trim().replace(',', '.');
         let num = parseFloat(normalized);
         return isNaN(num) ? 0 : num;
@@ -1187,7 +1228,6 @@
         });
     });
 
-    // Kontrol Modal Edit Data
     window.openEditModal = function(key, encodedNama, encodedSatuan, jumlah) {
         document.getElementById('editItemKey').value = key;
         document.getElementById('editNamaBarang').value = decodeURIComponent(encodedNama);
@@ -1237,7 +1277,6 @@
         }
     });
 
-    // Kontrol Modal Kode Rahasia (071001)
     window.openCodeModal = function() {
         document.getElementById('secretCodeInput').value = '';
         document.getElementById('codeError').style.display = 'none';
@@ -1259,7 +1298,6 @@
         }
     };
 
-    // Modal Pemberitahuan Nama Petugas Sebelum Export
     window.promptPetugasBeforeExport = function() {
         document.getElementById('petugasModal').classList.add('active');
         document.getElementById('inputNamaPetugasSO').focus();
@@ -1275,13 +1313,11 @@
             alert('Nama Petugas SO harus diisi!');
             return;
         }
-        // Update teks tanda tangan petugas di layar secara live sebelum export
         document.getElementById('valPetugasText').innerText = `( ${namaPetugas} )`;
         closePetugasModal();
         exportToPNG();
     };
 
-    // Modal Rentang Tanggal
     window.openRangeModal = function() {
         document.getElementById('rangeModal').classList.add('active');
     };
@@ -1289,7 +1325,6 @@
         document.getElementById('rangeModal').classList.remove('active');
     };
 
-    // Fungsi membuat laporan rekap multi-tanggal bentuk Matriks Tanggal ke Samping
     window.generateRangeReport = function() {
         const startStr = document.getElementById('startDateRange').value;
         const endStr = document.getElementById('endDateRange').value;
@@ -1309,7 +1344,7 @@
         db.ref('stock_barang').once('value', (snapshot) => {
             const allData = snapshot.val() || {};
             const datesList = [];
-            const aggregatedMap = {}; // key: namaBarangLower, val: {nama, satuan, daily: {dateStr: qty}}
+            const aggregatedMap = {};
 
             let curr = new Date(startStr + 'T00:00:00');
             const last = new Date(endStr + 'T00:00:00');
@@ -1319,7 +1354,6 @@
                 curr.setDate(curr.getDate() + 1);
             }
 
-            // Kumpulkan data per tanggal
             datesList.forEach(dateKey => {
                 const dayData = allData[dateKey];
                 if (dayData && typeof dayData === 'object') {
@@ -1530,7 +1564,6 @@
 
         const targetWidth = isRangeReportMode ? Math.max(950, 600 + (cachedDatesList.length * 55)) : 950;
 
-        // Menggunakan scale: 3 untuk resolusi tajam tinggi dan format PNG
         html2canvas(container, {
             scale: 3,
             windowWidth: targetWidth,
