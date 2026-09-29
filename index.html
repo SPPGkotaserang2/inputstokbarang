@@ -252,6 +252,18 @@
             cursor: pointer;
         }
 
+        .location-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .loc-valid { background: #d1fae5; color: #047857; border: 1px solid #a7f3d0; }
+        .loc-invalid { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+
         .invoice-print-header {
             display: none;
             border-bottom: 2px solid #4f46e5;
@@ -686,6 +698,10 @@
             </div>
         </div>
         <div class="header-controls">
+            <!-- STATUS GEOLOKASI PERANGKAT -->
+            <div class="location-badge loc-invalid" id="locStatusBadge">
+                <i class="fa-solid fa-location-crosshairs"></i> <span id="locStatusText">Mengecek Lokasi...</span>
+            </div>
             <div class="live-clock" id="liveClock">
                 <i class="fa-regular fa-clock"></i> <span id="clockText">00:00:00</span>
             </div>
@@ -709,6 +725,11 @@
         <span>Anda sedang melihat data arsip masa lalu. Input data baru hanya aktif untuk hari ini.</span>
     </div>
 
+    <div class="notice-banner" id="locationBlockedNotice" style="background:#fee2e2; border-color:#ef4444; color:#991b1b;">
+        <i class="fa-solid fa-lock"></i>
+        <span><strong>AKSES INPUT DIKUNCI!</strong> Anda tidak berada di area lokasi SPPG D&D SERANG MANDIRI. Silakan berada di lokasi resmi untuk dapat menginput data stock.</span>
+    </div>
+
     <!-- Form Input Data -->
     <div class="card" id="formCard">
         <form id="itemForm" autocomplete="off">
@@ -727,10 +748,10 @@
                     <label for="jumlah">Jumlah Hari Ini</label>
                     <input type="text" id="jumlah" class="form-control" placeholder="0 atau 1.5" required>
                 </div>
-                <!-- FITUR UPLOAD FOTO -->
+                <!-- FITUR UPLOAD FOTO LANGSUNG DARI KAMERA -->
                 <div class="form-group">
-                    <label for="fotoBahan"><i class="fa-solid fa-cloud-arrow-up"></i> Foto Bukti</label>
-                    <input type="file" id="fotoBahan" class="form-control" accept="image/*" required>
+                    <label for="fotoBahan"><i class="fa-solid fa-camera"></i> Foto Bukti Kamera</label>
+                    <input type="file" id="fotoBahan" class="form-control" accept="image/*" capture="environment" required>
                 </div>
                 <button type="submit" id="submitBtn" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Simpan
@@ -917,6 +938,15 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
+    // KOORDINAT TARGET (SPPG D&D SERANG MANDIRI)
+    const TARGET_LAT = -6.1265918;
+    const TARGET_LNG = 106.1490035;
+    const MAX_ALLOWED_DISTANCE_METERS = 200; // Radius toleransi lokasi (200 meter)
+
+    let userCurrentLat = null;
+    let userCurrentLng = null;
+    let isLocationValid = false;
+
     // URL WEB APP GOOGLE APPS SCRIPT
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzb-aEZ4v2bS5VX7RhOC4jP7Upb52K7yEtXSfukiuP3s0EcDiFTfC_eltmWR_zwzsTNgg/exec";
 
@@ -928,6 +958,70 @@
 
     const WA_PHONE = "6283111399112";
     const WA_TOKEN = "uJ8CF79nyQaJbPrVGeeE";
+
+    // FUNGSI MENGHITUNG JARAK ANTARA DUA KOORDINAT (HAVERSINE FORMULA)
+    function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // meter
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δφ = (lat2 - lat1) * Math.PI / 180;
+        const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+        const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                  Math.cos(φ1) * Math.cos(φ2) *
+                  Math.sin(Δλ/2) * Math.sin(Δλ/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        return R * c;
+    }
+
+    // CEK DAN MONITORING LOKASI GPS USER
+    function initGeolocationChecking() {
+        const badge = document.getElementById('locStatusBadge');
+        const badgeText = document.getElementById('locStatusText');
+        const submitBtn = document.getElementById('submitBtn');
+        const blockedNotice = document.getElementById('locationBlockedNotice');
+
+        if (!navigator.geolocation) {
+            badge.className = "location-badge loc-invalid";
+            badgeText.innerText = "GPS Tidak Didukung";
+            isLocationValid = false;
+            if (submitBtn) submitBtn.disabled = true;
+            if (blockedNotice) blockedNotice.style.display = 'flex';
+            return;
+        }
+
+        navigator.geolocation.watchPosition((pos) => {
+            userCurrentLat = pos.coords.latitude;
+            userCurrentLng = pos.coords.longitude;
+            const dist = calculateDistanceMeters(userCurrentLat, userCurrentLng, TARGET_LAT, TARGET_LNG);
+
+            if (dist <= MAX_ALLOWED_DISTANCE_METERS) {
+                isLocationValid = true;
+                badge.className = "location-badge loc-valid";
+                badgeText.innerHTML = `<i class="fa-solid fa-location-dot"></i> Di Lokasi SPPG (${Math.round(dist)}m)`;
+                if (blockedNotice) blockedNotice.style.display = 'none';
+                if (submitBtn && getCurrentSelectedDate() === getFormattedDate()) submitBtn.disabled = false;
+            } else {
+                isLocationValid = false;
+                badge.className = "location-badge loc-invalid";
+                badgeText.innerHTML = `<i class="fa-solid fa-location-pin-lock"></i> Di Luar Lokasi (${Math.round(dist)}m)`;
+                if (blockedNotice) blockedNotice.style.display = 'flex';
+                if (submitBtn) submitBtn.disabled = true;
+            }
+        }, (err) => {
+            console.warn("GPS Error:", err.message);
+            isLocationValid = false;
+            badge.className = "location-badge loc-invalid";
+            badgeText.innerText = "GPS Wajib Aktif";
+            if (blockedNotice) blockedNotice.style.display = 'flex';
+            if (submitBtn) submitBtn.disabled = true;
+        }, {
+            enableHighAccuracy: true,
+            maximumAge: 10000,
+            timeout: 10000
+        });
+    }
 
     // FUNGSI NOTIFIKASI CUSTOM MODAL
     function showCustomAlert(title, message, type = 'info') {
@@ -1071,6 +1165,7 @@
         listenToDailyData();
         loadMasterDataList();
         loadGlobalSignatureConfig();
+        initGeolocationChecking();
     }
 
     function onDateChange() {
@@ -1207,7 +1302,8 @@
         return isNaN(num) ? 0 : num;
     }
 
-    function convertFileToBase64(file) {
+    // KONVERSI HASIL KAMERA KE BASE64 DAN MENAMBAHKAN WATERMARK LOKASI, TANGGAL & JAM
+    function convertFileToBase64WithWatermark(file, lat, lng) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -1216,8 +1312,8 @@
                 img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1000;
-                    const MAX_HEIGHT = 1000;
+                    const MAX_WIDTH = 1200;
+                    const MAX_HEIGHT = 1200;
                     let width = img.width;
                     let height = img.height;
 
@@ -1237,7 +1333,31 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.8));
+
+                    // MENAMBAHKAN STAMP WATERMARK TANGGAL, JAM & LOKASI GEOGRAFI
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    const timeStr = now.toLocaleTimeString('id-ID');
+                    const locStr = (lat && lng) ? `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)} (SPPG D&D SERANG)` : "GPS: -";
+
+                    const fontSize = Math.max(16, Math.floor(width / 32));
+                    const padding = 15;
+                    const bannerHeight = (fontSize * 2.8) + (padding * 2);
+
+                    // Background semi-transparan hitam di bagian bawah foto
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+                    ctx.fillRect(0, height - bannerHeight, width, bannerHeight);
+
+                    // Teks Watermark Tanda Bukti Foto
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+                    ctx.fillText(`📅 ${dateStr} - ${timeStr}`, padding, height - bannerHeight + padding + fontSize);
+
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.font = `${fontSize * 0.9}px Inter, sans-serif`;
+                    ctx.fillText(`📍 ${locStr}`, padding, height - padding - 4);
+
+                    resolve(canvas.toDataURL('image/jpeg', 0.85));
                 };
                 img.onerror = error => reject(error);
             };
@@ -1300,6 +1420,14 @@
         Object.keys(dataObj).forEach(key => {
             const item = dataObj[key];
             if (item && typeof item === 'object') {
+                // PENAMBAHAN: Konversi dan cek jumlah barang
+                const jumlahNum = parseJumlahInput(item.jumlah);
+                
+                // Jika jumlah barang 0, jangan tampilkan di tabel
+                if (jumlahNum === 0) {
+                    return;
+                }
+
                 index++;
                 const actionButton = isToday ? `
                     <div style="display: flex; gap: 0.4rem; justify-content: center;">
@@ -1377,6 +1505,12 @@
         const selectedDate = getCurrentSelectedDate();
         if (selectedDate !== getFormattedDate()) return;
 
+        // CEK KEMBALI HAK AKSES LOKASI SEBELUM SIMPAN
+        if (!isLocationValid) {
+            showCustomAlert('Akses Di-Blokir', 'Aplikasi hanya dapat digunakan di lokasi SPPG D&D SERANG MANDIRI. Aktifkan GPS dan berada di lokasi resmi!', 'danger');
+            return;
+        }
+
         const nama = document.getElementById('namaBarang').value.trim();
         const satuan = document.getElementById('satuan').value.trim();
         const rawJumlah = document.getElementById('jumlah').value;
@@ -1389,17 +1523,18 @@
         }
 
         if (!fotoInput.files || fotoInput.files.length === 0) {
-            showCustomAlert('Wajib Upload Foto', 'Pilih atau unggah foto bukti barang terlebih dahulu!', 'warning');
+            showCustomAlert('Wajib Upload Foto', 'Ambil foto bukti menggunakan kamera terlebih dahulu!', 'warning');
             return;
         }
 
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah ke Sistem...`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah & Memproses Foto...`;
 
         try {
             const file = fotoInput.files[0];
-            const base64Photo = await convertFileToBase64(file);
+            // Tambahkan Stamp Watermark Tanggal, Jam, dan Lokasi GPS ke Foto
+            const base64Photo = await convertFileToBase64WithWatermark(file, userCurrentLat, userCurrentLng);
             const fileName = `${selectedDate}_${nama.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
 
             const driveResponse = await uploadPhotoToGoogleDrive(base64Photo, fileName);
@@ -1432,7 +1567,7 @@
                 loadMasterDataList();
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
-                showCustomAlert('Berhasil', 'Data barang dan foto berhasil disimpan ke sistem.', 'success');
+                showCustomAlert('Berhasil', 'Data barang berhasil disimpan ke sistem.', 'success');
             });
         } catch (error) {
             console.error('Error unggah ke Sistem :', error);
@@ -1593,7 +1728,14 @@
             });
 
             cachedDatesList = datesList;
-            cachedAggregatedData = Object.values(aggregatedMap).sort((a, b) => a.nama.localeCompare(b.nama));
+
+            // PENAMBAHAN: Filter barang yang total jumlahnya di seluruh rentang tanggal adalah > 0
+            cachedAggregatedData = Object.values(aggregatedMap)
+                .filter(item => {
+                    const totalQty = Object.values(item.daily).reduce((sum, val) => sum + val, 0);
+                    return totalQty > 0;
+                })
+                .sort((a, b) => a.nama.localeCompare(b.nama));
             
             isRangeReportMode = true;
             renderRangeReportMatrix(startStr, endStr, cachedDatesList, cachedAggregatedData);
