@@ -727,7 +727,7 @@
 
     <div class="notice-banner" id="locationBlockedNotice" style="background:#fee2e2; border-color:#ef4444; color:#991b1b;">
         <i class="fa-solid fa-lock"></i>
-        <span><strong>AKSES INPUT DIKUNCI!</strong> Anda tidak berada di area lokasi SPPG D&D SERANG MANDIRI. Silakan berada di lokasi resmi untuk dapat menginput data stock.</span>
+        <span><strong>AKSES INPUT DIKUNCI!</strong> Anda tidak berada di area lokasi SPPG KOTA SERANG SERANG SERANG 2. Silakan berada di lokasi resmi untuk dapat menginput data stock.</span>
     </div>
 
     <!-- Form Input Data -->
@@ -750,7 +750,7 @@
                 </div>
                 <!-- FITUR UPLOAD FOTO LANGSUNG DARI KAMERA -->
                 <div class="form-group">
-                    <label for="fotoBahan"><i class="fa-solid fa-camera"></i> Foto Bukti Kamera</label>
+                    <label for="fotoBahan"><i class="fa-solid fa-camera"></i> Foto</label>
                     <input type="file" id="fotoBahan" class="form-control" accept="image/*" capture="environment" required>
                 </div>
                 <button type="submit" id="submitBtn" class="btn btn-primary">
@@ -787,7 +787,7 @@
                         <th id="thNamaCol">Nama Barang/Bahan Baku</th>
                         <th style="width: 12%;">Satuan</th>
                         <th style="width: 12%;" id="thJumlahCol">Jumlah</th>
-                        <th style="width: 18%;">Foto / Bukti</th>
+                        <th style="width: 18%;">Foto</th>
                         <th style="width: 15%;" class="text-center action-col" id="thAksiCol">Aksi</th>
                     </tr>
                 </thead>
@@ -864,7 +864,7 @@
 <!-- Modal Preview Foto Terbesar -->
 <div class="modal-overlay" id="imageModal">
     <div class="modal-box" style="max-width: 500px; padding: 1rem;">
-        <img id="modalImagePreview" src="" alt="Foto Bukti" style="width: 100%; height: auto; border-radius: 12px; max-height: 70vh; object-fit: contain;" crossorigin="anonymous">
+        <img id="modalImagePreview" src="" alt="Foto" style="width: 100%; height: auto; border-radius: 12px; max-height: 70vh; object-fit: contain;" crossorigin="anonymous">
         <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
             <button type="button" class="btn btn-info" onclick="downloadImageFromModal()" style="flex: 1;"><i class="fa-solid fa-download"></i> Download Foto</button>
             <button type="button" class="btn btn-primary" onclick="closeImageModal()" style="flex: 1;">Tutup</button>
@@ -1338,7 +1338,7 @@
                     const now = new Date();
                     const dateStr = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                     const timeStr = now.toLocaleTimeString('id-ID');
-                    const locStr = (lat && lng) ? `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)} (SPPG D&D SERANG)` : "GPS: -";
+                    const locStr = (lat && lng) ? `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)} (SPPG KOTA SERANG SERANG SERANG 2)` : "GPS: -";
 
                     const fontSize = Math.max(16, Math.floor(width / 32));
                     const padding = 15;
@@ -1403,7 +1403,7 @@
             <th>Nama Barang/Bahan Baku</th>
             <th style="width: 12%;">Satuan</th>
             <th style="width: 12%;">Jumlah</th>
-            <th style="width: 18%;">Foto / Bukti</th>
+            <th style="width: 18%;">Foto</th>
             <th style="width: 15%;" class="text-center action-col">Aksi</th>
         `;
 
@@ -1470,7 +1470,7 @@
         if (!src) return;
 
         try {
-            const fileName = `Foto_Bukti_${Date.now()}.jpg`;
+            const fileName = `Foto_${Date.now()}.jpg`;
             const link = document.createElement('a');
 
             if (src.startsWith('data:image')) {
@@ -1507,7 +1507,7 @@
 
         // CEK KEMBALI HAK AKSES LOKASI SEBELUM SIMPAN
         if (!isLocationValid) {
-            showCustomAlert('Akses Di-Blokir', 'Aplikasi hanya dapat digunakan di lokasi SPPG D&D SERANG MANDIRI. Aktifkan GPS dan berada di lokasi resmi!', 'danger');
+            showCustomAlert('Akses Di-Blokir', 'Aplikasi hanya dapat digunakan di lokasi SPPG KOTA SERANG SERANG SERANG 2. Aktifkan GPS dan berada di lokasi resmi!', 'danger');
             return;
         }
 
@@ -1523,7 +1523,7 @@
         }
 
         if (!fotoInput.files || fotoInput.files.length === 0) {
-            showCustomAlert('Wajib Upload Foto', 'Ambil foto bukti menggunakan kamera terlebih dahulu!', 'warning');
+            showCustomAlert('Wajib Upload Foto', 'Ambil foto menggunakan kamera terlebih dahulu!', 'warning');
             return;
         }
 
