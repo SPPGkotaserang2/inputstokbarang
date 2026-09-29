@@ -7,7 +7,7 @@
     <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2canvas untuk export ke JPG -->
+    <!-- html2canvas untuk export ke PNG/JPG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
@@ -40,7 +40,6 @@
             min-height: 100vh;
         }
 
-        /* Layar Login (Mode Mobile Terkunci) */
         .login-wrapper {
             position: fixed;
             top: 0;
@@ -150,7 +149,6 @@
             max-width: 98vw;
         }
 
-        /* Header Cerah & Berwarna */
         .header {
             margin-bottom: 2rem;
             display: flex;
@@ -254,7 +252,6 @@
             cursor: pointer;
         }
 
-        /* Invoice Header khusus Export/Preview */
         .invoice-print-header {
             display: none;
             border-bottom: 2px solid #4f46e5;
@@ -299,7 +296,6 @@
             font-weight: 700;
         }
 
-        /* Notice Banner */
         .notice-banner {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -313,7 +309,6 @@
             gap: 0.75rem;
         }
 
-        /* Card Form Container */
         .card {
             background: var(--card-bg);
             border-radius: 16px;
@@ -325,8 +320,8 @@
 
         .form-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr auto;
-            gap: 1.25rem;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr auto;
+            gap: 1rem;
             align-items: flex-end;
         }
 
@@ -357,10 +352,6 @@
         .form-control:focus {
             border-color: #4f46e5;
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-        }
-
-        select.form-control {
-            cursor: pointer;
         }
 
         .btn {
@@ -415,10 +406,6 @@
             border: 1px solid #fde68a;
         }
 
-        .btn-edit-soft:hover {
-            background: #fde68a;
-        }
-
         .btn-danger-soft {
             background: #fee2e2;
             color: var(--danger-color);
@@ -438,12 +425,6 @@
             font-weight: 600;
         }
 
-        .btn-logout:hover {
-            background: #fee2e2;
-            color: var(--danger-color);
-        }
-
-        /* Table Container */
         .table-container {
             background: var(--card-bg);
             border-radius: 16px;
@@ -477,6 +458,7 @@
         th, td {
             padding: 1.125rem 1.5rem;
             font-size: 0.925rem;
+            vertical-align: middle;
         }
 
         th {
@@ -493,10 +475,6 @@
             color: var(--text-main);
         }
 
-        tr:last-child td {
-            border-bottom: none;
-        }
-
         .text-center {
             text-align: center;
         }
@@ -507,7 +485,26 @@
             text-align: center;
         }
 
-        /* Kelas untuk mode Edit Langsung */
+        .img-preview-thumb {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .img-preview-thumb:hover {
+            transform: scale(1.08);
+        }
+
+        .no-photo-badge {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
         .editable-active {
             outline: 2px dashed #4f46e5 !important;
             background-color: #e0e7ff33 !important;
@@ -516,7 +513,6 @@
             padding: 2px 4px;
         }
 
-        /* Panel Floating Simpan Perubahan Preview */
         .floating-edit-bar {
             position: fixed;
             bottom: 25px;
@@ -535,7 +531,7 @@
             font-weight: 600;
         }
 
-        /* Modal Umum */
+        /* MODAL SYSTEM UI */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -547,7 +543,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
+            z-index: 99999;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
@@ -572,8 +568,6 @@
         .modal-icon {
             width: 60px;
             height: 60px;
-            background: #fee2e2;
-            color: var(--danger-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -581,6 +575,11 @@
             font-size: 1.5rem;
             margin: 0 auto 1.25rem auto;
         }
+
+        .modal-icon.icon-danger { background: #fee2e2; color: var(--danger-color); }
+        .modal-icon.icon-warning { background: #fef3c7; color: var(--warning-color); }
+        .modal-icon.icon-success { background: #d1fae5; color: #10b981; }
+        .modal-icon.icon-info { background: #e0e7ff; color: #4f46e5; }
 
         .modal-actions {
             display: flex;
@@ -611,7 +610,7 @@
 </head>
 <body>
 
-<!-- Layar Login (Mode Mobile Terkunci) -->
+<!-- Layar Login -->
 <div class="login-wrapper" id="loginScreen">
     <div class="login-card">
         <div class="login-logo">
@@ -645,23 +644,23 @@
     </div>
 </div>
 
-<!-- Floating Bar Simpan Perubahan Saat Mode Preview -->
+<!-- Floating Bar Simpan Edit Invoice -->
 <div class="floating-edit-bar" id="floatingEditBar">
     <span><i class="fa-solid fa-pen-to-square"></i> Mode Edit Invoice Aktif: Klik teks mana saja untuk mengubahnya!</span>
     <button type="button" class="btn btn-success" onclick="saveEditedInvoiceConfig()" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
-        <i class="fa-solid fa-floppy-disk"></i> Simpan & Terapkan Permanen
+        <i class="fa-solid fa-floppy-disk"></i> Simpan & Terapkan
     </button>
 </div>
 
 <!-- Aplikasi Utama -->
 <div class="container" id="captureArea" style="display: none; background: #ffffff; padding: 2rem; border-radius: 16px;">
     
-    <!-- Header Khusus Invoice (Hanya Muncul Saat Preview/Export PNG) -->
+    <!-- Header Invoice -->
     <div class="invoice-print-header" id="invoiceHeader">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 1rem;">
                 <div style="width: 70px; height: 70px; border-radius: 12px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--border-color);">
-                    <img src="logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';">
+                    <img src="logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';" crossorigin="anonymous">
                 </div>
                 <div>
                     <h2 id="invTitleHeader" style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">SPPG KOTA SERANG SERANG SERANG 2</h2>
@@ -675,11 +674,11 @@
         </div>
     </div>
 
-    <!-- Header Standar Web -->
+    <!-- Header Aplikasi Standar -->
     <div class="header" id="webHeader">
         <div class="header-brand">
             <div class="app-logo">
-                <img src="logo.png" alt="Logo Header" onerror="this.onerror=null; this.remove(); document.querySelector('.app-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';">
+                <img src="logo.png" alt="Logo Header" onerror="this.onerror=null; this.remove(); document.querySelector('.app-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';" crossorigin="anonymous">
             </div>
             <div class="header-title">
                 <h1>SPPG KOTA SERANG SERANG SERANG 2</h1>
@@ -700,35 +699,38 @@
         </div>
     </div>
 
-    <!-- Informasi Ringkasan Tanggal (Khusus Mode Invoice Preview/Export) -->
     <div class="invoice-print-meta" id="invoiceMeta">
         <div><strong>Periode Laporan:</strong> <span id="invoiceDateText">-</span></div>
         <div><strong>Status Dokumen:</strong> Verified & Validated</div>
     </div>
 
-    <!-- Peringatan jika melihat tanggal masa lalu -->
     <div class="notice-banner" id="pastDateNotice">
         <i class="fa-solid fa-triangle-exclamation"></i>
         <span>Anda sedang melihat data arsip masa lalu. Input data baru hanya aktif untuk hari ini.</span>
     </div>
 
-    <!-- Form Input -->
+    <!-- Form Input Data -->
     <div class="card" id="formCard">
         <form id="itemForm" autocomplete="off">
             <div class="form-grid">
                 <div class="form-group">
                     <label for="namaBarang">Nama Barang/Bahan Baku</label>
-                    <input type="text" id="namaBarang" class="form-control" list="listNamaBarang" placeholder="" oninput="onNamaBarangInput()" required>
+                    <input type="text" id="namaBarang" class="form-control" list="listNamaBarang" placeholder="Contoh: Beras, Telur" oninput="onNamaBarangInput()" required>
                     <datalist id="listNamaBarang"></datalist>
                 </div>
                 <div class="form-group">
                     <label for="satuan">Satuan</label>
-                    <input type="text" id="satuan" class="form-control" list="listSatuan" placeholder="Pcs, Kg, Gram, dll" required>
+                    <input type="text" id="satuan" class="form-control" list="listSatuan" placeholder="Pcs, Kg, Gram" required>
                     <datalist id="listSatuan"></datalist>
                 </div>
                 <div class="form-group">
-                    <label for="jumlah">Jumlah Hari Ini </label>
-                    <input type="text" id="jumlah" class="form-control" placeholder="0 atau 0.5 atau 1,5" required>
+                    <label for="jumlah">Jumlah Hari Ini</label>
+                    <input type="text" id="jumlah" class="form-control" placeholder="0 atau 1.5" required>
+                </div>
+                <!-- FITUR UPLOAD FOTO -->
+                <div class="form-group">
+                    <label for="fotoBahan"><i class="fa-solid fa-cloud-arrow-up"></i> Foto Bukti</label>
+                    <input type="file" id="fotoBahan" class="form-control" accept="image/*" required>
                 </div>
                 <button type="submit" id="submitBtn" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Simpan
@@ -737,7 +739,7 @@
         </form>
     </div>
 
-    <!-- Tabel Data -->
+    <!-- Tabel Data Stock -->
     <div class="table-container">
         <div class="table-header-bar">
             <h2 id="tableTitle">Daftar Stock Bahan Baku</h2>
@@ -748,7 +750,7 @@
                 <button type="button" class="btn btn-info" id="previewBtn" onclick="openCodeModal()">
                     <i class="fa-solid fa-eye"></i> Admin
                 </button>
-                <button type="button" class="btn btn-success" id="exportBtn" onclick="promptPetugasBeforeExport()">
+                <button type="button" class="btn btn-success" id="exportBtn" onclick="openExportModal()">
                     <i class="fa-solid fa-file-image"></i> Export ke PNG
                 </button>
                 <button type="button" class="btn btn-primary" id="backToNormalBtn" onclick="backToNormalView()" style="display:none;">
@@ -760,10 +762,11 @@
             <table id="mainTable">
                 <thead>
                     <tr id="tableHeadRow">
-                        <th style="width: 8%;">No</th>
+                        <th style="width: 5%;">No</th>
                         <th id="thNamaCol">Nama Barang/Bahan Baku</th>
-                        <th style="width: 15%;">Satuan</th>
-                        <th style="width: 15%;" id="thJumlahCol">Jumlah</th>
+                        <th style="width: 12%;">Satuan</th>
+                        <th style="width: 12%;" id="thJumlahCol">Jumlah</th>
+                        <th style="width: 18%;">Foto / Bukti</th>
                         <th style="width: 15%;" class="text-center action-col" id="thAksiCol">Aksi</th>
                     </tr>
                 </thead>
@@ -772,7 +775,7 @@
         </div>
     </div>
 
-    <!-- Footer Tanda Tangan (Khusus Mode Invoice / Preview / Export) -->
+    <!-- Footer Tanda Tangan -->
     <div class="invoice-print-footer" id="invoiceFooter">
         <div class="signature-box">
             <div>
@@ -792,37 +795,58 @@
 
 </div>
 
-<!-- Modal Input Kode Rahasia (071001) -->
-<div class="modal-overlay" id="codeModal">
+<!-- MODAL POPUP PROFESIONAL ALERTPUBLIC -->
+<div class="modal-overlay" id="customAlertModal">
     <div class="modal-box">
-        <div class="modal-icon" style="background: #e0e7ff; color: #4f46e5;"><i class="fa-solid fa-lock"></i></div>
-        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Admin</h3>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;"></p>
-        <div class="error-alert" id="codeError" style="margin-bottom: 0.75rem;">
-            <i class="fa-solid fa-circle-exclamation"></i>
-            <span>Kode akses salah!</span>
+        <div class="modal-icon icon-info" id="alertModalIcon"><i class="fa-solid fa-circle-info"></i></div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;" id="alertModalTitle">Notifikasi</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem;" id="alertModalMessage">Pesan informasi</p>
+        <button type="button" class="btn btn-primary" onclick="closeCustomAlert()" style="width: 100%;">OK</button>
+    </div>
+</div>
+
+<!-- MODAL INPUT NAMA PETUGAS UNTUK EXPORT PNG -->
+<div class="modal-overlay" id="exportModal">
+    <div class="modal-box" style="text-align: left;">
+        <div class="modal-icon icon-info" style="margin: 0 auto 1rem auto;"><i class="fa-solid fa-file-image"></i></div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; text-align: center;">Export Laporan ke PNG</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;">Konfirmasi nama Petugas SO sebelum mengunduh laporan.</p>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="exportPetugasInput">Nama Petugas SO</label>
+            <input type="text" id="exportPetugasInput" class="form-control" placeholder="Masukkan nama petugas">
         </div>
-        <input type="password" id="secretCodeInput" class="form-control" placeholder="" style="text-align: center; letter-spacing: 2px; font-weight: 700;" autocomplete="off">
         <div class="modal-actions">
-            <button type="button" class="btn-cancel-modal" onclick="closeCodeModal()">Batal</button>
-            <button type="button" class="btn btn-primary" onclick="verifySecretCode()" style="flex: 1; padding: 0.75rem;">Masuk</button>
+            <button type="button" class="btn-cancel-modal" onclick="closeExportModal()">Batal</button>
+            <button type="button" class="btn btn-success" id="exportProcessBtn" onclick="processExportPNG()"><i class="fa-solid fa-download"></i> Unduh PNG</button>
         </div>
     </div>
 </div>
 
-<!-- Modal Pemberitahuan / Pengisian Nama Petugas SO Sebelum Export PNG -->
-<div class="modal-overlay" id="petugasModal">
-    <div class="modal-box" style="max-width: 400px; text-align: left;">
-        <div class="modal-icon" style="background: #e0e7ff; color: #4f46e5; margin: 0 auto 1rem auto;"><i class="fa-solid fa-user-pen"></i></div>
-        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center;">Konfirmasi Nama Petugas SO</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;"></p>
-        <div class="form-group" style="margin-bottom: 1.5rem;">
-            <label for="inputNamaPetugasSO">Nama Petugas SO</label>
-            <input type="text" id="inputNamaPetugasSO" class="form-control" placeholder="Contoh:" required>
+<!-- Modal Kode Rahasia Admin -->
+<div class="modal-overlay" id="codeModal">
+    <div class="modal-box">
+        <div class="modal-icon icon-info"><i class="fa-solid fa-lock"></i></div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Akses Admin</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1rem;">Masukkan kode rahasia untuk mengedit laporan.</p>
+        <div class="error-alert" id="codeError" style="margin-bottom: 0.75rem;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>Kode akses salah!</span>
         </div>
+        <input type="password" id="secretCodeInput" class="form-control" placeholder="Masukkan Kode" style="text-align: center; letter-spacing: 2px; font-weight: 700;" autocomplete="off">
         <div class="modal-actions">
-            <button type="button" class="btn-cancel-modal" onclick="closePetugasModal()">Batal</button>
-            <button type="button" class="btn btn-success" onclick="proceedExportToPNG()" style="flex: 1; color: white;">Lanjutkan Export PNG</button>
+            <button type="button" class="btn-cancel-modal" onclick="closeCodeModal()">Batal</button>
+            <button type="button" class="btn btn-primary" onclick="verifySecretCode()">Masuk</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Preview Foto Terbesar -->
+<div class="modal-overlay" id="imageModal">
+    <div class="modal-box" style="max-width: 500px; padding: 1rem;">
+        <img id="modalImagePreview" src="" alt="Foto Bukti" style="width: 100%; height: auto; border-radius: 12px; max-height: 70vh; object-fit: contain;" crossorigin="anonymous">
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+            <button type="button" class="btn btn-info" onclick="downloadImageFromModal()" style="flex: 1;"><i class="fa-solid fa-download"></i> Download Foto</button>
+            <button type="button" class="btn btn-primary" onclick="closeImageModal()" style="flex: 1;">Tutup</button>
         </div>
     </div>
 </div>
@@ -830,7 +854,7 @@
 <!-- Modal Edit Barang -->
 <div class="modal-overlay" id="editModal">
     <div class="modal-box" style="max-width: 400px; text-align: left;">
-        <div class="modal-icon" style="background: #fef3c7; color: #d97706; margin: 0 auto 1rem auto;"><i class="fa-solid fa-pen-to-square"></i></div>
+        <div class="modal-icon icon-warning" style="margin: 0 auto 1rem auto;"><i class="fa-solid fa-pen-to-square"></i></div>
         <h3 style="font-size: 1.25rem; margin-bottom: 1rem; text-align: center;">Edit Data Barang</h3>
         <input type="hidden" id="editItemKey">
         <div class="form-group" style="margin-bottom: 1rem;">
@@ -847,17 +871,17 @@
         </div>
         <div class="modal-actions">
             <button type="button" class="btn-cancel-modal" onclick="closeEditModal()">Batal</button>
-            <button type="button" class="btn btn-warning" onclick="submitEditData()" style="flex: 1; color: white;">Simpan Perubahan</button>
+            <button type="button" class="btn btn-warning" onclick="submitEditData()" style="color: white;">Simpan Perubahan</button>
         </div>
     </div>
 </div>
 
-<!-- Modal Pilih Rentang Tanggal Rekap -->
+<!-- Modal Multi-Tanggal -->
 <div class="modal-overlay" id="rangeModal">
     <div class="modal-box" style="max-width: 460px; text-align: left;">
-        <div class="modal-icon" style="background: #fef3c7; color: #d97706; margin: 0 auto 1rem auto;"><i class="fa-solid fa-calendar-days"></i></div>
-        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center;">Rekap Laporan Multi-Tanggal (Matriks)</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;">Pilih rentang tanggal (misal tanggal 1 s/d 30). Kolom tanggal akan berjejer ke samping dan jumlah per hari tampil di bawahnya.</p>
+        <div class="modal-icon icon-warning" style="margin: 0 auto 1rem auto;"><i class="fa-solid fa-calendar-days"></i></div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center;">Rekap Laporan Multi-Tanggal</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;">Pilih rentang tanggal untuk merekap data secara kolektif.</p>
         
         <div class="form-group" style="margin-bottom: 1rem;">
             <label for="startDateRange">Dari Tanggal:</label>
@@ -870,7 +894,7 @@
 
         <div class="modal-actions">
             <button type="button" class="btn-cancel-modal" onclick="closeRangeModal()">Batal</button>
-            <button type="button" class="btn btn-warning" onclick="generateRangeReport()" style="flex: 1; color: white;">Buat Rekap & Export</button>
+            <button type="button" class="btn btn-warning" onclick="generateRangeReport()" style="color: white;">Buat Rekap</button>
         </div>
     </div>
 </div>
@@ -878,9 +902,9 @@
 <!-- Modal Hapus -->
 <div class="modal-overlay" id="deleteModal">
     <div class="modal-box">
-        <div class="modal-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="modal-icon icon-danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Hapus Data Barang?</h3>
-        <p style="font-size: 0.9rem; color: var(--text-muted);">Apakah Anda yakin akan menghapus data ini dari sistem?</p>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Apakah Anda yakin? Foto di Sistem juga akan ikut terhapus.</p>
         <div class="modal-actions">
             <button type="button" class="btn-cancel-modal" onclick="closeDeleteModal()">Batal</button>
             <button type="button" class="btn-confirm-delete" id="confirmDeleteBtn">Ya, Hapus</button>
@@ -893,15 +917,45 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
+    // URL WEB APP GOOGLE APPS SCRIPT
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzb-aEZ4v2bS5VX7RhOC4jP7Upb52K7yEtXSfukiuP3s0EcDiFTfC_eltmWR_zwzsTNgg/exec";
+
     const AUTH_USERNAME = "AdminSo";
     const AUTH_PASSWORD = "Admin123";
     let isRangeReportMode = false;
     let cachedDatesList = [];
     let cachedAggregatedData = [];
 
-    // Konfigurasi WhatsApp API
     const WA_PHONE = "6283111399112";
     const WA_TOKEN = "uJ8CF79nyQaJbPrVGeeE";
+
+    // FUNGSI NOTIFIKASI CUSTOM MODAL
+    function showCustomAlert(title, message, type = 'info') {
+        const modal = document.getElementById('customAlertModal');
+        const iconContainer = document.getElementById('alertModalIcon');
+        document.getElementById('alertModalTitle').innerText = title;
+        document.getElementById('alertModalMessage').innerText = message;
+
+        iconContainer.className = 'modal-icon';
+        if (type === 'danger') {
+            iconContainer.classList.add('icon-danger');
+            iconContainer.innerHTML = `<i class="fa-solid fa-circle-xmark"></i>`;
+        } else if (type === 'warning') {
+            iconContainer.classList.add('icon-warning');
+            iconContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+        } else if (type === 'success') {
+            iconContainer.classList.add('icon-success');
+            iconContainer.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+        } else {
+            iconContainer.classList.add('icon-info');
+            iconContainer.innerHTML = `<i class="fa-solid fa-circle-info"></i>`;
+        }
+        modal.classList.add('active');
+    }
+
+    function closeCustomAlert() {
+        document.getElementById('customAlertModal').classList.remove('active');
+    }
 
     function sendWhatsAppNotification(message) {
         const data = new URLSearchParams();
@@ -911,9 +965,7 @@
 
         fetch('https://api.fonnte.com/send', {
             method: 'POST',
-            headers: {
-                'Authorization': WA_TOKEN
-            },
+            headers: { 'Authorization': WA_TOKEN },
             body: data
         })
         .then(response => response.json())
@@ -925,10 +977,7 @@
 
     function resetLogoutTimer() {
         if (logoutTimer) clearTimeout(logoutTimer);
-        // 1 Jam = 3600000 milidetik
-        logoutTimer = setTimeout(() => {
-            logout(true); // Parameter true menandakan logout otomatis karena durasi 1 jam
-        }, 3600000);
+        logoutTimer = setTimeout(() => { logout(true); }, 3600000);
     }
 
     function checkAuth() {
@@ -955,8 +1004,7 @@
         const pass = document.getElementById('password').value;
         if (user === AUTH_USERNAME && pass === AUTH_PASSWORD) {
             sessionStorage.setItem('isLoggedIn', 'true');
-            // Kirim pesan WhatsApp Berhasil Login
-            sendWhatsAppNotification("🔔 *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nPengguna berhasil *LOGIN* ke Sistem Input Stock Bahan Baku SPPG Kota Serang 2.");
+            sendWhatsAppNotification("📱 *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nPengguna berhasil *LOGIN* ke Sistem Input Stock Bahan Baku SPPG Kota Serang 2.");
             checkAuth();
         } else {
             document.getElementById('loginError').style.display = 'flex';
@@ -975,7 +1023,7 @@
         if (isAuto) {
             sendWhatsAppNotification("⏰ *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nSistem telah melakukan *LOGOUT OTOMATIS* karena sesi telah melewati batas waktu 1 jam.");
         } else {
-            sendWhatsAppNotification("🔒 *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nPengguna telah melakukan *LOGOUT* (keluar) dari sistem.");
+            sendWhatsAppNotification("🚪 *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nPengguna telah melakukan *LOGOUT* dari sistem.");
         }
         
         checkAuth();
@@ -1015,6 +1063,14 @@
         document.getElementById('selectedDate').value = todayStr;
         document.getElementById('startDateRange').value = todayStr;
         document.getElementById('endDateRange').value = todayStr;
+    }
+
+    function initApp() {
+        initDatePicker();
+        renderUIState();
+        listenToDailyData();
+        loadMasterDataList();
+        loadGlobalSignatureConfig();
     }
 
     function onDateChange() {
@@ -1114,10 +1170,6 @@
             document.getElementById('lblMengetahuiText').innerText = cfg.mengetahuiLabel;
             document.getElementById('lblJabatanText').innerText = cfg.jabatanLabel;
             document.getElementById('valMengetahuiName').innerText = `( ${cfg.mengetahuiName} )`;
-            
-            if(document.getElementById('inputNamaPetugasSO')) {
-                document.getElementById('inputNamaPetugasSO').value = cfg.petugasName;
-            }
         });
     }
 
@@ -1133,11 +1185,11 @@
         };
 
         db.ref('settings/signature').set(cfg).then(() => {
-            alert('Perubahan berhasil disimpan permanen ke database dan diterapkan ke semua invoice!');
-            location.reload();
+            showCustomAlert('Berhasil', 'Konfigurasi header & tanda tangan berhasil disimpan.', 'success');
+            setTimeout(() => { location.reload(); }, 1200);
         }).catch(err => {
             console.error('Gagal menyimpan:', err);
-            alert('Terjadi kesalahan saat menyimpan pengaturan.');
+            showCustomAlert('Gagal', 'Terjadi kesalahan saat menyimpan pengaturan.', 'danger');
         });
     };
 
@@ -1155,13 +1207,83 @@
         return isNaN(num) ? 0 : num;
     }
 
+    function convertFileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 1000;
+                    const MAX_HEIGHT = 1000;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.8));
+                };
+                img.onerror = error => reject(error);
+            };
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    async function uploadPhotoToGoogleDrive(base64Data, fileName) {
+        const payload = {
+            base64: base64Data,
+            filename: fileName
+        };
+
+        const response = await fetch(GAS_WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+            return result;
+        } else {
+            throw new Error(result.message || 'Gagal upload ke Sistem');
+        }
+    }
+
+    async function deletePhotoFromGoogleDrive(fileId) {
+        if (!fileId) return;
+        try {
+            await fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: "delete", fileId: fileId })
+            });
+        } catch (e) {
+            console.error("Gagal menghapus foto di Sistem:", e);
+        }
+    }
+
     function renderTableDaily(dataObj) {
         const headRow = document.getElementById('tableHeadRow');
         headRow.innerHTML = `
-            <th style="width: 8%;">No</th>
+            <th style="width: 5%;">No</th>
             <th>Nama Barang/Bahan Baku</th>
-            <th style="width: 15%;">Satuan</th>
-            <th style="width: 15%;">Jumlah</th>
+            <th style="width: 12%;">Satuan</th>
+            <th style="width: 12%;">Jumlah</th>
+            <th style="width: 18%;">Foto / Bukti</th>
             <th style="width: 15%;" class="text-center action-col">Aksi</th>
         `;
 
@@ -1170,7 +1292,7 @@
         tbody.innerHTML = '';
 
         if (!dataObj || typeof dataObj !== 'object') {
-            tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal ini.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal ini.</td></tr>`;
             return;
         }
 
@@ -1185,23 +1307,72 @@
                         <button class="btn btn-danger-soft" onclick="promptDelete('${key}')" title="Hapus Barang"><i class="fa-solid fa-trash"></i></button>
                     </div>` : `<span style="color: var(--text-muted); font-size: 0.85rem;">Arsip</span>`;
                 
+                let photoDisplay = `<span class="no-photo-badge">Tanpa foto</span>`;
+                const imgSrc = item.fotoDriveDirect || item.fotoBase64;
+
+                if (imgSrc) {
+                    photoDisplay = `<img src="${imgSrc}" class="img-preview-thumb" crossorigin="anonymous" onclick="openImageModal('${imgSrc}')" title="Klik untuk lihat foto">`;
+                }
+
                 tbody.innerHTML += `
                     <tr>
                         <td>${index}</td>
                         <td><strong class="editable-item-text" data-key="${key}" data-field="nama">${escapeHtml(item.nama || '')}</strong></td>
                         <td><span class="editable-item-text" data-key="${key}" data-field="satuan">${escapeHtml(item.satuan || '')}</span></td>
                         <td><strong class="editable-item-text" data-key="${key}" data-field="jumlah">${item.jumlah !== undefined ? item.jumlah : 0}</strong></td>
+                        <td>${photoDisplay}</td>
                         <td class="text-center action-col">${actionButton}</td>
                     </tr>
                 `;
             }
         });
         if (index === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal ini.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal ini.</td></tr>`;
         }
     }
 
-    document.getElementById('itemForm').addEventListener('submit', function(e) {
+    window.openImageModal = function(src) {
+        document.getElementById('modalImagePreview').src = src;
+        document.getElementById('imageModal').classList.add('active');
+    };
+
+    // PROSES MENGUNDUH FOTO LANGSUNG KE FOLDER DOWNLOAD
+    window.downloadImageFromModal = async function() {
+        const src = document.getElementById('modalImagePreview').src;
+        if (!src) return;
+
+        try {
+            const fileName = `Foto_Bukti_${Date.now()}.jpg`;
+            const link = document.createElement('a');
+
+            if (src.startsWith('data:image')) {
+                link.href = src;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                const response = await fetch(src, { mode: 'cors' });
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                link.href = blobUrl;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(blobUrl);
+            }
+        } catch (err) {
+            console.error("Gagal mendownload gambar otomatis:", err);
+            window.open(src, '_blank');
+        }
+    };
+
+    window.closeImageModal = function() {
+        document.getElementById('imageModal').classList.remove('active');
+    };
+
+    document.getElementById('itemForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const selectedDate = getCurrentSelectedDate();
         if (selectedDate !== getFormattedDate()) return;
@@ -1210,22 +1381,65 @@
         const satuan = document.getElementById('satuan').value.trim();
         const rawJumlah = document.getElementById('jumlah').value;
         const jumlah = parseJumlahInput(rawJumlah);
-        
-        if (!nama || !satuan || isNaN(jumlah)) return;
+        const fotoInput = document.getElementById('fotoBahan');
 
-        const ref = db.ref('stock_barang/' + selectedDate);
-        ref.orderByChild('nama').equalTo(nama).once('value', (snapshot) => {
-            if (snapshot.exists()) {
-                snapshot.forEach((child) => {
-                    let existingVal = parseJumlahInput(child.val().jumlah);
-                    ref.child(child.key).update({ jumlah: existingVal + jumlah, satuan: satuan });
-                });
-            } else {
-                ref.push({ nama, satuan, jumlah: rawJumlah.trim() });
-            }
-            document.getElementById('itemForm').reset();
-            loadMasterDataList();
-        });
+        if (!nama || !satuan || isNaN(jumlah)) {
+            showCustomAlert('Validasi Gagal', 'Mohon isi semua data barang dengan benar.', 'warning');
+            return;
+        }
+
+        if (!fotoInput.files || fotoInput.files.length === 0) {
+            showCustomAlert('Wajib Upload Foto', 'Pilih atau unggah foto bukti barang terlebih dahulu!', 'warning');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah ke Sistem...`;
+
+        try {
+            const file = fotoInput.files[0];
+            const base64Photo = await convertFileToBase64(file);
+            const fileName = `${selectedDate}_${nama.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
+
+            const driveResponse = await uploadPhotoToGoogleDrive(base64Photo, fileName);
+
+            const ref = db.ref('stock_barang/' + selectedDate);
+            ref.orderByChild('nama').equalTo(nama).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    snapshot.forEach((child) => {
+                        let existingVal = parseJumlahInput(child.val().jumlah);
+                        ref.child(child.key).update({ 
+                            jumlah: existingVal + jumlah, 
+                            satuan: satuan,
+                            driveFileId: driveResponse.fileId,
+                            fotoDriveUrl: driveResponse.url,
+                            fotoDriveDirect: driveResponse.directUrl
+                        });
+                    });
+                } else {
+                    ref.push({ 
+                        nama: nama, 
+                        satuan: satuan, 
+                        jumlah: rawJumlah.trim(),
+                        driveFileId: driveResponse.fileId,
+                        fotoDriveUrl: driveResponse.url,
+                        fotoDriveDirect: driveResponse.directUrl
+                    });
+                }
+                
+                document.getElementById('itemForm').reset();
+                loadMasterDataList();
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
+                showCustomAlert('Berhasil', 'Data barang dan foto berhasil disimpan ke sistem.', 'success');
+            });
+        } catch (error) {
+            console.error('Error unggah ke Sistem :', error);
+            showCustomAlert('Gagal Upload', 'Terjadi kesalahan saat unggah foto ke Sistem.', 'danger');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
+        }
     });
 
     window.openEditModal = function(key, encodedNama, encodedSatuan, jumlah) {
@@ -1248,7 +1462,7 @@
         const jumlahNum = parseJumlahInput(rawJumlah);
 
         if (!nama || !satuan || isNaN(jumlahNum)) {
-            alert('Mohon isi semua data dengan benar.');
+            showCustomAlert('Validasi Gagal', 'Mohon isi seluruh data dengan benar.', 'warning');
             return;
         }
 
@@ -1260,19 +1474,42 @@
         }).then(() => {
             closeEditModal();
             loadMasterDataList();
+            showCustomAlert('Berhasil', 'Perubahan data barang berhasil disimpan.', 'success');
         }).catch(err => {
             console.error('Gagal memperbarui data:', err);
-            alert('Terjadi kesalahan saat memperbarui data.');
+            showCustomAlert('Gagal', 'Gagal memperbarui data barang.', 'danger');
         });
     };
 
-    window.promptDelete = (key) => { itemKeyToDelete = key; document.getElementById('deleteModal').classList.add('active'); };
-    window.closeDeleteModal = () => { itemKeyToDelete = null; document.getElementById('deleteModal').classList.remove('active'); };
+    window.promptDelete = (key) => { 
+        itemKeyToDelete = key; 
+        document.getElementById('deleteModal').classList.add('active'); 
+    };
+
+    window.closeDeleteModal = () => { 
+        itemKeyToDelete = null; 
+        document.getElementById('deleteModal').classList.remove('active'); 
+    };
+
     document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
         if (itemKeyToDelete) {
-            db.ref('stock_barang/' + getCurrentSelectedDate() + '/' + itemKeyToDelete).remove().then(() => {
-                loadMasterDataList();
-                closeDeleteModal();
+            const selectedDate = getCurrentSelectedDate();
+            const targetRef = db.ref('stock_barang/' + selectedDate + '/' + itemKeyToDelete);
+            
+            targetRef.once('value', async (snapshot) => {
+                const itemData = snapshot.val();
+                if (itemData && itemData.driveFileId) {
+                    await deletePhotoFromGoogleDrive(itemData.driveFileId);
+                }
+                
+                targetRef.remove().then(() => {
+                    loadMasterDataList();
+                    closeDeleteModal();
+                    showCustomAlert('Terhapus', 'Data barang dan foto berhasil dihapus.', 'success');
+                }).catch(err => {
+                    console.error('Gagal menghapus data:', err);
+                    showCustomAlert('Gagal', 'Terjadi kesalahan saat menghapus data.', 'danger');
+                });
             });
         }
     });
@@ -1298,26 +1535,6 @@
         }
     };
 
-    window.promptPetugasBeforeExport = function() {
-        document.getElementById('petugasModal').classList.add('active');
-        document.getElementById('inputNamaPetugasSO').focus();
-    };
-
-    window.closePetugasModal = function() {
-        document.getElementById('petugasModal').classList.remove('active');
-    };
-
-    window.proceedExportToPNG = function() {
-        const namaPetugas = document.getElementById('inputNamaPetugasSO').value.trim();
-        if (!namaPetugas) {
-            alert('Nama Petugas SO harus diisi!');
-            return;
-        }
-        document.getElementById('valPetugasText').innerText = `( ${namaPetugas} )`;
-        closePetugasModal();
-        exportToPNG();
-    };
-
     window.openRangeModal = function() {
         document.getElementById('rangeModal').classList.add('active');
     };
@@ -1330,12 +1547,12 @@
         const endStr = document.getElementById('endDateRange').value;
 
         if (!startStr || !endStr) {
-            alert('Silakan tentukan tanggal awal dan tanggal akhir dengan lengkap.');
+            showCustomAlert('Validasi', 'Silakan tentukan tanggal awal dan akhir.', 'warning');
             return;
         }
 
         if (startStr > endStr) {
-            alert('Tanggal awal tidak boleh lebih besar dari tanggal akhir.');
+            showCustomAlert('Validasi', 'Tanggal awal tidak boleh lebih besar dari tanggal akhir.', 'warning');
             return;
         }
 
@@ -1386,7 +1603,6 @@
     function renderRangeReportMatrix(startStr, endStr, datesList, listData) {
         const formCard = document.getElementById('formCard');
         const previewBtn = document.getElementById('previewBtn');
-        const exportBtn = document.getElementById('exportBtn');
         const rangeExportBtn = document.getElementById('rangeExportBtn');
         const backToNormalBtn = document.getElementById('backToNormalBtn');
         const webHeader = document.getElementById('webHeader');
@@ -1472,7 +1688,6 @@
         const formCard = document.getElementById('formCard');
         const actionCols = document.querySelectorAll('.action-col');
         const previewBtn = document.getElementById('previewBtn');
-        const exportBtn = document.getElementById('exportBtn');
         const rangeExportBtn = document.getElementById('rangeExportBtn');
         const webHeader = document.getElementById('webHeader');
         const invoiceHeader = document.getElementById('invoiceHeader');
@@ -1524,7 +1739,44 @@
         return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    window.exportToPNG = function() {
+    // MODAL DIALOG EXPORT PNG
+    window.openExportModal = function() {
+        const defaultName = document.getElementById('valPetugasText').innerText.replace(/[()]/g, '').trim() || 'Riyan';
+        document.getElementById('exportPetugasInput').value = defaultName;
+        document.getElementById('exportModal').classList.add('active');
+    };
+
+    window.closeExportModal = function() {
+        document.getElementById('exportModal').classList.remove('active');
+    };
+
+    function preloadAllImagesInElement(element) {
+        const images = element.querySelectorAll('img');
+        const promises = Array.from(images).map(img => {
+            return new Promise((resolve) => {
+                if (img.complete && img.naturalHeight !== 0) {
+                    resolve();
+                } else {
+                    img.onload = () => resolve();
+                    img.onerror = () => resolve();
+                }
+            });
+        });
+        return Promise.all(promises);
+    }
+
+    // PROSES EKSPOR PNG DENGAN UNDUHAN OTOMATIS LANGSUNG KE FOLDER DOWNLOAD
+    window.processExportPNG = async function() {
+        const exportBtnModal = document.getElementById('exportProcessBtn');
+        if (exportBtnModal) {
+            exportBtnModal.disabled = true;
+            exportBtnModal.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+        }
+
+        const namaInput = document.getElementById('exportPetugasInput').value.trim();
+        const namaPetugas = namaInput || 'Riyan';
+        document.getElementById('valPetugasText').innerText = `( ${namaPetugas} )`;
+
         const formCard = document.getElementById('formCard');
         const actionCols = document.querySelectorAll('.action-col');
         const previewBtn = document.getElementById('previewBtn');
@@ -1540,19 +1792,21 @@
         const container = document.getElementById('captureArea');
         const selectedDate = getCurrentSelectedDate();
 
+        // Sembunyikan elemen UI yang tidak perlu ikut tercetak
         if (formCard) formCard.style.display = 'none';
         if (noticeBanner) noticeBanner.style.display = 'none';
         actionCols.forEach(el => el.style.display = 'none');
         if (previewBtn) previewBtn.style.display = 'none';
-        exportBtn.style.display = 'none';
+        if (exportBtn) exportBtn.style.display = 'none';
         if (rangeExportBtn) rangeExportBtn.style.display = 'none';
         if (backToNormalBtn) backToNormalBtn.style.display = 'none';
-        webHeader.style.display = 'none';
+        if (webHeader) webHeader.style.display = 'none';
         if (floatingBar) floatingBar.style.display = 'none';
 
-        invoiceHeader.style.display = 'block';
-        invoiceMeta.style.display = 'flex';
-        invoiceFooter.style.display = 'flex';
+        // Tampilkan header & footer laporan
+        if (invoiceHeader) invoiceHeader.style.display = 'block';
+        if (invoiceMeta) invoiceMeta.style.display = 'flex';
+        if (invoiceFooter) invoiceFooter.style.display = 'flex';
 
         document.querySelectorAll('[contenteditable="true"]').forEach(el => el.removeAttribute('contenteditable'));
 
@@ -1560,65 +1814,48 @@
             const dateObj = new Date(selectedDate + 'T00:00:00');
             document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
-        document.getElementById('printTimestamp').innerText = 'Dicetak : ' + new Date().toLocaleString('id-ID');
+        document.getElementById('printTimestamp').innerText = 'Dicetak Tanggal : ' + new Date().toLocaleString('id-ID');
 
-        const targetWidth = isRangeReportMode ? Math.max(950, 600 + (cachedDatesList.length * 55)) : 950;
+        closeExportModal();
 
-        html2canvas(container, {
-            scale: 3,
-            windowWidth: targetWidth,
-            width: targetWidth,
-            backgroundColor: '#ffffff',
-            logging: false,
-            useCORS: true,
-            allowTaint: true
-        }).then(canvas => {
-            if (!isRangeReportMode) {
-                renderUIState();
-                actionCols.forEach(el => el.style.display = '');
-                if (previewBtn) previewBtn.style.display = 'inline-flex';
-            } else {
-                if (backToNormalBtn) backToNormalBtn.style.display = 'inline-flex';
-            }
-            exportBtn.style.display = 'inline-flex';
-            webHeader.style.display = 'flex';
-            invoiceHeader.style.display = 'none';
-            invoiceMeta.style.display = 'none';
-            invoiceFooter.style.display = 'none';
+        try {
+            await preloadAllImagesInElement(container);
 
-            const fileName = isRangeReportMode ? `Rekap-Matriks-Stock.png` : `Invoice-Stock-${selectedDate}.png`;
-            const link = document.createElement('a');
-            link.download = fileName;
-            link.href = canvas.toDataURL('image/png', 1.0);
-            link.click();
-        }).catch(err => {
-            console.error('Gagal export:', err);
-            if (!isRangeReportMode) {
-                renderUIState();
-                actionCols.forEach(el => el.style.display = '');
-                if (previewBtn) previewBtn.style.display = 'inline-flex';
-            } else {
-                if (backToNormalBtn) backToNormalBtn.style.display = 'inline-flex';
-            }
-            exportBtn.style.display = 'inline-flex';
-            webHeader.style.display = 'flex';
-            invoiceHeader.style.display = 'none';
-            invoiceMeta.style.display = 'none';
-            invoiceFooter.style.display = 'none';
-            alert('Terjadi kesalahan saat mengeksport gambar PNG.');
-        });
+            const canvas = await html2canvas(container, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: "#ffffff",
+                logging: false
+            });
+
+            // Otomatisasi pemicu unduhan gambar PNG langsung tersimpan ke folder Download
+            const dataUrl = canvas.toDataURL('image/png');
+            const fileName = `Laporan_Stock_${selectedDate}.png`;
+            const downloadLink = document.createElement('a');
+
+            downloadLink.href = dataUrl;
+            downloadLink.download = fileName;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+
+            showCustomAlert('Berhasil Export', 'Berkas laporan PNG berhasil diunduh dan tersimpan di folder Unduhan (Downloads).', 'success');
+
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+
+        } catch (err) {
+            console.error("Gagal export ke PNG:", err);
+            showCustomAlert('Gagal Export', 'Terjadi kesalahan saat memproses laporan ke format PNG.', 'danger');
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        }
     };
 
-    function initApp() {
-        initDatePicker();
-        renderUIState();
-        listenToDailyData();
-        loadMasterDataList();
-        loadGlobalSignatureConfig();
-    }
-
-    window.onload = checkAuth;
+    checkAuth();
 </script>
-
 </body>
 </html>
