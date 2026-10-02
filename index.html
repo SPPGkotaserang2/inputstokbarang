@@ -996,6 +996,9 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
+    // DEKLARASI WADAH CONTAINER UTAMA UNTUK PROSES EKSPOR PNG
+    const container = document.getElementById('captureArea');
+
     // KOORDINAT TARGET (SPPG D&D SERANG MANDIRI)
     const TARGET_LAT = -6.1265918;
     const TARGET_LNG = 106.1490035;
@@ -1138,7 +1141,7 @@
 
     function resetLogoutTimer() {
         if (logoutTimer) clearTimeout(logoutTimer);
-        logoutTimer = setTimeout(() => { logout(true); }, 3600000);
+        logoutTimer = setTimeout(() => { logout(true); }, 10800000);
     }
 
     function checkAuth() {
@@ -1149,7 +1152,7 @@
         if (isLoggedIn === 'true') {
             viewportMeta.setAttribute('content', 'width=950');
             document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('captureArea').style.display = 'block';
+            container.style.display = 'block';
             
             if (userRole === 'user') {
                 if (document.getElementById('previewBtn')) document.getElementById('previewBtn').style.display = 'none';
@@ -1164,7 +1167,7 @@
         } else {
             viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
             document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('captureArea').style.display = 'none';
+            container.style.display = 'none';
             if (logoutTimer) clearTimeout(logoutTimer);
         }
     }
@@ -1889,7 +1892,6 @@
         const invoiceFooter = document.getElementById('invoiceFooter');
         const noticeBanner = document.getElementById('pastDateNotice');
         const floatingBar = document.getElementById('floatingEditBar');
-        const container = document.getElementById('captureArea');
 
         if (formCard) formCard.style.display = 'none';
         if (noticeBanner) noticeBanner.style.display = 'none';
@@ -1958,7 +1960,7 @@
 
     window.backToNormalView = function() {
         isRangeReportMode = false;
-        document.getElementById('captureArea').classList.remove('range-mode');
+        container.classList.remove('range-mode');
         location.reload();
     };
 
