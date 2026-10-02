@@ -321,18 +321,6 @@
             gap: 0.75rem;
         }
 
-        .admin-badge {
-            background: #e0e7ff;
-            color: #4f46e5;
-            padding: 0.25rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
         .card {
             background: var(--card-bg);
             border-radius: 16px;
@@ -578,14 +566,6 @@
             font-style: italic;
         }
 
-        .editable-active {
-            outline: 2px dashed #4f46e5 !important;
-            background-color: #e0e7ff33 !important;
-            cursor: text !important;
-            border-radius: 4px;
-            padding: 2px 4px;
-        }
-
         .floating-edit-bar {
             position: fixed;
             bottom: 25px;
@@ -604,7 +584,6 @@
             font-weight: 600;
         }
 
-        /* MODAL SYSTEM UI */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -759,7 +738,6 @@
             </div>
         </div>
         <div class="header-controls">
-            <!-- STATUS GEOLOKASI PERANGKAT -->
             <div class="location-badge loc-invalid" id="locStatusBadge">
                 <i class="fa-solid fa-location-crosshairs"></i> <span id="locStatusText">Mengecek Lokasi...</span>
             </div>
@@ -809,12 +787,10 @@
                     <label for="jumlah">Jumlah Hari Ini</label>
                     <input type="text" id="jumlah" class="form-control" placeholder="0 atau 1.5" required>
                 </div>
-                <!-- FITUR INPUT TANGGAL EXPIRED BARANG -->
                 <div class="form-group">
                     <label for="expiredDate"><i class="fa-solid fa-calendar-xmark"></i> Expired</label>
                     <input type="date" id="expiredDate" class="form-control" title="Pilih tanggal kadaluarsa (opsional)">
                 </div>
-                <!-- FITUR UPLOAD FOTO LANGSUNG DARI KAMERA -->
                 <div class="form-group">
                     <label for="fotoBahan"><i class="fa-solid fa-camera"></i> Foto</label>
                     <input type="file" id="fotoBahan" class="form-control" accept="image/*" capture="environment" required>
@@ -846,7 +822,6 @@
             </div>
         </div>
 
-        <!-- SEARCH BAR BARANG REALTIME -->
         <div class="search-container" id="searchBarContainer">
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -892,7 +867,7 @@
 
 </div>
 
-<!-- MODAL POPUP PROFESIONAL ALERTPUBLIC -->
+<!-- Modal Alert Custom -->
 <div class="modal-overlay" id="customAlertModal">
     <div class="modal-box">
         <div class="modal-icon icon-info" id="alertModalIcon"><i class="fa-solid fa-circle-info"></i></div>
@@ -902,7 +877,7 @@
     </div>
 </div>
 
-<!-- MODAL INPUT NAMA PETUGAS UNTUK EXPORT PNG -->
+<!-- Modal Export PNG -->
 <div class="modal-overlay" id="exportModal">
     <div class="modal-box" style="text-align: left;">
         <div class="modal-icon icon-info" style="margin: 0 auto 1rem auto;"><i class="fa-solid fa-file-image"></i></div>
@@ -919,7 +894,7 @@
     </div>
 </div>
 
-<!-- Modal Kode Rahasia Admin -->
+<!-- Modal Admin -->
 <div class="modal-overlay" id="codeModal">
     <div class="modal-box">
         <div class="modal-icon icon-info"><i class="fa-solid fa-lock"></i></div>
@@ -937,7 +912,7 @@
     </div>
 </div>
 
-<!-- Modal Preview Foto Terbesar -->
+<!-- Modal Preview Foto -->
 <div class="modal-overlay" id="imageModal">
     <div class="modal-box" style="max-width: 500px; padding: 1rem;">
         <img id="modalImagePreview" src="" alt="Foto" style="width: 100%; height: auto; border-radius: 12px; max-height: 70vh; object-fit: contain;" crossorigin="anonymous">
@@ -1018,22 +993,19 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
-    // DEKLARASI WADAH CONTAINER UTAMA UNTUK PROSES EKSPOR PNG
     const container = document.getElementById('captureArea');
 
-    // KOORDINAT TARGET (SPPG D&D SERANG MANDIRI)
     const TARGET_LAT = -6.1265918;
     const TARGET_LNG = 106.1490035;
-    const MAX_ALLOWED_DISTANCE_METERS = 200; // Radius toleransi lokasi (200 meter)
+    const MAX_ALLOWED_DISTANCE_METERS = 200;
 
     let userCurrentLat = null;
     let userCurrentLng = null;
     let isLocationValid = false;
 
     // URL WEB APP GOOGLE APPS SCRIPT
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzb-aEZ4v2bS5VX7RhOC4jP7Upb52K7yEtXSfukiuP3s0EcDiFTfC_eltmWR_zwzsTNgg/exec";
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxefGrYKqsEm0m1im9UusPMQQ8tO7_n3ZeK_nd_xPju8uPY4PL10aKsoLuYS-a99QVp/exec";
 
-    // DAFTAR AKUN LOGIN USER & ADMIN
     const USERS_DATABASE = {
         "serang": { pass: "Mandiri02srg", role: "admin", name: "Serang" },
         "adminso": { pass: "Admin123", role: "user", name: "AdminSo" }
@@ -1042,14 +1014,13 @@
     let isRangeReportMode = false;
     let cachedDatesList = [];
     let cachedAggregatedData = [];
-    let rawDailyData = null; // Menyimpan data harian mentah untuk pencarian
+    let rawDailyData = null;
 
     const WA_PHONE = "6283111399112";
     const WA_TOKEN = "uJ8CF79nyQaJbPrVGeeE";
 
-    // FUNGSI MENGHITUNG JARAK ANTARA DUA KOORDINAT (HAVERSINE FORMULA)
     function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
-        const R = 6371e3; // meter
+        const R = 6371e3;
         const φ1 = lat1 * Math.PI / 180;
         const φ2 = lat2 * Math.PI / 180;
         const Δφ = (lat2 - lat1) * Math.PI / 180;
@@ -1063,7 +1034,6 @@
         return R * c;
     }
 
-    // CEK DAN MONITORING LOKASI GPS USER
     function initGeolocationChecking() {
         const badge = document.getElementById('locStatusBadge');
         const badgeText = document.getElementById('locStatusText');
@@ -1115,7 +1085,6 @@
         });
     }
 
-    // FUNGSI NOTIFIKASI CUSTOM MODAL
     function showCustomAlert(title, message, type = 'info') {
         const modal = document.getElementById('customAlertModal');
         const iconContainer = document.getElementById('alertModalIcon');
@@ -1225,7 +1194,7 @@
         if (logoutTimer) clearTimeout(logoutTimer);
         
         if (isAuto) {
-            sendWhatsAppNotification(`⏰ *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nSistem telah melakukan *LOGOUT OTOMATIS* untuk pengguna *${userName}* karena sesi telah melewati batas waktu 1 jam.`);
+            sendWhatsAppNotification(`⏰ *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nSistem telah melakukan *LOGOUT OTOMATIS* untuk pengguna *${userName}* karena sesi telah melewati batas waktu.`);
         } else {
             sendWhatsAppNotification(`🚪 *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nPengguna *${userName}* telah melakukan *LOGOUT* dari sistem.`);
         }
@@ -1524,10 +1493,13 @@
         });
     }
 
-    async function uploadPhotoToGoogleDrive(base64Data, fileName) {
+    // MEMANGGIL GAS UNTUK UPLOAD DENGAN TAMBAHAN DUA PARAMETER BARU (namaBarang & tanggalInput)
+    async function uploadPhotoToGoogleDrive(base64Data, fileName, namaBarang, tanggalInput) {
         const payload = {
             base64: base64Data,
-            filename: fileName
+            filename: fileName,
+            namaBarang: namaBarang,
+            tanggalInput: tanggalInput
         };
 
         const response = await fetch(GAS_WEB_APP_URL, {
@@ -1605,7 +1577,6 @@
                     photoDisplay = `<img src="${imgSrc}" class="img-preview-thumb" crossorigin="anonymous" onclick="openImageModal('${imgSrc}')" title="Klik untuk lihat foto">`;
                 }
 
-                // Format Tanggal Expired & Cek Status
                 let expiredDisplay = `<span style="color: var(--text-muted); font-size: 0.85rem;">-</span>`;
                 if (item.expiredDate) {
                     const expObj = new Date(item.expiredDate + 'T00:00:00');
@@ -1634,6 +1605,15 @@
         if (index === 0) {
             tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal/pencarian ini.</td></tr>`;
         }
+    }
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     window.openImageModal = function(src) {
@@ -1717,7 +1697,8 @@
             const base64Photo = await convertFileToBase64WithWatermark(file, userCurrentLat, userCurrentLng);
             const fileName = `${selectedDate}_${nama.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
 
-            const driveResponse = await uploadPhotoToGoogleDrive(base64Photo, fileName);
+            // MENGIRIM DUA PARAMETER BARU UNTUK PROSES DRIVE AUTOMATION
+            const driveResponse = await uploadPhotoToGoogleDrive(base64Photo, fileName, nama, selectedDate);
 
             const ref = db.ref('stock_barang/' + selectedDate);
             ref.orderByChild('nama').equalTo(nama).once('value', (snapshot) => {
@@ -1749,7 +1730,7 @@
                 loadMasterDataList();
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
-                showCustomAlert('Berhasil', 'Data barang berhasil disimpan ke sistem.', 'success');
+                showCustomAlert('Berhasil', 'Data barang berhasil disimpan ke folder ' + (driveResponse.folderName || 'Drive') + '.', 'success');
             });
         } catch (error) {
             console.error('Error unggah ke Sistem :', error);
@@ -1955,119 +1936,99 @@
 
         const dStart = new Date(startStr + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
         const dEnd = new Date(endStr + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-        document.getElementById('invoiceDateText').innerText = `${dStart} s/d ${dEnd}`;
-        document.getElementById('printTimestamp').innerText = 'Di Cetak Tanggal : ' + new Date().toLocaleString('id-ID');
-
-        document.getElementById('tableTitle').innerText = `Rekap Stock Bahan Baku`;
+        document.getElementById('invoiceDateText').innerText = `${dStart} - ${dEnd}`;
+        document.getElementById('tableTitle').innerText = `Rekapitulasi Stock (${datesList.length} Hari)`;
 
         const headRow = document.getElementById('tableHeadRow');
-        let headHTML = `
-            <th style="width: 5%;">No</th>
-            <th style="min-width: 160px;">Nama Barang/Bahan Baku</th>
-            <th style="width: 90px;">Satuan</th>
-        `;
-
-        datesList.forEach(dKey => {
-            const dayNum = dKey.split('-')[2];
-            headHTML += `<th class="text-center" style="min-width: 55px;">${dayNum}</th>`;
+        let headerHTML = `<th style="width: 40px;">No</th><th>Nama Barang</th><th style="width: 70px;">Satuan</th>`;
+        datesList.forEach(d => {
+            const dt = new Date(d + 'T00:00:00');
+            const label = dt.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' });
+            headerHTML += `<th class="text-center" style="min-width: 55px;">${label}</th>`;
         });
-        headHTML += `<th class="text-center" style="min-width: 75px; background: #e0e7ff; color: #4f46e5;">Total</th>`;
-        headRow.innerHTML = headHTML;
+        headerHTML += `<th class="text-center" style="min-width: 80px; background: #e0e7ff; color: #4f46e5;">Total</th>`;
+        headRow.innerHTML = headerHTML;
 
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
 
-        if (listData.length === 0) {
-            const totalCols = 4 + datesList.length;
-            tbody.innerHTML = `<tr><td colspan="${totalCols}" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock pada rentang tanggal tersebut.</td></tr>`;
-        } else {
-            listData.forEach((item, idx) => {
-                let rowHTML = `
-                    <tr>
-                        <td>${idx + 1}</td>
-                        <td><strong>${escapeHtml(item.nama)}</strong></td>
-                        <td>${escapeHtml(item.satuan)}</td>
-                `;
-
-                let rowTotal = 0;
-                datesList.forEach(dKey => {
-                    const qty = item.daily[dKey] || 0;
-                    rowTotal += qty;
-                    rowHTML += `<td class="text-center">${qty > 0 ? (Number.isInteger(qty) ? qty : qty.toFixed(2).replace(/\.?0+$/, '')) : '-'}</td>`;
-                });
-
-                rowHTML += `<td class="text-center" style="font-weight: 800; background: #f8fafc; color: #4f46e5;">${Number.isInteger(rowTotal) ? rowTotal : rowTotal.toFixed(2).replace(/\.?0+$/, '')}</td>`;
-                rowHTML += `</tr>`;
-                tbody.innerHTML += rowHTML;
-            });
+        if (!listData || listData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${datesList.length + 4}" class="empty-state">Tidak ada data stock pada rentang tanggal ini.</td></tr>`;
+            return;
         }
+
+        listData.forEach((row, index) => {
+            let trHTML = `<tr><td>${index + 1}</td><td><strong>${escapeHtml(row.nama)}</strong></td><td>${escapeHtml(row.satuan)}</td>`;
+            let totalRow = 0;
+
+            datesList.forEach(d => {
+                const val = row.daily[d] || 0;
+                totalRow += val;
+                trHTML += `<td class="text-center">${val > 0 ? val : '-'}</td>`;
+            });
+
+            trHTML += `<td class="text-center" style="background: #f8fafc; font-weight: 800; color: #4f46e5;">${totalRow}</td></tr>`;
+            tbody.innerHTML += trHTML;
+        });
     }
 
     window.backToNormalView = function() {
         isRangeReportMode = false;
         container.classList.remove('range-mode');
-        location.reload();
-    };
 
-    window.enableInvoicePreviewMode = function() {
-        const formCard = document.getElementById('formCard');
-        const actionCols = document.querySelectorAll('.action-col');
-        const previewBtn = document.getElementById('previewBtn');
-        const rangeExportBtn = document.getElementById('rangeExportBtn');
-        const webHeader = document.getElementById('webHeader');
-        const invoiceHeader = document.getElementById('invoiceHeader');
-        const invoiceMeta = document.getElementById('invoiceMeta');
-        const invoiceFooter = document.getElementById('invoiceFooter');
-        const noticeBanner = document.getElementById('pastDateNotice');
-        const floatingBar = document.getElementById('floatingEditBar');
-        const selectedDate = getCurrentSelectedDate();
+        document.getElementById('webHeader').style.display = 'flex';
+        document.getElementById('invoiceHeader').style.display = 'none';
+        document.getElementById('invoiceMeta').style.display = 'none';
+        document.getElementById('invoiceFooter').style.display = 'none';
+        document.getElementById('floatingEditBar').style.display = 'none';
 
-        if (formCard) formCard.style.display = 'none';
-        if (noticeBanner) noticeBanner.style.display = 'none';
-        actionCols.forEach(el => el.style.display = 'none');
-        if (previewBtn) previewBtn.style.display = 'none';
-        webHeader.style.display = 'none';
-
-        invoiceHeader.style.display = 'block';
-        invoiceMeta.style.display = 'flex';
-        invoiceFooter.style.display = 'flex';
-        floatingBar.style.display = 'flex';
-        if (rangeExportBtn && sessionStorage.getItem('userRole') !== 'user') rangeExportBtn.style.display = 'inline-flex';
-
-        const dateObj = new Date(selectedDate + 'T00:00:00');
-        document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('printTimestamp').innerText = 'Di Cetak Tanggal : ' + new Date().toLocaleString('id-ID');
-
-        const editableElements = [
-            document.getElementById('invTitleHeader'),
-            document.getElementById('invSubHeader'),
-            document.getElementById('lblPetugasText'),
-            document.getElementById('valPetugasText'),
-            document.getElementById('lblMengetahuiText'),
-            document.getElementById('lblJabatanText'),
-            document.getElementById('valMengetahuiName')
-        ];
-
-        if (!isRangeReportMode) {
-            document.querySelectorAll('.editable-item-text').forEach(el => editableElements.push(el));
+        const role = sessionStorage.getItem('userRole');
+        if (role === 'admin') {
+            document.getElementById('previewBtn').style.display = 'inline-flex';
+            document.getElementById('rangeExportBtn').style.display = 'inline-flex';
         }
 
-        editableElements.forEach(el => {
-            if(el) {
-                el.setAttribute('contenteditable', 'true');
-                el.classList.add('editable-active');
-            }
-        });
+        document.getElementById('backToNormalBtn').style.display = 'none';
+
+        renderUIState();
+        listenToDailyData();
     };
 
-    function escapeHtml(str) {
-        return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    function enableInvoicePreviewMode() {
+        document.getElementById('webHeader').style.display = 'none';
+        document.getElementById('invoiceHeader').style.display = 'block';
+        document.getElementById('invoiceMeta').style.display = 'flex';
+        document.getElementById('invoiceFooter').style.display = 'flex';
+        document.getElementById('floatingEditBar').style.display = 'flex';
+
+        const selectedDate = getCurrentSelectedDate();
+        const dateObj = new Date(selectedDate + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        document.getElementById('invoiceDateText').innerText = formattedDate;
+        document.getElementById('printTimestamp').innerText = 'Dicetak: ' + new Date().toLocaleString('id-ID');
+
+        makeElementsEditable(true);
     }
 
-    // MODAL DIALOG EXPORT PNG
+    function makeElementsEditable(isEditable) {
+        const editableIDs = ['invTitleHeader', 'invSubHeader', 'lblPetugasText', 'valPetugasText', 'lblMengetahuiText', 'lblJabatanText', 'valMengetahuiName'];
+        editableIDs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.contentEditable = isEditable ? 'true' : 'false';
+                if (isEditable) {
+                    el.classList.add('editable-active');
+                } else {
+                    el.classList.remove('editable-active');
+                }
+            }
+        });
+    }
+
     window.openExportModal = function() {
-        const defaultName = sessionStorage.getItem('userName') || document.getElementById('valPetugasText').innerText.replace(/[()]/g, '').trim() || 'Riyan';
-        document.getElementById('exportPetugasInput').value = defaultName;
+        const currentPetugas = document.getElementById('valPetugasText').innerText.replace(/[()]/g, '').trim();
+        document.getElementById('exportPetugasInput').value = currentPetugas;
         document.getElementById('exportModal').classList.add('active');
     };
 
@@ -2075,110 +2036,64 @@
         document.getElementById('exportModal').classList.remove('active');
     };
 
-    function preloadAllImagesInElement(element) {
-        const images = element.querySelectorAll('img');
-        const promises = Array.from(images).map(img => {
-            return new Promise((resolve) => {
-                if (img.complete && img.naturalHeight !== 0) {
-                    resolve();
-                } else {
-                    img.onload = () => resolve();
-                    img.onerror = () => resolve();
-                }
-            });
-        });
-        return Promise.all(promises);
-    }
-
-    // PROSES EKSPOR PNG DENGAN UNDUHAN OTOMATIS LANGSUNG KE FOLDER DOWNLOAD
-    window.processExportPNG = async function() {
-        const exportBtnModal = document.getElementById('exportProcessBtn');
-        if (exportBtnModal) {
-            exportBtnModal.disabled = true;
-            exportBtnModal.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+    window.processExportPNG = function() {
+        const inputName = document.getElementById('exportPetugasInput').value.trim();
+        if (inputName) {
+            document.getElementById('valPetugasText').innerText = `( ${inputName} )`;
         }
-
-        const namaInput = document.getElementById('exportPetugasInput').value.trim();
-        const namaPetugas = namaInput || sessionStorage.getItem('userName') || 'Riyan';
-        document.getElementById('valPetugasText').innerText = `( ${namaPetugas} )`;
-
-        const formCard = document.getElementById('formCard');
-        const actionCols = document.querySelectorAll('.action-col');
-        const previewBtn = document.getElementById('previewBtn');
-        const exportBtn = document.getElementById('exportBtn');
-        const rangeExportBtn = document.getElementById('rangeExportBtn');
-        const backToNormalBtn = document.getElementById('backToNormalBtn');
-        const webHeader = document.getElementById('webHeader');
-        const invoiceHeader = document.getElementById('invoiceHeader');
-        const invoiceMeta = document.getElementById('invoiceMeta');
-        const invoiceFooter = document.getElementById('invoiceFooter');
-        const noticeBanner = document.getElementById('pastDateNotice');
-        const floatingBar = document.getElementById('floatingEditBar');
-        const searchContainer = document.getElementById('searchBarContainer');
-        const selectedDate = getCurrentSelectedDate();
-
-        if (formCard) formCard.style.display = 'none';
-        if (noticeBanner) noticeBanner.style.display = 'none';
-        if (searchContainer) searchContainer.style.display = 'none';
-        actionCols.forEach(el => el.style.display = 'none');
-        if (previewBtn) previewBtn.style.display = 'none';
-        if (exportBtn) exportBtn.style.display = 'none';
-        if (rangeExportBtn) rangeExportBtn.style.display = 'none';
-        if (backToNormalBtn) backToNormalBtn.style.display = 'none';
-        if (webHeader) webHeader.style.display = 'none';
-        if (floatingBar) floatingBar.style.display = 'none';
-
-        if (invoiceHeader) invoiceHeader.style.display = 'block';
-        if (invoiceMeta) invoiceMeta.style.display = 'flex';
-        if (invoiceFooter) invoiceFooter.style.display = 'flex';
-
-        document.querySelectorAll('[contenteditable="true"]').forEach(el => el.removeAttribute('contenteditable'));
-
-        if (!isRangeReportMode) {
-            const dateObj = new Date(selectedDate + 'T00:00:00');
-            document.getElementById('invoiceDateText').innerText = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        }
-        document.getElementById('printTimestamp').innerText = 'Dicetak Tanggal : ' + new Date().toLocaleString('id-ID');
-
         closeExportModal();
 
-        try {
-            await preloadAllImagesInElement(container);
+        const exportBtn = document.getElementById('exportBtn');
+        exportBtn.disabled = true;
+        exportBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
 
-            const canvas = await html2canvas(container, {
+        const wasWebHeaderVisible = document.getElementById('webHeader').style.display !== 'none';
+        
+        document.getElementById('webHeader').style.display = 'none';
+        document.getElementById('invoiceHeader').style.display = 'block';
+        document.getElementById('invoiceMeta').style.display = 'flex';
+        document.getElementById('invoiceFooter').style.display = 'flex';
+
+        const actionCols = document.querySelectorAll('.action-col');
+        actionCols.forEach(col => col.style.display = 'none');
+
+        const selectedDate = getCurrentSelectedDate();
+        document.getElementById('invoiceDateText').innerText = selectedDate;
+        document.getElementById('printTimestamp').innerText = 'Dicetak: ' + new Date().toLocaleString('id-ID');
+
+        setTimeout(() => {
+            html2canvas(container, {
                 scale: 2,
                 useCORS: true,
-                allowTaint: true,
-                backgroundColor: "#ffffff",
-                logging: false
+                logging: false,
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                if (wasWebHeaderVisible && !isRangeReportMode) {
+                    document.getElementById('webHeader').style.display = 'flex';
+                    document.getElementById('invoiceHeader').style.display = 'none';
+                    document.getElementById('invoiceMeta').style.display = 'none';
+                    document.getElementById('invoiceFooter').style.display = 'none';
+                }
+                actionCols.forEach(col => col.style.display = '');
+
+                exportBtn.disabled = false;
+                exportBtn.innerHTML = `<i class="fa-solid fa-file-image"></i> Export ke PNG`;
+
+                const link = document.createElement('a');
+                link.download = `Laporan_Stock_SPPG_${selectedDate}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.error("Gagal export PNG:", err);
+                showCustomAlert('Gagal Export', 'Terjadi kesalahan saat memproses gambar.', 'danger');
+                exportBtn.disabled = false;
+                exportBtn.innerHTML = `<i class="fa-solid fa-file-image"></i> Export ke PNG`;
             });
-
-            const dataUrl = canvas.toDataURL('image/png');
-            const fileName = `Laporan_Stock_${selectedDate}.png`;
-            const downloadLink = document.createElement('a');
-
-            downloadLink.href = dataUrl;
-            downloadLink.download = fileName;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-
-            showCustomAlert('Berhasil Export', 'Berkas laporan PNG berhasil diunduh dan tersimpan di folder Unduhan (Downloads).', 'success');
-
-            setTimeout(() => {
-                location.reload();
-            }, 1500);
-
-        } catch (err) {
-            console.error("Gagal export ke PNG:", err);
-            showCustomAlert('Gagal Export', 'Terjadi kesalahan saat memproses laporan ke format PNG.', 'danger');
-            setTimeout(() => {
-                location.reload();
-            }, 2000);
-        }
+        }, 500);
     };
 
     checkAuth();
 </script>
+
 </body>
 </html>
