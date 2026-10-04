@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- html2canvas untuk export ke PNG/JPG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- jsPDF untuk export ke PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         :root {
@@ -750,27 +752,8 @@
 
 <!-- Aplikasi Utama -->
 <div class="container" id="captureArea" style="display: none; background: #ffffff; padding: 2rem; border-radius: 16px;">
-    
-    <!-- Header Invoice -->
-    <div class="invoice-print-header" id="invoiceHeader">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 70px; height: 70px; border-radius: 12px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--border-color);">
-                    <img src="logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';" crossorigin="anonymous">
-                </div>
-                <div>
-                    <h2 id="invTitleHeader" style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">SPPG KOTA SERANG SERANG SERANG 2</h2>
-                    <p id="invSubHeader" style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten</p>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <span style="background: #e0e7ff; color: #4f46e5; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;" id="badgeReportType">LAPORAN HARIAN</span>
-                <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;" id="printTimestamp">Dicetak: -</p>
-            </div>
-        </div>
-    </div>
 
-    <!-- Header Aplikasi Standar -->
+    <!-- Header Aplikasi Standar (Bagian atas yang tidak dicetak saat export) -->
     <div class="header" id="webHeader">
         <div class="header-brand">
             <div class="app-logo">
@@ -796,11 +779,6 @@
                 <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
             </button>
         </div>
-    </div>
-
-    <div class="invoice-print-meta" id="invoiceMeta">
-        <div><strong>Tanggal Laporan:</strong> <span id="invoiceDateText">-</span></div>
-        <div><strong>Status Dokumen:</strong> Verified & Validated</div>
     </div>
 
     <div class="notice-banner" id="pastDateNotice">
@@ -846,60 +824,87 @@
         </form>
     </div>
 
-    <!-- Tabel Data Stock -->
-    <div class="table-container">
-        <div class="table-header-bar">
-            <h2 id="tableTitle">Daftar Stock Bahan Baku</h2>
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <button type="button" class="btn btn-info" id="previewBtn" onclick="openCodeModal()">
-                    <i class="fa-solid fa-eye"></i> Admin
-                </button>
-                <button type="button" class="btn btn-success" id="exportBtn" onclick="openExportModal()">
-                    <i class="fa-solid fa-file-image"></i> Export ke PNG
-                </button>
+    <!-- WRAPPER UNTUK EXPORT LOKASI TABEL & HEADER KHUSUS SEBALIKNYA -->
+    <div id="exportContainer" style="background: #ffffff; padding: 10px; border-radius: 12px;">
+        <!-- Header Invoice (Satu-satunya Header yang muncul saat Export) -->
+        <div class="invoice-print-header" id="invoiceHeader" style="display: block;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div style="width: 70px; height: 70px; border-radius: 12px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--border-color);">
+                        <img src="logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';" crossorigin="anonymous">
+                    </div>
+                    <div>
+                        <h2 id="invTitleHeader" style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">SPPG KOTA SERANG SERANG SERANG 2</h2>
+                        <p id="invSubHeader" style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten</p>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="background: #e0e7ff; color: #4f46e5; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 1px;" id="badgeReportType">LAPORAN HARIAN</span>
+                    <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;" id="printTimestamp">Dicetak: -</p>
+                </div>
             </div>
         </div>
 
-        <div class="search-container" id="searchBarContainer">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" class="search-input" placeholder="Cari nama barang atau satuan..." onkeyup="filterTableItems()">
+        <div class="invoice-print-meta" id="invoiceMeta" style="display: flex;">
+            <div><strong>Tanggal Laporan:</strong> <span id="invoiceDateText">-</span></div>
+            <div><strong>Status Dokumen:</strong> Verified & Validated</div>
+        </div>
+
+        <!-- Tabel Data Stock -->
+        <div class="table-container">
+            <div class="table-header-bar">
+                <h2 id="tableTitle">Daftar Stock Bahan Baku</h2>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" class="action-col">
+                    <button type="button" class="btn btn-info" id="previewBtn" onclick="openCodeModal()">
+                        <i class="fa-solid fa-eye"></i> Admin
+                    </button>
+                    <button type="button" class="btn btn-success" id="exportBtn" onclick="openExportModal()">
+                        <i class="fa-solid fa-file-image"></i> Export Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="search-container" id="searchBarContainer">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Cari nama barang atau satuan..." onkeyup="filterTableItems()">
+                </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table id="mainTable">
+                    <thead>
+                        <tr id="tableHeadRow">
+                            <th style="width: 5%;">No</th>
+                            <th id="thNamaCol">Nama Barang/Bahan Baku</th>
+                            <th style="width: 12%;">Satuan</th>
+                            <th style="width: 12%;" id="thJumlahCol">Jumlah</th>
+                            <th style="width: 15%;">Expired</th>
+                            <th style="width: 18%;">Foto</th>
+                            <th style="width: 14%;" class="text-center action-col" id="thAksiCol">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
         </div>
 
-        <div style="overflow-x: auto;">
-            <table id="mainTable">
-                <thead>
-                    <tr id="tableHeadRow">
-                        <th style="width: 5%;">No</th>
-                        <th id="thNamaCol">Nama Barang/Bahan Baku</th>
-                        <th style="width: 12%;">Satuan</th>
-                        <th style="width: 12%;" id="thJumlahCol">Jumlah</th>
-                        <th style="width: 15%;">Expired</th>
-                        <th style="width: 18%;">Foto</th>
-                        <th style="width: 14%;" class="text-center action-col" id="thAksiCol">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Footer Tanda Tangan -->
-    <div class="invoice-print-footer" id="invoiceFooter">
-        <div class="signature-box">
-            <div>
-                <p id="lblPetugasText">Petugas SO</p>
-                <div class="signature-space"></div>
+        <!-- Footer Tanda Tangan -->
+        <div class="invoice-print-footer" id="invoiceFooter" style="display: flex;">
+            <div class="signature-box">
+                <div>
+                    <p id="lblPetugasText">Petugas SO</p>
+                    <div class="signature-space"></div>
+                </div>
+                <div class="signature-line" id="valPetugasText">( Riyan )</div>
             </div>
-            <div class="signature-line" id="valPetugasText">( Riyan )</div>
-        </div>
-        <div class="signature-box">
-            <div>
-                <p id="lblMengetahuiText">Mengetahui</p>
-                <p id="lblJabatanText">Kepala SPPG Kota Serang 2</p>
+            <div class="signature-box">
+                <div>
+                    <p id="lblMengetahuiText">Mengetahui</p>
+                    <p id="lblJabatanText">Kepala SPPG Kota Serang 2</p>
+                </div>
+                <div class="signature-line" id="valMengetahuiName">( Mohamad Fakhrurozi )</div>
             </div>
-            <div class="signature-line" id="valMengetahuiName">( Mohamad Fakhrurozi )</div>
         </div>
     </div>
 
@@ -915,19 +920,26 @@
     </div>
 </div>
 
-<!-- Modal Export PNG -->
+<!-- Modal Export PNG / PDF -->
 <div class="modal-overlay" id="exportModal">
     <div class="modal-box" style="text-align: left;">
-        <div class="modal-icon icon-info" style="margin: 0 auto 1rem auto;"><i class="fa-solid fa-file-image"></i></div>
-        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; text-align: center;">Export Laporan ke PNG</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;">Konfirmasi nama Petugas SO sebelum mengunduh laporan.</p>
-        <div class="form-group" style="margin-bottom: 1.25rem;">
+        <div class="modal-icon icon-info" style="margin: 0 auto 1rem auto;"><i class="fa-solid fa-file-export"></i></div>
+        <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; text-align: center;">Export Laporan</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;">Konfirmasi nama Petugas SO & Format sebelum mengunduh.</p>
+        <div class="form-group" style="margin-bottom: 1rem;">
             <label for="exportPetugasInput">Nama Petugas SO</label>
             <input type="text" id="exportPetugasInput" class="form-control" placeholder="Masukkan nama petugas">
         </div>
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label for="exportFormatSelect">Pilih Format Unduhan</label>
+            <select id="exportFormatSelect" class="form-control">
+                <option value="png">Gambar (PNG)</option>
+                <option value="pdf">Dokumen (PDF)</option>
+            </select>
+        </div>
         <div class="modal-actions">
             <button type="button" class="btn-cancel-modal" onclick="closeExportModal()">Batal</button>
-            <button type="button" class="btn btn-success" id="exportProcessBtn" onclick="processExportPNG()"><i class="fa-solid fa-download"></i> Unduh PNG</button>
+            <button type="button" class="btn btn-success" id="exportProcessBtn" onclick="processExportReport()"><i class="fa-solid fa-download"></i> Unduh File</button>
         </div>
     </div>
 </div>
@@ -1893,9 +1905,6 @@
 
     function enableInvoicePreviewMode() {
         document.getElementById('webHeader').style.display = 'none';
-        document.getElementById('invoiceHeader').style.display = 'block';
-        document.getElementById('invoiceMeta').style.display = 'flex';
-        document.getElementById('invoiceFooter').style.display = 'flex';
         document.getElementById('floatingEditBar').style.display = 'flex';
 
         const selectedDate = getCurrentSelectedDate();
@@ -1928,8 +1937,11 @@
         document.getElementById('exportModal').classList.remove('active');
     };
 
-    window.processExportPNG = function() {
+    // PROSES EXPORT TERPISAH KHUSUS HANYA UNTUK AREA LAPORAN & DUKUNG PNG/PDF
+    window.processExportReport = function() {
         const inputName = document.getElementById('exportPetugasInput').value.trim();
+        const exportFormat = document.getElementById('exportFormatSelect').value;
+
         if (inputName) {
             document.getElementById('valPetugasText').innerText = `( ${inputName} )`;
         }
@@ -1939,53 +1951,65 @@
         exportBtn.disabled = true;
         exportBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
 
-        const wasWebHeaderVisible = document.getElementById('webHeader').style.display !== 'none';
-        
-        document.getElementById('webHeader').style.display = 'none';
-        document.getElementById('invoiceHeader').style.display = 'block';
-        document.getElementById('invoiceMeta').style.display = 'flex';
-        document.getElementById('invoiceFooter').style.display = 'flex';
-
         const actionCols = document.querySelectorAll('.action-col');
+        const searchBox = document.getElementById('searchBarContainer');
+
         actionCols.forEach(col => col.style.display = 'none');
+        if (searchBox) searchBox.style.display = 'none';
 
         const selectedDate = getCurrentSelectedDate();
-        document.getElementById('invoiceDateText').innerText = selectedDate;
+        const dateObj = new Date(selectedDate + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        document.getElementById('invoiceDateText').innerText = formattedDate;
         document.getElementById('printTimestamp').innerText = 'Dicetak: ' + new Date().toLocaleString('id-ID');
 
+        const targetExportArea = document.getElementById('exportContainer');
+
         setTimeout(() => {
-            html2canvas(container, {
+            html2canvas(targetExportArea, {
                 scale: 2,
                 useCORS: true,
                 logging: false,
                 backgroundColor: "#ffffff"
             }).then(canvas => {
-                if (wasWebHeaderVisible) {
-                    document.getElementById('webHeader').style.display = 'flex';
-                    document.getElementById('invoiceHeader').style.display = 'none';
-                    document.getElementById('invoiceMeta').style.display = 'none';
-                    document.getElementById('invoiceFooter').style.display = 'none';
-                }
                 actionCols.forEach(col => col.style.display = '');
+                if (searchBox) searchBox.style.display = 'flex';
 
                 exportBtn.disabled = false;
-                exportBtn.innerHTML = `<i class="fa-solid fa-file-image"></i> Export ke PNG`;
+                exportBtn.innerHTML = `<i class="fa-solid fa-file-image"></i> Export Data`;
 
-                const link = document.createElement('a');
-                link.download = `Laporan_Stock_SPPG_${selectedDate}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+                if (exportFormat === 'png') {
+                    const link = document.createElement('a');
+                    link.download = `Laporan_Stock_SPPG_${selectedDate}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                } else if (exportFormat === 'pdf') {
+                    const { jsPDF } = window.jspdf;
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 210; // Ukuran A4 standar (mm)
+                    const pageHeight = 297;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    let position = 0;
+
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    pdf.save(`Laporan_Stock_SPPG_${selectedDate}.pdf`);
+                }
             }).catch(err => {
-                console.error("Gagal export PNG:", err);
-                showCustomAlert('Gagal Export', 'Terjadi kesalahan saat memproses gambar.', 'danger');
+                console.error("Gagal export laporan:", err);
+                showCustomAlert('Gagal Export', 'Terjadi kesalahan saat memproses laporan.', 'danger');
+                actionCols.forEach(col => col.style.display = '');
+                if (searchBox) searchBox.style.display = 'flex';
                 exportBtn.disabled = false;
-                exportBtn.innerHTML = `<i class="fa-solid fa-file-image"></i> Export ke PNG`;
+                exportBtn.innerHTML = `<i class="fa-solid fa-file-image"></i> Export Data`;
             });
-        }, 500);
+        }, 300);
     };
 
     checkAuth();
 </script>
 
 </body>
-</htm
+</html>
