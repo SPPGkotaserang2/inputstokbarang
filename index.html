@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <!-- Viewport dinamis untuk menangani kunci zoom dan tampilan mobile khusus login -->
     <meta name="viewport" id="viewportMeta" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Input Bahan Baku Dapur</title>
     <!-- Google Fonts & FontAwesome -->
@@ -28,6 +29,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
+            touch-action: manipulation; /* Mencegah double-tap zoom pada layar sentuh */
         }
 
         body {
@@ -40,6 +42,7 @@
             min-height: 100vh;
         }
 
+        /* PERBAIKAN KHUSUS LAYAR LOGIN MOBILE & KUNCI ZOOM */
         .login-wrapper {
             position: fixed;
             top: 0;
@@ -52,20 +55,59 @@
             justify-content: center;
             z-index: 10000;
             padding: 1rem;
-            overflow: hidden;
-            touch-action: none;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: none; /* Mencegah pinch-zoom / ciut pada wrapper login */
         }
 
         .login-card {
             background: var(--card-bg);
             width: 100%;
-            max-width: 360px;
+            max-width: 380px;
             padding: 2rem 1.5rem;
             border-radius: 24px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             border: 1px solid var(--border-color);
             text-align: center;
             margin: auto;
+            touch-action: auto;
+        }
+
+        /* PERBAIKAN KHUSUS TAMPILAN MOBILE DI BAGIAN LOGIN */
+        @media screen and (max-width: 768px) {
+            .login-wrapper {
+                padding: 1.25rem 0.75rem;
+                align-items: center;
+            }
+            .login-card {
+                width: 92% !important;
+                max-width: 350px !important;
+                padding: 1.5rem 1.125rem !important;
+                border-radius: 20px !important;
+            }
+            .login-logo {
+                width: 65px !important;
+                height: 65px !important;
+                margin-bottom: 0.75rem !important;
+            }
+            .login-header h2 {
+                font-size: 1.15rem !important;
+            }
+            .login-header p {
+                font-size: 0.75rem !important;
+                margin-bottom: 1rem !important;
+            }
+            .login-form .form-group {
+                margin-bottom: 0.85rem !important;
+            }
+            .login-form .form-control {
+                padding: 0.75rem 0.85rem !important;
+                font-size: 16px !important; /* Minimum 16px agar Safari/iOS tidak otomatis zoom saat diklik */
+            }
+            .login-form .btn {
+                padding: 0.75rem 1rem !important;
+                font-size: 0.875rem !important;
+            }
         }
 
         .login-logo {
@@ -139,14 +181,9 @@
         }
 
         .container {
-            width: 950px;
+            width: 980px;
             margin: 0 auto;
             transition: all 0.3s ease;
-        }
-
-        .container.range-mode {
-            width: 100% !important;
-            max-width: 98vw;
         }
 
         .header {
@@ -240,6 +277,7 @@
         .date-filter-box label {
             font-size: 0.875rem;
             color: #0891b2;
+            font-weight: 600;
         }
 
         .date-filter-box input[type="date"] {
@@ -671,7 +709,7 @@
         <div class="login-header">
             <h2>INPUT DATA</h2>
             <h2>STOCK BAHAN BAKU</h2>
-            <p>SPPG KOTA SERANG 2</p>
+            <p>SPPG KOTA SERANG SERANG SERANG 2</p>
         </div>
         <div class="error-alert" id="loginError">
             <i class="fa-solid fa-circle-exclamation"></i>
@@ -692,6 +730,12 @@
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
                 <i class="fa-solid fa-right-to-bracket"></i> Masuk
             </button>
+            
+            <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                <button type="button" class="btn btn-warning" style="width: 100%; font-size: 0.85rem;" onclick="enterPublicGuestMode()">
+                    <i class="fa-solid fa-eye"></i> Lihat Stok
+                </button>
+            </div>
         </form>
     </div>
 </div>
@@ -715,7 +759,7 @@
                     <img src="logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';" crossorigin="anonymous">
                 </div>
                 <div>
-                    <h2 id="invTitleHeader" style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">SPPG KOTA SERANG 2</h2>
+                    <h2 id="invTitleHeader" style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">SPPG KOTA SERANG SERANG SERANG 2</h2>
                     <p id="invSubHeader" style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten</p>
                 </div>
             </div>
@@ -733,7 +777,7 @@
                 <img src="logo.png" alt="Logo Header" onerror="this.onerror=null; this.remove(); document.querySelector('.app-logo').innerHTML='<i class=\'fa-solid fa-utensils\'></i>';" crossorigin="anonymous">
             </div>
             <div class="header-title">
-                <h1>SPPG KOTA SERANG 2</h1>
+                <h1>SPPG KOTA SERANG SERANG SERANG 2</h1>
                 <p>Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten 42116</p>
             </div>
         </div>
@@ -744,8 +788,8 @@
             <div class="live-clock" id="liveClock">
                 <i class="fa-regular fa-clock"></i> <span id="clockText">00:00:00</span>
             </div>
-            <div class="date-filter-box">
-                <label for="selectedDate"><i class="fa-solid fa-calendar-days"></i></label>
+            <div class="date-filter-box" id="dailyDateFilterBox">
+                <label for="selectedDate"><i class="fa-solid fa-calendar-days"></i> Pilih Tanggal:</label>
                 <input type="date" id="selectedDate" onchange="onDateChange()">
             </div>
             <button class="btn btn-logout" onclick="logout()" title="Keluar dari sistem" id="logoutBtn">
@@ -755,7 +799,7 @@
     </div>
 
     <div class="invoice-print-meta" id="invoiceMeta">
-        <div><strong>Periode Laporan:</strong> <span id="invoiceDateText">-</span></div>
+        <div><strong>Tanggal Laporan:</strong> <span id="invoiceDateText">-</span></div>
         <div><strong>Status Dokumen:</strong> Verified & Validated</div>
     </div>
 
@@ -766,7 +810,7 @@
 
     <div class="notice-banner" id="locationBlockedNotice" style="background:#fee2e2; border-color:#ef4444; color:#991b1b;">
         <i class="fa-solid fa-lock"></i>
-        <span><strong>AKSES INPUT DIKUNCI!</strong> Anda tidak berada di area lokasi SPPG KOTA SERANG 2. Silakan berada di lokasi resmi untuk dapat menginput data stock.</span>
+        <span><strong>AKSES INPUT DIKUNCI!</strong> Anda tidak berada di area lokasi SPPG KOTA SERANG SERANG SERANG 2. Silakan berada di lokasi resmi untuk dapat menginput data stock.</span>
     </div>
 
     <!-- Form Input Data -->
@@ -807,17 +851,11 @@
         <div class="table-header-bar">
             <h2 id="tableTitle">Daftar Stock Bahan Baku</h2>
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <button type="button" class="btn btn-warning" id="rangeExportBtn" onclick="openRangeModal()" style="display:none;">
-                    <i class="fa-solid fa-calendar-week"></i> Rekap Rentang Tanggal
-                </button>
                 <button type="button" class="btn btn-info" id="previewBtn" onclick="openCodeModal()">
                     <i class="fa-solid fa-eye"></i> Admin
                 </button>
                 <button type="button" class="btn btn-success" id="exportBtn" onclick="openExportModal()">
                     <i class="fa-solid fa-file-image"></i> Export ke PNG
-                </button>
-                <button type="button" class="btn btn-primary" id="backToNormalBtn" onclick="backToNormalView()" style="display:none;">
-                    <i class="fa-solid fa-arrow-left"></i> Kembali ke Harian
                 </button>
             </div>
         </div>
@@ -835,10 +873,10 @@
                     <tr id="tableHeadRow">
                         <th style="width: 5%;">No</th>
                         <th id="thNamaCol">Nama Barang/Bahan Baku</th>
-                        <th style="width: 10%;">Satuan</th>
-                        <th style="width: 10%;" id="thJumlahCol">Jumlah</th>
-                        <th style="width: 14%;">Expired</th>
-                        <th style="width: 16%;">Foto</th>
+                        <th style="width: 12%;">Satuan</th>
+                        <th style="width: 12%;" id="thJumlahCol">Jumlah</th>
+                        <th style="width: 15%;">Expired</th>
+                        <th style="width: 18%;">Foto</th>
                         <th style="width: 14%;" class="text-center action-col" id="thAksiCol">Aksi</th>
                     </tr>
                 </thead>
@@ -952,29 +990,6 @@
     </div>
 </div>
 
-<!-- Modal Multi-Tanggal -->
-<div class="modal-overlay" id="rangeModal">
-    <div class="modal-box" style="max-width: 460px; text-align: left;">
-        <div class="modal-icon icon-warning" style="margin: 0 auto 1rem auto;"><i class="fa-solid fa-calendar-days"></i></div>
-        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center;">Rekap Laporan Multi-Tanggal</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center;">Pilih rentang tanggal untuk merekap data secara kolektif.</p>
-        
-        <div class="form-group" style="margin-bottom: 1rem;">
-            <label for="startDateRange">Dari Tanggal:</label>
-            <input type="date" id="startDateRange" class="form-control">
-        </div>
-        <div class="form-group" style="margin-bottom: 1.5rem;">
-            <label for="endDateRange">Sampai Tanggal:</label>
-            <input type="date" id="endDateRange" class="form-control">
-        </div>
-
-        <div class="modal-actions">
-            <button type="button" class="btn-cancel-modal" onclick="closeRangeModal()">Batal</button>
-            <button type="button" class="btn btn-warning" onclick="generateRangeReport()" style="color: white;">Buat Rekap</button>
-        </div>
-    </div>
-</div>
-
 <!-- Modal Hapus -->
 <div class="modal-overlay" id="deleteModal">
     <div class="modal-box">
@@ -993,6 +1008,32 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
+    // FUNGSI KHUSUS UNTUK MENJAGA ZOOM DILOCK DAN PAKSA MOBILE DI HALAMAN LOGIN
+    function setViewportForLogin(isLoginScreen) {
+        const vp = document.getElementById('viewportMeta');
+        if (isLoginScreen) {
+            vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            document.body.style.minWidth = "auto";
+        } else {
+            vp.setAttribute('content', 'width=1024, initial-scale=0.35, minimum-scale=0.1, maximum-scale=3.0, user-scalable=yes');
+            document.body.style.minWidth = "1024px";
+        }
+    }
+
+    // MEMBLOKIR PINCH-TO-ZOOM PADA LAYAR SENTUH KHUSUS SAAT DI LAYAR LOGIN
+    document.addEventListener('touchmove', function (event) {
+        if (document.getElementById('loginScreen').style.display !== 'none' && event.touches.length > 1) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+
+    // MEMBLOKIR GESTURE ZOOM KONTROL PADA SAFARI/IOS
+    document.addEventListener('gesturestart', function (event) {
+        if (document.getElementById('loginScreen').style.display !== 'none') {
+            event.preventDefault();
+        }
+    });
+
     const container = document.getElementById('captureArea');
 
     const TARGET_LAT = -6.1265918;
@@ -1011,9 +1052,6 @@
         "adminso": { pass: "Admin123", role: "user", name: "AdminSo" }
     };
 
-    let isRangeReportMode = false;
-    let cachedDatesList = [];
-    let cachedAggregatedData = [];
     let rawDailyData = null;
 
     const WA_PHONE = "6283111399112";
@@ -1135,28 +1173,58 @@
         logoutTimer = setTimeout(() => { logout(true); }, 10800000);
     }
 
+    // MODE LIHAT STOK KANAN-LUAR (PUBLIC GUEST - BISA PILIH 1 TANGGAL)
+    window.enterPublicGuestMode = function() {
+        sessionStorage.clear();
+        sessionStorage.setItem('isGuest', 'true');
+        sessionStorage.setItem('userRole', 'guest');
+
+        setViewportForLogin(false);
+        document.getElementById('loginScreen').style.display = 'none';
+        container.style.display = 'block';
+
+        // Sembunyikan elemen input dan fitur khusus admin
+        document.getElementById('formCard').style.display = 'none';
+        document.getElementById('previewBtn').style.display = 'none';
+        document.getElementById('exportBtn').style.display = 'none';
+        document.getElementById('locStatusBadge').style.display = 'none';
+        document.getElementById('pastDateNotice').style.display = 'none';
+        document.getElementById('locationBlockedNotice').style.display = 'none';
+        
+        // Sesuaikan tombol logout menjadi Kembali Ke Login
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Kembali ke Login`;
+        
+        initDatePicker();
+        renderUIState();
+        listenToDailyData();
+    };
+
     function checkAuth() {
         const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+        const isGuest = sessionStorage.getItem('isGuest');
         const userRole = sessionStorage.getItem('userRole');
-        const viewportMeta = document.getElementById('viewportMeta');
-        
+
+        if (isGuest === 'true') {
+            enterPublicGuestMode();
+            return;
+        }
+
         if (isLoggedIn === 'true') {
-            viewportMeta.setAttribute('content', 'width=950');
+            setViewportForLogin(false);
             document.getElementById('loginScreen').style.display = 'none';
             container.style.display = 'block';
             
             if (userRole === 'user') {
                 if (document.getElementById('previewBtn')) document.getElementById('previewBtn').style.display = 'none';
-                if (document.getElementById('rangeExportBtn')) document.getElementById('rangeExportBtn').style.display = 'none';
             } else {
                 if (document.getElementById('previewBtn')) document.getElementById('previewBtn').style.display = 'inline-flex';
-                if (document.getElementById('rangeExportBtn')) document.getElementById('rangeExportBtn').style.display = 'inline-flex';
             }
 
             resetLogoutTimer();
             initApp();
         } else {
-            viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            setViewportForLogin(true);
             document.getElementById('loginScreen').style.display = 'flex';
             container.style.display = 'none';
             if (logoutTimer) clearTimeout(logoutTimer);
@@ -1190,16 +1258,20 @@
 
     function logout(isAuto = false) {
         const userName = sessionStorage.getItem('userName') || 'Pengguna';
+        const isGuest = sessionStorage.getItem('isGuest');
+        
         sessionStorage.clear();
         if (logoutTimer) clearTimeout(logoutTimer);
         
-        if (isAuto) {
-            sendWhatsAppNotification(`⏰ *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nSistem telah melakukan *LOGOUT OTOMATIS* untuk pengguna *${userName}* karena sesi telah melewati batas waktu.`);
-        } else {
-            sendWhatsAppNotification(`🚪 *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nPengguna *${userName}* telah melakukan *LOGOUT* dari sistem.`);
+        if (!isGuest) {
+            if (isAuto) {
+                sendWhatsAppNotification(`⏰ *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nSistem telah melakukan *LOGOUT OTOMATIS* untuk pengguna *${userName}* karena sesi telah melewati batas waktu.`);
+            } else {
+                sendWhatsAppNotification(`🚪 *PEMBERITAHUAN SISTEM SO BAHAN BAKU*\n\nPengguna *${userName}* telah melakukan *LOGOUT* dari sistem.`);
+            }
         }
         
-        checkAuth();
+        location.reload();
     }
 
     const firebaseConfig = {
@@ -1234,8 +1306,6 @@
     function initDatePicker() {
         const todayStr = getFormattedDate();
         document.getElementById('selectedDate').value = todayStr;
-        document.getElementById('startDateRange').value = todayStr;
-        document.getElementById('endDateRange').value = todayStr;
     }
 
     function initApp() {
@@ -1249,21 +1319,25 @@
 
     function onDateChange() {
         document.getElementById('searchInput').value = '';
-        if (isRangeReportMode) return;
         renderUIState();
         listenToDailyData();
     }
 
     function renderUIState() {
-        if (isRangeReportMode) return;
         const selectedDate = getCurrentSelectedDate();
         const today = getFormattedDate();
         const dateObj = new Date(selectedDate + 'T00:00:00');
         const formattedName = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         const userRole = sessionStorage.getItem('userRole');
 
-        document.getElementById('tableTitle').innerText = `Daftar Stock Barang/Bahan Baku (${formattedName})`;
+        document.getElementById('tableTitle').innerText = `Daftar Stock Barang (${formattedName})`;
         
+        if (userRole === 'guest') {
+            document.getElementById('formCard').style.display = 'none';
+            document.getElementById('pastDateNotice').style.display = 'none';
+            return;
+        }
+
         if (selectedDate !== today) {
             if (userRole === 'admin') {
                 document.getElementById('formCard').style.display = 'block';
@@ -1282,7 +1356,6 @@
 
     let currentRef = null;
     function listenToDailyData() {
-        if (isRangeReportMode) return;
         const selectedDate = getCurrentSelectedDate();
         if (currentRef) currentRef.off();
         currentRef = db.ref('stock_barang/' + selectedDate);
@@ -1294,20 +1367,6 @@
 
     function filterTableItems() {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
-        
-        if (isRangeReportMode) {
-            if (!cachedAggregatedData) return;
-            const filteredData = cachedAggregatedData.filter(item => {
-                return item.nama.toLowerCase().includes(query) || item.satuan.toLowerCase().includes(query);
-            });
-            renderRangeReportMatrix(
-                document.getElementById('startDateRange').value,
-                document.getElementById('endDateRange').value,
-                cachedDatesList,
-                filteredData
-            );
-            return;
-        }
 
         if (!rawDailyData) return;
 
@@ -1379,7 +1438,7 @@
             const data = snapshot.val();
             const currentUserName = sessionStorage.getItem('userName') || "Riyan";
             const def = {
-                headerTitle: "SPPG KOTA SERANG 2",
+                headerTitle: "SPPG KOTA SERANG SERANG SERANG 2",
                 headerSub: "Jl. Kolonel Tubagus Suwandi Kav. BRI 2 No.19, Serang, Kec. Serang, Kota Serang, Banten",
                 petugasLabel: "Petugas SO",
                 petugasName: currentUserName,
@@ -1404,10 +1463,10 @@
             headerTitle: document.getElementById('invTitleHeader').innerText.trim(),
             headerSub: document.getElementById('invSubHeader').innerText.trim(),
             petugasLabel: document.getElementById('lblPetugasText').innerText.trim(),
-            petugasName: document.getElementById('valPetugasText').innerText.replace(/[()]/g, '').trim(),
+            petugasName: document.getElementById('valPetugasText').replace(/[()]/g, '').trim(),
             mengetahuiLabel: document.getElementById('lblMengetahuiText').innerText.trim(),
             jabatanLabel: document.getElementById('lblJabatanText').innerText.trim(),
-            mengetahuiName: document.getElementById('valMengetahuiName').innerText.replace(/[()]/g, '').trim()
+            mengetahuiName: document.getElementById('valMengetahuiName').replace(/[()]/g, '').trim()
         };
 
         db.ref('settings/signature').set(cfg).then(() => {
@@ -1468,7 +1527,7 @@
                     const dateObj = new Date(selectedDate + 'T00:00:00');
                     const dateStr = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                     const timeStr = new Date().toLocaleTimeString('id-ID');
-                    const locStr = (lat && lng) ? `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)} (SPPG KOTA SERANG 2)` : "GPS: -";
+                    const locStr = (lat && lng) ? `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)} (SPPG KOTA SERANG SERANG SERANG 2)` : "GPS: -";
 
                     const fontSize = Math.max(16, Math.floor(width / 32));
                     const padding = 15;
@@ -1493,7 +1552,6 @@
         });
     }
 
-    // MEMANGGIL GAS UNTUK UPLOAD DENGAN TAMBAHAN DUA PARAMETER BARU (namaBarang & tanggalInput)
     async function uploadPhotoToGoogleDrive(base64Data, fileName, namaBarang, tanggalInput) {
         const payload = {
             base64: base64Data,
@@ -1528,26 +1586,24 @@
     }
 
     function renderTableDaily(dataObj) {
-        const headRow = document.getElementById('tableHeadRow');
-        headRow.innerHTML = `
-            <th style="width: 5%;">No</th>
-            <th>Nama Barang/Bahan Baku</th>
-            <th style="width: 10%;">Satuan</th>
-            <th style="width: 10%;">Jumlah</th>
-            <th style="width: 14%;">Expired</th>
-            <th style="width: 16%;">Foto</th>
-            <th style="width: 14%;" class="text-center action-col">Aksi</th>
-        `;
+        const userRole = sessionStorage.getItem('userRole');
+        const isGuest = (userRole === 'guest');
+
+        const thAksiCol = document.getElementById('thAksiCol');
+        if (isGuest) {
+            if (thAksiCol) thAksiCol.style.display = 'none';
+        } else {
+            if (thAksiCol) thAksiCol.style.display = '';
+        }
 
         const tbody = document.getElementById('tableBody');
-        const userRole = sessionStorage.getItem('userRole');
         const isToday = (getCurrentSelectedDate() === getFormattedDate());
-        const isEditable = isToday || (userRole === 'admin');
+        const isEditable = !isGuest && (isToday || (userRole === 'admin'));
 
         tbody.innerHTML = '';
 
         if (!dataObj || typeof dataObj !== 'object') {
-            tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal/pencarian ini.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${isGuest ? 6 : 7}" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal ini.</td></tr>`;
             return;
         }
 
@@ -1597,13 +1653,13 @@
                         <td><strong class="editable-item-text" data-key="${key}" data-field="jumlah">${item.jumlah !== undefined ? item.jumlah : 0}</strong></td>
                         <td>${expiredDisplay}</td>
                         <td>${photoDisplay}</td>
-                        <td class="text-center action-col">${actionButton}</td>
+                        ${!isGuest ? `<td class="text-center action-col">${actionButton}</td>` : ''}
                     </tr>
                 `;
             }
         });
         if (index === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal/pencarian ini.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${isGuest ? 6 : 7}" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal ini.</td></tr>`;
         }
     }
 
@@ -1667,7 +1723,7 @@
         }
 
         if (!isLocationValid) {
-            showCustomAlert('Akses Di-Blokir', 'Aplikasi hanya dapat digunakan di lokasi SPPG KOTA SERANG 2. Aktifkan GPS dan berada di lokasi resmi!', 'danger');
+            showCustomAlert('Akses Di-Blokir', 'Aplikasi hanya dapat digunakan di lokasi SPPG KOTA SERANG SERANG SERANG 2. Aktifkan GPS dan berada di lokasi resmi!', 'danger');
             return;
         }
 
@@ -1690,14 +1746,13 @@
 
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah & Memproses Foto...`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah & Memproses...`;
 
         try {
             const file = fotoInput.files[0];
             const base64Photo = await convertFileToBase64WithWatermark(file, userCurrentLat, userCurrentLng);
             const fileName = `${selectedDate}_${nama.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
 
-            // MENGIRIM DUA PARAMETER BARU UNTUK PROSES DRIVE AUTOMATION
             const driveResponse = await uploadPhotoToGoogleDrive(base64Photo, fileName, nama, selectedDate);
 
             const ref = db.ref('stock_barang/' + selectedDate);
@@ -1730,7 +1785,7 @@
                 loadMasterDataList();
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
-                showCustomAlert('Berhasil', 'Data barang berhasil disimpan ke folder ' + (driveResponse.folderName || 'Drive') + '.', 'success');
+                showCustomAlert('Berhasil', 'Data barang berhasil disimpan.', 'success');
             });
         } catch (error) {
             console.error('Error unggah ke Sistem :', error);
@@ -1836,164 +1891,6 @@
         }
     };
 
-    window.openRangeModal = function() {
-        document.getElementById('rangeModal').classList.add('active');
-    };
-    window.closeRangeModal = function() {
-        document.getElementById('rangeModal').classList.remove('active');
-    };
-
-    window.generateRangeReport = function() {
-        const startStr = document.getElementById('startDateRange').value;
-        const endStr = document.getElementById('endDateRange').value;
-
-        if (!startStr || !endStr) {
-            showCustomAlert('Validasi', 'Silakan tentukan tanggal awal dan akhir.', 'warning');
-            return;
-        }
-
-        if (startStr > endStr) {
-            showCustomAlert('Validasi', 'Tanggal awal tidak boleh lebih besar dari tanggal akhir.', 'warning');
-            return;
-        }
-
-        closeRangeModal();
-
-        db.ref('stock_barang').once('value', (snapshot) => {
-            const allData = snapshot.val() || {};
-            const datesList = [];
-            const aggregatedMap = {};
-
-            let curr = new Date(startStr + 'T00:00:00');
-            const last = new Date(endStr + 'T00:00:00');
-
-            while (curr <= last) {
-                datesList.push(getFormattedDate(curr));
-                curr.setDate(curr.getDate() + 1);
-            }
-
-            datesList.forEach(dateKey => {
-                const dayData = allData[dateKey];
-                if (dayData && typeof dayData === 'object') {
-                    Object.keys(dayData).forEach(k => {
-                        const item = dayData[k];
-                        if (item && item.nama) {
-                            const cleanName = item.nama.trim();
-                            const mapKey = cleanName.toLowerCase();
-                            const qty = parseJumlahInput(item.jumlah);
-                            const sat = item.satuan ? item.satuan.trim() : '';
-
-                            if (!aggregatedMap[mapKey]) {
-                                aggregatedMap[mapKey] = { nama: cleanName, satuan: sat, daily: {} };
-                            }
-                            aggregatedMap[mapKey].daily[dateKey] = (aggregatedMap[mapKey].daily[dateKey] || 0) + qty;
-                            if (sat) aggregatedMap[mapKey].satuan = sat;
-                        }
-                    });
-                }
-            });
-
-            cachedDatesList = datesList;
-
-            cachedAggregatedData = Object.values(aggregatedMap)
-                .filter(item => {
-                    const totalQty = Object.values(item.daily).reduce((sum, val) => sum + val, 0);
-                    return totalQty > 0;
-                })
-                .sort((a, b) => a.nama.localeCompare(b.nama));
-            
-            isRangeReportMode = true;
-            renderRangeReportMatrix(startStr, endStr, cachedDatesList, cachedAggregatedData);
-        });
-    };
-
-    function renderRangeReportMatrix(startStr, endStr, datesList, listData) {
-        const formCard = document.getElementById('formCard');
-        const previewBtn = document.getElementById('previewBtn');
-        const rangeExportBtn = document.getElementById('rangeExportBtn');
-        const backToNormalBtn = document.getElementById('backToNormalBtn');
-        const webHeader = document.getElementById('webHeader');
-        const invoiceHeader = document.getElementById('invoiceHeader');
-        const invoiceMeta = document.getElementById('invoiceMeta');
-        const invoiceFooter = document.getElementById('invoiceFooter');
-        const noticeBanner = document.getElementById('pastDateNotice');
-        const floatingBar = document.getElementById('floatingEditBar');
-
-        if (formCard) formCard.style.display = 'none';
-        if (noticeBanner) noticeBanner.style.display = 'none';
-        if (previewBtn) previewBtn.style.display = 'none';
-        webHeader.style.display = 'none';
-        container.classList.add('range-mode');
-
-        invoiceHeader.style.display = 'block';
-        invoiceMeta.style.display = 'flex';
-        invoiceFooter.style.display = 'flex';
-        if (floatingBar) floatingBar.style.display = 'flex';
-        if (rangeExportBtn) rangeExportBtn.style.display = 'none';
-        if (backToNormalBtn) backToNormalBtn.style.display = 'inline-flex';
-
-        document.getElementById('badgeReportType').innerText = 'REKAP LAPORAN';
-
-        const dStart = new Date(startStr + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-        const dEnd = new Date(endStr + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-        document.getElementById('invoiceDateText').innerText = `${dStart} - ${dEnd}`;
-        document.getElementById('tableTitle').innerText = `Rekapitulasi Stock (${datesList.length} Hari)`;
-
-        const headRow = document.getElementById('tableHeadRow');
-        let headerHTML = `<th style="width: 40px;">No</th><th>Nama Barang</th><th style="width: 70px;">Satuan</th>`;
-        datesList.forEach(d => {
-            const dt = new Date(d + 'T00:00:00');
-            const label = dt.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit' });
-            headerHTML += `<th class="text-center" style="min-width: 55px;">${label}</th>`;
-        });
-        headerHTML += `<th class="text-center" style="min-width: 80px; background: #e0e7ff; color: #4f46e5;">Total</th>`;
-        headRow.innerHTML = headerHTML;
-
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-
-        if (!listData || listData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${datesList.length + 4}" class="empty-state">Tidak ada data stock pada rentang tanggal ini.</td></tr>`;
-            return;
-        }
-
-        listData.forEach((row, index) => {
-            let trHTML = `<tr><td>${index + 1}</td><td><strong>${escapeHtml(row.nama)}</strong></td><td>${escapeHtml(row.satuan)}</td>`;
-            let totalRow = 0;
-
-            datesList.forEach(d => {
-                const val = row.daily[d] || 0;
-                totalRow += val;
-                trHTML += `<td class="text-center">${val > 0 ? val : '-'}</td>`;
-            });
-
-            trHTML += `<td class="text-center" style="background: #f8fafc; font-weight: 800; color: #4f46e5;">${totalRow}</td></tr>`;
-            tbody.innerHTML += trHTML;
-        });
-    }
-
-    window.backToNormalView = function() {
-        isRangeReportMode = false;
-        container.classList.remove('range-mode');
-
-        document.getElementById('webHeader').style.display = 'flex';
-        document.getElementById('invoiceHeader').style.display = 'none';
-        document.getElementById('invoiceMeta').style.display = 'none';
-        document.getElementById('invoiceFooter').style.display = 'none';
-        document.getElementById('floatingEditBar').style.display = 'none';
-
-        const role = sessionStorage.getItem('userRole');
-        if (role === 'admin') {
-            document.getElementById('previewBtn').style.display = 'inline-flex';
-            document.getElementById('rangeExportBtn').style.display = 'inline-flex';
-        }
-
-        document.getElementById('backToNormalBtn').style.display = 'none';
-
-        renderUIState();
-        listenToDailyData();
-    };
-
     function enableInvoicePreviewMode() {
         document.getElementById('webHeader').style.display = 'none';
         document.getElementById('invoiceHeader').style.display = 'block';
@@ -2017,11 +1914,6 @@
             const el = document.getElementById(id);
             if (el) {
                 el.contentEditable = isEditable ? 'true' : 'false';
-                if (isEditable) {
-                    el.classList.add('editable-active');
-                } else {
-                    el.classList.remove('editable-active');
-                }
             }
         });
     }
@@ -2068,7 +1960,7 @@
                 logging: false,
                 backgroundColor: "#ffffff"
             }).then(canvas => {
-                if (wasWebHeaderVisible && !isRangeReportMode) {
+                if (wasWebHeaderVisible) {
                     document.getElementById('webHeader').style.display = 'flex';
                     document.getElementById('invoiceHeader').style.display = 'none';
                     document.getElementById('invoiceMeta').style.display = 'none';
@@ -2096,4 +1988,4 @@
 </script>
 
 </body>
-</html>
+</htm
