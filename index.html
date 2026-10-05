@@ -781,6 +781,32 @@
         </div>
     </div>
 
+    <!-- PANEL KHUSUS ADMIN (KIRIM PESAN INFO & KONTROL USER) -->
+    <div class="card" id="adminControlPanel" style="display: none; background: #f8fafc; border: 2px dashed #4f46e5;">
+        <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #4f46e5;"><i class="fa-solid fa-bullhorn"></i> Panel Admin: Kirim Informasi / Broadcast & Kelola User</h3>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div class="form-group" style="flex: 1; min-width: 250px;">
+                <label for="adminBroadcastMsg">Pesan / Info Profesional</label>
+                <textarea id="adminBroadcastMsg" class="form-control" rows="2" placeholder="Tuliskan informasi atau instruksi untuk user..."></textarea>
+            </div>
+            <div class="form-group" style="width: 220px;">
+                <label for="adminAttachFile">Lampiran (Foto/Video/Audio/File)</label>
+                <input type="file" id="adminAttachFile" class="form-control" accept="image/*,video/*,audio/*,.pdf,.doc,.docx">
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" onclick="sendAdminBroadcast()"><i class="fa-solid fa-paper-plane"></i> Kirim Info ke User</button>
+            <div id="adminUserStatusInfo" style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted);">Status User: Memuat...</div>
+        </div>
+        <!-- Kotak Tampilan Balasan User -->
+        <div style="margin-top: 1.25rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-main);"><i class="fa-solid fa-comments"></i> Balasan Masuk dari User:</h4>
+            <div id="adminUserReplyBox" style="background: #ffffff; padding: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-muted); min-height: 50px;">
+                Belum ada balasan dari user.
+            </div>
+        </div>
+    </div>
+
     <div class="notice-banner" id="pastDateNotice">
         <i class="fa-solid fa-triangle-exclamation"></i>
         <span id="pastDateNoticeText">Anda sedang melihat data arsip masa lalu. Input data baru hanya aktif untuk hari ini.</span>
@@ -814,7 +840,7 @@
                     <input type="date" id="expiredDate" class="form-control" title="Pilih tanggal kadaluarsa (opsional)">
                 </div>
                 <div class="form-group">
-                    <label for="fotoBahan"><i class="fa-solid fa-camera"></i> Foto</label>
+                    <label for="fotoBahan"><i class="fa-solid fa-camera"></i> Foto <span id="labelFotoReq" style="color:var(--danger-color)">*</span></label>
                     <input type="file" id="fotoBahan" class="form-control" accept="image/*" capture="environment" required>
                 </div>
                 <button type="submit" id="submitBtn" class="btn btn-primary">
@@ -917,6 +943,28 @@
         <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;" id="alertModalTitle">Notifikasi</h3>
         <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.5rem;" id="alertModalMessage">Pesan informasi</p>
         <button type="button" class="btn btn-primary" onclick="closeCustomAlert()" style="width: 100%;">OK</button>
+    </div>
+</div>
+
+<!-- Modal Popup Admin Broadcast untuk User (Wajib Balas) -->
+<div class="modal-overlay" id="adminBroadcastPopupModal" style="background: rgba(15, 23, 42, 0.85);">
+    <div class="modal-box" style="max-width: 480px; text-align: left;">
+        <div class="modal-icon icon-warning" style="margin: 0 auto 1rem auto;"><i class="fa-solid fa-circle-exclamation"></i></div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center; color: var(--warning-color);">Pemberitahuan Profesional dari Admin</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; text-align: center;">Input barang dikunci sementara sampai Anda membalas pesan ini.</p>
+        
+        <div id="broadcastContentDisplay" style="background: #f8fafc; padding: 1rem; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-main);">
+            <!-- Pesan / Lampiran dari Admin -->
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+            <label for="userReplyInput">Balasan Anda (Wajib diisi untuk melanjutkan)</label>
+            <textarea id="userReplyInput" class="form-control" rows="3" placeholder="Ketik balasan Anda di sini..."></textarea>
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="submitUserReply()" style="width: 100%;">
+            <i class="fa-solid fa-paper-plane"></i> Kirim Balasan & Buka Kunci Input
+        </button>
     </div>
 </div>
 
@@ -1089,6 +1137,17 @@
         const badgeText = document.getElementById('locStatusText');
         const submitBtn = document.getElementById('submitBtn');
         const blockedNotice = document.getElementById('locationBlockedNotice');
+        const loggedUser = sessionStorage.getItem('userName');
+
+        // Khusus admin "Serang" dengan password "Mandiri02srg", bisa akses di luar lokasi SPPG tanpa harus ada di lokasi[cite: 3]
+        if (loggedUser === "Serang") {
+            isLocationValid = true;
+            badge.className = "location-badge loc-valid";
+            badgeText.innerHTML = `<i class="fa-solid fa-user-shield"></i>Admin`;
+            if (blockedNotice) blockedNotice.style.display = 'none';
+            if (submitBtn) submitBtn.disabled = false;
+            return;
+        }
 
         if (!navigator.geolocation) {
             badge.className = "location-badge loc-invalid";
@@ -1202,6 +1261,7 @@
         document.getElementById('locStatusBadge').style.display = 'none';
         document.getElementById('pastDateNotice').style.display = 'none';
         document.getElementById('locationBlockedNotice').style.display = 'none';
+        document.getElementById('adminControlPanel').style.display = 'none';
         
         // Sesuaikan tombol logout menjadi Kembali Ke Login
         const logoutBtn = document.getElementById('logoutBtn');
@@ -1216,6 +1276,7 @@
         const isLoggedIn = sessionStorage.getItem('isLoggedIn');
         const isGuest = sessionStorage.getItem('isGuest');
         const userRole = sessionStorage.getItem('userRole');
+        const userName = sessionStorage.getItem('userName');
 
         if (isGuest === 'true') {
             enterPublicGuestMode();
@@ -1227,14 +1288,27 @@
             document.getElementById('loginScreen').style.display = 'none';
             container.style.display = 'block';
             
-            if (userRole === 'user') {
+            if (userName === "Serang") {
+                // Tampilkan panel admin khusus untuk Serang - Mandiri02srg[cite: 3]
+                document.getElementById('adminControlPanel').style.display = 'block';
+                document.getElementById('previewBtn').style.display = 'inline-flex';
+                // Foto opsional untuk admin[cite: 3]
+                const fotoInput = document.getElementById('fotoBahan');
+                if (fotoInput) fotoInput.removeAttribute('required');
+                const reqLabel = document.getElementById('labelFotoReq');
+                if (reqLabel) reqLabel.style.display = 'none';
+                listenToAdminFeatures();
+            } else if (userRole === 'user') {
                 if (document.getElementById('previewBtn')) document.getElementById('previewBtn').style.display = 'none';
+                // User mendengarkan pesan broadcast / info dari admin
+                listenToUserBroadcastState();
             } else {
                 if (document.getElementById('previewBtn')) document.getElementById('previewBtn').style.display = 'inline-flex';
             }
 
             resetLogoutTimer();
             initApp();
+            checkAndRecordAttendance();
         } else {
             setViewportForLogin(true);
             document.getElementById('loginScreen').style.display = 'flex';
@@ -1249,6 +1323,7 @@
         const passInput = document.getElementById('password').value;
         const key = userInput.toLowerCase();
 
+        // Mendukung login "Serang" / "Mandiri02srg" dan "AdminSo" / "Admin123"[cite: 3]
         if (USERS_DATABASE[key] && USERS_DATABASE[key].pass === passInput) {
             const userData = USERS_DATABASE[key];
             sessionStorage.setItem('isLoggedIn', 'true');
@@ -1351,7 +1426,7 @@
         }
 
         if (selectedDate !== today) {
-            if (userRole === 'admin') {
+            if (userRole === 'admin' || sessionStorage.getItem('userName') === 'Serang') {
                 document.getElementById('formCard').style.display = 'block';
                 document.getElementById('pastDateNotice').style.display = 'flex';
                 document.getElementById('pastDateNoticeText').innerHTML = `<strong>Mode Admin:</strong> Anda sedang mengelola data arsip tanggal <strong>${formattedName}</strong>. Akses full edit & tambah data aktif.`;
@@ -1610,7 +1685,7 @@
 
         const tbody = document.getElementById('tableBody');
         const isToday = (getCurrentSelectedDate() === getFormattedDate());
-        const isEditable = !isGuest && (isToday || (userRole === 'admin'));
+        const isEditable = !isGuest && (isToday || (userRole === 'admin') || (sessionStorage.getItem('userName') === 'Serang'));
 
         tbody.innerHTML = '';
 
@@ -1724,12 +1799,154 @@
         document.getElementById('imageModal').classList.remove('active');
     };
 
+    // FITUR: KELOLA BROADCAST ADMIN & PENGECEKAN KEHADIRAN / TIDAK HADIR
+    function sendAdminBroadcast() {
+        const msg = document.getElementById('adminBroadcastMsg').value.trim();
+        const fileInput = document.getElementById('adminAttachFile');
+
+        if (!msg && (!fileInput.files || fileInput.files.length === 0)) {
+            showCustomAlert('Validasi', 'Masukkan pesan info atau lampiran file terlebih dahulu.', 'warning');
+            return;
+        }
+
+        const processBroadcast = (fileData = null, fileName = '') => {
+            const payload = {
+                message: msg,
+                fileData: fileData,
+                fileName: fileName,
+                timestamp: Date.now(),
+                active: true
+            };
+
+            db.ref('admin_broadcast').set(payload).then(() => {
+                document.getElementById('adminBroadcastMsg').value = '';
+                fileInput.value = '';
+                showCustomAlert('Berhasil', 'Pesan info & file profesional berhasil dikirim ke user.', 'success');
+            }).catch(err => {
+                console.error("Gagal broadcast:", err);
+                showCustomAlert('Gagal', 'Terjadi kesalahan saat mengirim info.', 'danger');
+            });
+        };
+
+        if (fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                processBroadcast(e.target.result, file.name);
+            };
+        } else {
+            processBroadcast();
+        }
+    }
+
+    function listenToAdminFeatures() {
+        // Mendengarkan status balasan user di panel admin
+        db.ref('user_reply').on('value', (snapshot) => {
+            const data = snapshot.val();
+            const replyBox = document.getElementById('adminUserReplyBox');
+            const statusInfo = document.getElementById('adminUserStatusInfo');
+
+            if (data && data.text) {
+                const timeStr = new Date(data.timestamp || Date.now()).toLocaleTimeString('id-ID');
+                replyBox.innerHTML = `<strong>Waktu (${timeStr}):</strong> ${escapeHtml(data.text)}`;
+                statusInfo.innerHTML = `<span style="color: var(--success-gradient);"><i class="fa-solid fa-circle-check"></i> User sudah membalas & aktif menginput.</span>`;
+            } else {
+                replyBox.innerHTML = `Belum ada balasan dari user. User sedang diblokir inputnya menunggu balasan.`;
+                statusInfo.innerHTML = `<span style="color: var(--danger-color);"><i class="fa-solid fa-triangle-exclamation"></i> Menunggu balasan user...</span>`;
+            }
+        });
+    }
+
+    function listenToUserBroadcastState() {
+        db.ref('admin_broadcast').on('value', (snapshot) => {
+            const data = snapshot.val();
+            const submitBtn = document.getElementById('submitBtn');
+            const itemFormInput = document.getElementById('itemForm');
+
+            if (data && data.active) {
+                // User harus membalas dulu untuk melanjutkan input barang[cite: 3]
+                if (submitBtn) submitBtn.disabled = true;
+
+                let contentHtml = `<p><strong>Pesan Admin:</strong> ${escapeHtml(data.message || '-')}</p>`;
+                if (data.fileData) {
+                    if (data.fileName && (data.fileName.endsWith('.jpg') || data.fileName.endsWith('.png') || data.fileName.endsWith('.jpeg'))) {
+                        contentHtml += `<div style="margin-top: 0.5rem;"><img src="${data.fileData}" style="max-width: 100%; max-height: 200px; border-radius: 8px;" /></div>`;
+                    } else {
+                        contentHtml += `<div style="margin-top: 0.5rem;"><a href="${data.fileData}" download="${data.fileName}" class="btn btn-info" style="font-size:0.8rem; padding:0.4rem 0.8rem;"><i class="fa-solid fa-download"></i> Download Lampiran: ${escapeHtml(data.fileName)}</a></div>`;
+                    }
+                }
+
+                document.getElementById('broadcastContentDisplay').innerHTML = contentHtml;
+                document.getElementById('adminBroadcastPopupModal').classList.add('active');
+            } else {
+                if (submitBtn && isLocationValid) submitBtn.disabled = false;
+                document.getElementById('adminBroadcastPopupModal').classList.remove('active');
+            }
+        });
+    }
+
+    window.submitUserReply = function() {
+        const replyText = document.getElementById('userReplyInput').value.trim();
+        if (!replyText) {
+            showCustomAlert('Validasi', 'Mohon isi balasan Anda terlebih dahulu.', 'warning');
+            return;
+        }
+
+        db.ref('user_reply').set({
+            text: replyText,
+            timestamp: Date.now(),
+            user: sessionStorage.getItem('userName') || 'AdminSo'
+        }).then(() => {
+            // Nonaktifkan broadcast aktif sehingga user bisa melanjutkan input
+            return db.ref('admin_broadcast/active').set(false);
+        }).then(() => {
+            document.getElementById('userReplyInput').value = '';
+            document.getElementById('adminBroadcastPopupModal').classList.remove('active');
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn && isLocationValid) submitBtn.disabled = false;
+            showCustomAlert('Berhasil', 'Balasan terkirim. Input barang kembali dibuka.', 'success');
+        }).catch(err => {
+            console.error("Gagal kirim balasan:", err);
+            showCustomAlert('Gagal', 'Terjadi kesalahan saat mengirim balasan.', 'danger');
+        });
+    };
+
+    function checkAndRecordAttendance() {
+        // Jika user tidak input sehari maka masuk ke laporan tidak hadir[cite: 3]
+        const todayStr = getFormattedDate();
+        const userName = sessionStorage.getItem('userName');
+        if (userName === 'AdminSo') {
+            db.ref('stock_barang/' + todayStr).once('value', (snapshot) => {
+                const hasInputToday = snapshot.exists() && Object.keys(snapshot.val()).length > 0;
+                
+                // Cek hari sebelumnya (kemarin)
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yestStr = getFormattedDate(yesterday);
+
+                db.ref('stock_barang/' + yestStr).once('value', (snapYest) => {
+                    const hasInputYest = snapYest.exists() && Object.keys(snapYest.val()).length > 0;
+                    if (!hasInputYest) {
+                        // Catat ke laporan tidak hadir di Firebase
+                        db.ref('attendance_reports/' + yestStr).set({
+                            status: 'TIDAK HADIR / TIDAK ADA INPUT',
+                            user: 'AdminSo',
+                            timestamp: Date.now()
+                        });
+                    }
+                });
+            });
+        }
+    }
+
     document.getElementById('itemForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const selectedDate = getCurrentSelectedDate();
         const userRole = sessionStorage.getItem('userRole');
+        const userName = sessionStorage.getItem('userName');
 
-        if (selectedDate !== getFormattedDate() && userRole !== 'admin') {
+        if (selectedDate !== getFormattedDate() && userRole !== 'admin' && userName !== 'Serang') {
             showCustomAlert('Akses Terbatas', 'Hanya Admin yang dapat memasukkan data ke tanggal arsip!', 'warning');
             return;
         }
@@ -1751,7 +1968,8 @@
             return;
         }
 
-        if (!fotoInput.files || fotoInput.files.length === 0) {
+        // Khusus admin "Serang", foto bersifat opsional[cite: 3]
+        if (userName !== 'Serang' && (!fotoInput.files || fotoInput.files.length === 0)) {
             showCustomAlert('Wajib Upload Foto', 'Ambil foto menggunakan kamera terlebih dahulu!', 'warning');
             return;
         }
@@ -1761,11 +1979,15 @@
         submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah & Memproses...`;
 
         try {
-            const file = fotoInput.files[0];
-            const base64Photo = await convertFileToBase64WithWatermark(file, userCurrentLat, userCurrentLng);
-            const fileName = `${selectedDate}_${nama.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
+            let base64Photo = '';
+            let driveResponse = { fileId: '', url: '', directUrl: '' };
 
-            const driveResponse = await uploadPhotoToGoogleDrive(base64Photo, fileName, nama, selectedDate);
+            if (fotoInput.files && fotoInput.files[0]) {
+                const file = fotoInput.files[0];
+                base64Photo = await convertFileToBase64WithWatermark(file, userCurrentLat, userCurrentLng);
+                const fileName = `${selectedDate}_${nama.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
+                driveResponse = await uploadPhotoToGoogleDrive(base64Photo, fileName, nama, selectedDate);
+            }
 
             const ref = db.ref('stock_barang/' + selectedDate);
             ref.orderByChild('nama').equalTo(nama).once('value', (snapshot) => {
@@ -1776,9 +1998,9 @@
                             jumlah: existingVal + jumlah, 
                             satuan: satuan,
                             expiredDate: expiredDate || child.val().expiredDate || '',
-                            driveFileId: driveResponse.fileId,
-                            fotoDriveUrl: driveResponse.url,
-                            fotoDriveDirect: driveResponse.directUrl
+                            driveFileId: driveResponse.fileId || child.val().driveFileId || '',
+                            fotoDriveUrl: driveResponse.url || child.val().fotoDriveUrl || '',
+                            fotoDriveDirect: driveResponse.directUrl || child.val().fotoDriveDirect || ''
                         });
                     });
                 } else {
@@ -1895,7 +2117,7 @@
 
     window.verifySecretCode = function() {
         const code = document.getElementById('secretCodeInput').value.trim();
-        if (code === "071001") {
+        if (code === "071001" || sessionStorage.getItem('userName') === "Serang") {
             closeCodeModal();
             enableInvoicePreviewMode();
         } else {
