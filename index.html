@@ -266,6 +266,19 @@
             border: 1px solid rgba(79, 70, 229, 0.2);
         }
 
+        .net-speed {
+            background: rgba(16, 185, 129, 0.08);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #059669;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
         .date-filter-box {
             display: flex;
             align-items: center;
@@ -771,6 +784,9 @@
             <div class="live-clock" id="liveClock">
                 <i class="fa-regular fa-clock"></i> <span id="clockText">00:00:00</span>
             </div>
+            <div class="net-speed" id="netSpeedIndicator">
+                <i class="fa-solid fa-wifi"></i> <span id="netSpeedText">Menguji Jaringan...</span>
+            </div>
             <div class="date-filter-box" id="dailyDateFilterBox">
                 <label for="selectedDate"><i class="fa-solid fa-calendar-days"></i> Pilih Tanggal:</label>
                 <input type="date" id="selectedDate" onchange="onDateChange()">
@@ -1139,7 +1155,7 @@
         const blockedNotice = document.getElementById('locationBlockedNotice');
         const loggedUser = sessionStorage.getItem('userName');
 
-        // Khusus admin "Serang" dengan password "Mandiri02srg", bisa akses di luar lokasi SPPG tanpa harus ada di lokasi[cite: 3]
+        // Khusus admin "Serang" dengan password "Mandiri02srg", bisa akses di luar lokasi SPPG tanpa harus ada di lokasi
         if (loggedUser === "Serang") {
             isLocationValid = true;
             badge.className = "location-badge loc-valid";
@@ -1289,10 +1305,10 @@
             container.style.display = 'block';
             
             if (userName === "Serang") {
-                // Tampilkan panel admin khusus untuk Serang - Mandiri02srg[cite: 3]
+                // Tampilkan panel admin khusus untuk Serang - Mandiri02srg
                 document.getElementById('adminControlPanel').style.display = 'block';
                 document.getElementById('previewBtn').style.display = 'inline-flex';
-                // Foto opsional untuk admin[cite: 3]
+                // Foto opsional untuk admin
                 const fotoInput = document.getElementById('fotoBahan');
                 if (fotoInput) fotoInput.removeAttribute('required');
                 const reqLabel = document.getElementById('labelFotoReq');
@@ -1323,7 +1339,7 @@
         const passInput = document.getElementById('password').value;
         const key = userInput.toLowerCase();
 
-        // Mendukung login "Serang" / "Mandiri02srg" dan "AdminSo" / "Admin123"[cite: 3]
+        // Mendukung login "Serang" / "Mandiri02srg" dan "AdminSo" / "Admin123"
         if (USERS_DATABASE[key] && USERS_DATABASE[key].pass === passInput) {
             const userData = USERS_DATABASE[key];
             sessionStorage.setItem('isLoggedIn', 'true');
@@ -1382,6 +1398,38 @@
         document.getElementById('clockText').innerText = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
     }, 1000);
 
+    // FITUR: KECEPATAN JARINGAN INTERNET REAL-TIME
+    async function checkInternetSpeed() {
+        const speedText = document.getElementById('netSpeedText');
+        if (!navigator.onLine) {
+            speedText.innerText = "Offline";
+            document.getElementById('netSpeedIndicator').style.borderColor = "#ef4444";
+            document.getElementById('netSpeedIndicator').style.color = "#ef4444";
+            return;
+        }
+
+        try {
+            const startTime = new Date().getTime();
+            // Unduh file gambar kecil untuk tes ping/kecepatan
+            await fetch('https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png?t=' + startTime, { mode: 'no-cors', cache: 'no-store' });
+            const endTime = new Date().getTime();
+            const duration = (endTime - startTime) / 1000; // detik
+            
+            if (duration < 0.3) {
+                speedText.innerText = "Cepat (4G/WiFi)";
+            } else if (duration < 1.0) {
+                speedText.innerText = "Sedang";
+            } else {
+                speedText.innerText = "Lambat";
+            }
+            document.getElementById('netSpeedIndicator').style.borderColor = "rgba(16, 185, 129, 0.2)";
+            document.getElementById('netSpeedIndicator').style.color = "#059669";
+        } catch (e) {
+            speedText.innerText = "Stabil";
+        }
+    }
+    setInterval(checkInternetSpeed, 15000);
+
     function getFormattedDate(date = new Date()) {
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     }
@@ -1402,6 +1450,7 @@
         loadMasterDataList();
         loadGlobalSignatureConfig();
         initGeolocationChecking();
+        checkInternetSpeed();
     }
 
     function onDateChange() {
@@ -1865,7 +1914,7 @@
             const itemFormInput = document.getElementById('itemForm');
 
             if (data && data.active) {
-                // User harus membalas dulu untuk melanjutkan input barang[cite: 3]
+                // User harus membalas dulu untuk melanjutkan input barang
                 if (submitBtn) submitBtn.disabled = true;
 
                 let contentHtml = `<p><strong>Pesan Admin:</strong> ${escapeHtml(data.message || '-')}</p>`;
@@ -1913,7 +1962,7 @@
     };
 
     function checkAndRecordAttendance() {
-        // Jika user tidak input sehari maka masuk ke laporan tidak hadir[cite: 3]
+        // Jika user tidak input sehari maka masuk ke laporan tidak hadir
         const todayStr = getFormattedDate();
         const userName = sessionStorage.getItem('userName');
         if (userName === 'AdminSo') {
@@ -1968,7 +2017,7 @@
             return;
         }
 
-        // Khusus admin "Serang", foto bersifat opsional[cite: 3]
+        // Khusus admin "Serang", foto bersifat opsional
         if (userName !== 'Serang' && (!fotoInput.files || fotoInput.files.length === 0)) {
             showCustomAlert('Wajib Upload Foto', 'Ambil foto menggunakan kamera terlebih dahulu!', 'warning');
             return;
@@ -2159,7 +2208,7 @@
         document.getElementById('exportModal').classList.remove('active');
     };
 
-    // PROSES EXPORT TERPISAH KHUSUS HANYA UNTUK AREA LAPORAN & DUKUNG PNG/PDF
+    // PROSES EXPORT TERPISAH KHUSUS HANYA UNTUK AREA LAPORAN & DUKUNG PNG/PDF DENGAN ANIMASI & BLOB DOWNLOAD iPHONE
     window.processExportReport = function() {
         const inputName = document.getElementById('exportPetugasInput').value.trim();
         const exportFormat = document.getElementById('exportFormatSelect').value;
@@ -2169,9 +2218,10 @@
         }
         closeExportModal();
 
-        const exportBtn = document.getElementById('exportBtn');
+        const exportBtn = document.getElementById('exportProcessBtn') || document.getElementById('exportBtn');
+        const originalBtnHtml = exportBtn.innerHTML;
         exportBtn.disabled = true;
-        exportBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+        exportBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sedang Mengunduh...`;
 
         const actionCols = document.querySelectorAll('.action-col');
         const searchBox = document.getElementById('searchBarContainer');
@@ -2198,14 +2248,25 @@
                 actionCols.forEach(col => col.style.display = '');
                 if (searchBox) searchBox.style.display = 'flex';
 
+                const mainExportBtn = document.getElementById('exportBtn');
+                if (mainExportBtn) {
+                    mainExportBtn.disabled = false;
+                    mainExportBtn.innerHTML = `<i class="fa-solid fa-file-image"></i> Export Data`;
+                }
                 exportBtn.disabled = false;
-                exportBtn.innerHTML = `<i class="fa-solid fa-file-image"></i> Export Data`;
+                exportBtn.innerHTML = originalBtnHtml;
 
                 if (exportFormat === 'png') {
-                    const link = document.createElement('a');
-                    link.download = `Laporan_Stock_SPPG_${selectedDate}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
+                    canvas.toBlob((blob) => {
+                        const blobUrl = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = `Laporan_Stock_SPPG_${selectedDate}.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                    }, 'image/png');
                 } else if (exportFormat === 'pdf') {
                     const { jsPDF } = window.jspdf;
                     const imgData = canvas.toDataURL('image/png');
@@ -2217,15 +2278,30 @@
                     let position = 0;
 
                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    pdf.save(`Laporan_Stock_SPPG_${selectedDate}.pdf`);
+                    
+                    // Menggunakan metode output blob untuk kompatibilitas penyimpanan langsung di iPhone/iOS
+                    const pdfBlob = pdf.output('blob');
+                    const blobUrl = URL.createObjectURL(pdfBlob);
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = `Laporan_Stock_SPPG_${selectedDate}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
                 }
             }).catch(err => {
                 console.error("Gagal export laporan:", err);
                 showCustomAlert('Gagal Export', 'Terjadi kesalahan saat memproses laporan.', 'danger');
                 actionCols.forEach(col => col.style.display = '');
                 if (searchBox) searchBox.style.display = 'flex';
+                const mainExportBtn = document.getElementById('exportBtn');
+                if (mainExportBtn) {
+                    mainExportBtn.disabled = false;
+                    mainExportBtn.innerHTML = `<i class="fa-solid fa-file-image"></i> Export Data`;
+                }
                 exportBtn.disabled = false;
-                exportBtn.innerHTML = `<i class="fa-solid fa-file-image"></i> Export Data`;
+                exportBtn.innerHTML = originalBtnHtml;
             });
         }, 300);
     };
