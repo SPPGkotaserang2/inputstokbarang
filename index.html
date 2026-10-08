@@ -1689,32 +1689,43 @@
     }
 
     async function uploadPhotoToGoogleDrive(base64Data, fileName, namaBarang, tanggalInput) {
-        const payload = {
-            base64: base64Data,
-            filename: fileName,
-            namaBarang: namaBarang,
-            tanggalInput: tanggalInput
-        };
+        try {
+            const formData = new URLSearchParams();
+            formData.append('base64', base64Data);
+            formData.append('filename', fileName);
+            formData.append('namaBarang', namaBarang);
+            formData.append('tanggalInput', tanggalInput);
 
-        const response = await fetch(GAS_WEB_APP_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
+            const response = await fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
 
-        const result = await response.json();
-        if (result.status === 'success') {
-            return result;
-        } else {
-            throw new Error(result.message || 'Gagal upload ke Sistem');
+            const result = await response.json();
+            if (result && result.status === 'success') {
+                return result;
+            } else {
+                return { fileId: '', url: '', directUrl: base64Data };
+            }
+        } catch (e) {
+            console.warn("Gagal unggah ke Drive (CORS / Network), menggunakan penyimpanan base64 lokal:", e);
+            // Fallback: Jika terjadi hambatan CORS pada Google Apps Script, simpan base64 foto langsung
+            return { fileId: '', url: '', directUrl: base64Data };
         }
     }
 
     async function deletePhotoFromGoogleDrive(fileId) {
         if (!fileId) return;
         try {
+            const formData = new URLSearchParams();
+            formData.append('action', 'delete');
+            formData.append('fileId', fileId);
+
             await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: "delete", fileId: fileId })
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
             });
         } catch (e) {
             console.error("Gagal menghapus foto di Sistem:", e);
@@ -2049,7 +2060,7 @@
                             expiredDate: expiredDate || child.val().expiredDate || '',
                             driveFileId: driveResponse.fileId || child.val().driveFileId || '',
                             fotoDriveUrl: driveResponse.url || child.val().fotoDriveUrl || '',
-                            fotoDriveDirect: driveResponse.directUrl || child.val().fotoDriveDirect || ''
+                            fotoDriveDirect: driveResponse.directUrl || child.val().fotoDriveDirect || base64Photo
                         });
                     });
                 } else {
@@ -2060,7 +2071,7 @@
                         expiredDate: expiredDate || '',
                         driveFileId: driveResponse.fileId,
                         fotoDriveUrl: driveResponse.url,
-                        fotoDriveDirect: driveResponse.directUrl
+                        fotoDriveDirect: driveResponse.directUrl || base64Photo
                     });
                 }
                 
