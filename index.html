@@ -2,15 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport dinamis untuk menangani kunci zoom dan tampilan mobile khusus login -->
     <meta name="viewport" id="viewportMeta" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Input Bahan Baku Dapur</title>
-    <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2canvas untuk export ke PNG/JPG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- jsPDF untuk export ke PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
@@ -31,7 +27,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
-            touch-action: manipulation; /* Mencegah double-tap zoom pada layar sentuh */
+            touch-action: manipulation;
         }
 
         body {
@@ -44,7 +40,6 @@
             min-height: 100vh;
         }
 
-        /* PERBAIKAN KHUSUS LAYAR LOGIN MOBILE & KUNCI ZOOM */
         .login-wrapper {
             position: fixed;
             top: 0;
@@ -59,7 +54,7 @@
             padding: 1rem;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            touch-action: none; /* Mencegah pinch-zoom / ciut pada wrapper login */
+            touch-action: none;
         }
 
         .login-card {
@@ -75,7 +70,6 @@
             touch-action: auto;
         }
 
-        /* PERBAIKAN KHUSUS TAMPILAN MOBILE DI BAGIAN LOGIN */
         @media screen and (max-width: 768px) {
             .login-wrapper {
                 padding: 1.25rem 0.75rem;
@@ -104,7 +98,7 @@
             }
             .login-form .form-control {
                 padding: 0.75rem 0.85rem !important;
-                font-size: 16px !important; /* Minimum 16px agar Safari/iOS tidak otomatis zoom saat diklik */
+                font-size: 16px !important;
             }
             .login-form .btn {
                 padding: 0.75rem 1rem !important;
@@ -766,7 +760,7 @@
 <!-- Aplikasi Utama -->
 <div class="container" id="captureArea" style="display: none; background: #ffffff; padding: 2rem; border-radius: 16px;">
 
-    <!-- Header Aplikasi Standar (Bagian atas yang tidak dicetak saat export) -->
+    <!-- Header Aplikasi Standar -->
     <div class="header" id="webHeader">
         <div class="header-brand">
             <div class="app-logo">
@@ -797,7 +791,7 @@
         </div>
     </div>
 
-    <!-- PANEL KHUSUS ADMIN (KIRIM PESAN INFO & KONTROL USER) -->
+    <!-- PANEL KHUSUS ADMIN -->
     <div class="card" id="adminControlPanel" style="display: none; background: #f8fafc; border: 2px dashed #4f46e5;">
         <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: #4f46e5;"><i class="fa-solid fa-bullhorn"></i> Panel Admin: Kirim Informasi / Broadcast & Kelola User</h3>
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
@@ -814,7 +808,6 @@
             <button type="button" class="btn btn-primary" onclick="sendAdminBroadcast()"><i class="fa-solid fa-paper-plane"></i> Kirim Info ke User</button>
             <div id="adminUserStatusInfo" style="font-size: 0.875rem; font-weight: 600; color: var(--text-muted);">Status User: Memuat...</div>
         </div>
-        <!-- Kotak Tampilan Balasan User -->
         <div style="margin-top: 1.25rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
             <h4 style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-main);"><i class="fa-solid fa-comments"></i> Balasan Masuk dari User:</h4>
             <div id="adminUserReplyBox" style="background: #ffffff; padding: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9rem; color: var(--text-muted); min-height: 50px;">
@@ -866,9 +859,8 @@
         </form>
     </div>
 
-    <!-- WRAPPER UNTUK EXPORT LOKASI TABEL & HEADER KHUSUS SEBALIKNYA -->
+    <!-- WRAPPER EXPORT -->
     <div id="exportContainer" style="background: #ffffff; padding: 10px; border-radius: 12px;">
-        <!-- Header Invoice (Satu-satunya Header yang muncul saat Export) -->
         <div class="invoice-print-header" id="invoiceHeader" style="display: block;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 1rem;">
@@ -909,8 +901,12 @@
             <div class="search-container" id="searchBarContainer">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Cari nama barang atau satuan..." onkeyup="filterTableItems()">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Cari nama barang atau satuan..." oninput="filterTableItemsDebounced()">
                 </div>
+                <!-- Tombol Cari Data dengan Animasi Proses -->
+                <button type="button" class="btn btn-primary" id="btnSearchAction" onclick="executeSearchWithAnimation()" style="padding: 0.65rem 1.25rem; font-size: 0.9rem;">
+                    <i class="fa-solid fa-magnifying-glass" id="searchBtnIcon"></i> <span id="searchBtnText">Cari Data</span>
+                </button>
             </div>
 
             <div style="overflow-x: auto;">
@@ -962,16 +958,14 @@
     </div>
 </div>
 
-<!-- Modal Popup Admin Broadcast untuk User (Wajib Balas) -->
+<!-- Modal Popup Admin Broadcast -->
 <div class="modal-overlay" id="adminBroadcastPopupModal" style="background: rgba(15, 23, 42, 0.85);">
     <div class="modal-box" style="max-width: 480px; text-align: left;">
         <div class="modal-icon icon-warning" style="margin: 0 auto 1rem auto;"><i class="fa-solid fa-circle-exclamation"></i></div>
         <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem; text-align: center; color: var(--warning-color);">Pemberitahuan Profesional dari Admin</h3>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem; text-align: center;">Input barang dikunci sementara sampai Anda membalas pesan ini.</p>
         
-        <div id="broadcastContentDisplay" style="background: #f8fafc; padding: 1rem; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-main);">
-            <!-- Pesan / Lampiran dari Admin -->
-        </div>
+        <div id="broadcastContentDisplay" style="background: #f8fafc; padding: 1rem; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-main);"></div>
 
         <div class="form-group" style="margin-bottom: 1rem;">
             <label for="userReplyInput">Balasan Anda (Wajib diisi untuk melanjutkan)</label>
@@ -1084,7 +1078,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 <script>
-    // FUNGSI KHUSUS UNTUK MENJAGA ZOOM DILOCK DAN PAKSA MOBILE DI HALAMAN LOGIN
     function setViewportForLogin(isLoginScreen) {
         const vp = document.getElementById('viewportMeta');
         if (isLoginScreen) {
@@ -1096,14 +1089,12 @@
         }
     }
 
-    // MEMBLOKIR PINCH-TO-ZOOM PADA LAYAR SENTUH KHUSUS SAAT DI LAYAR LOGIN
     document.addEventListener('touchmove', function (event) {
         if (document.getElementById('loginScreen').style.display !== 'none' && event.touches.length > 1) {
             event.preventDefault();
         }
     }, { passive: false });
 
-    // MEMBLOKIR GESTURE ZOOM KONTROL PADA SAFARI/IOS
     document.addEventListener('gesturestart', function (event) {
         if (document.getElementById('loginScreen').style.display !== 'none') {
             event.preventDefault();
@@ -1120,8 +1111,8 @@
     let userCurrentLng = null;
     let isLocationValid = false;
 
-    // URL WEB APP GOOGLE APPS SCRIPT
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxefGrYKqsEm0m1im9UusPMQQ8tO7_n3ZeK_nd_xPju8uPY4PL10aKsoLuYS-a99QVp/exec";
+    // URL WEB APP GOOGLE APPS SCRIPT ANDA
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyCl3u1eGmnEUi95V7im1W1ZIUm2l2h_4--8b0QbPDNjLNfqz6RUaxNEsWvFgi6fbZBCA/exec";
 
     const USERS_DATABASE = {
         "serang": { pass: "Mandiri02srg", role: "admin", name: "Serang" },
@@ -1131,7 +1122,7 @@
     let rawDailyData = null;
 
     const WA_PHONE = "6283111399112";
-    const WA_TOKEN = "uJ8CF79nyQaJbPrVGeeE";
+    const WA_TOKEN = "N1L5tFSqGg2BJQVD42SC";
 
     function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
         const R = 6371e3;
@@ -1155,7 +1146,6 @@
         const blockedNotice = document.getElementById('locationBlockedNotice');
         const loggedUser = sessionStorage.getItem('userName');
 
-        // Khusus admin "Serang" dengan password "Mandiri02srg", bisa akses di luar lokasi SPPG tanpa harus ada di lokasi
         if (loggedUser === "Serang") {
             isLocationValid = true;
             badge.className = "location-badge loc-valid";
@@ -1260,7 +1250,6 @@
         logoutTimer = setTimeout(() => { logout(true); }, 10800000);
     }
 
-    // MODE LIHAT STOK KANAN-LUAR (PUBLIC GUEST - BISA PILIH 1 TANGGAL)
     window.enterPublicGuestMode = function() {
         sessionStorage.clear();
         sessionStorage.setItem('isGuest', 'true');
@@ -1270,7 +1259,6 @@
         document.getElementById('loginScreen').style.display = 'none';
         container.style.display = 'block';
 
-        // Sembunyikan elemen input dan fitur khusus admin
         document.getElementById('formCard').style.display = 'none';
         document.getElementById('previewBtn').style.display = 'none';
         document.getElementById('exportBtn').style.display = 'none';
@@ -1279,7 +1267,6 @@
         document.getElementById('locationBlockedNotice').style.display = 'none';
         document.getElementById('adminControlPanel').style.display = 'none';
         
-        // Sesuaikan tombol logout menjadi Kembali Ke Login
         const logoutBtn = document.getElementById('logoutBtn');
         logoutBtn.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Kembali ke Login`;
         
@@ -1305,10 +1292,8 @@
             container.style.display = 'block';
             
             if (userName === "Serang") {
-                // Tampilkan panel admin khusus untuk Serang - Mandiri02srg
                 document.getElementById('adminControlPanel').style.display = 'block';
                 document.getElementById('previewBtn').style.display = 'inline-flex';
-                // Foto opsional untuk admin
                 const fotoInput = document.getElementById('fotoBahan');
                 if (fotoInput) fotoInput.removeAttribute('required');
                 const reqLabel = document.getElementById('labelFotoReq');
@@ -1316,7 +1301,6 @@
                 listenToAdminFeatures();
             } else if (userRole === 'user') {
                 if (document.getElementById('previewBtn')) document.getElementById('previewBtn').style.display = 'none';
-                // User mendengarkan pesan broadcast / info dari admin
                 listenToUserBroadcastState();
             } else {
                 if (document.getElementById('previewBtn')) document.getElementById('previewBtn').style.display = 'inline-flex';
@@ -1339,7 +1323,6 @@
         const passInput = document.getElementById('password').value;
         const key = userInput.toLowerCase();
 
-        // Mendukung login "Serang" / "Mandiri02srg" dan "AdminSo" / "Admin123"
         if (USERS_DATABASE[key] && USERS_DATABASE[key].pass === passInput) {
             const userData = USERS_DATABASE[key];
             sessionStorage.setItem('isLoggedIn', 'true');
@@ -1398,7 +1381,6 @@
         document.getElementById('clockText').innerText = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
     }, 1000);
 
-    // FITUR: KECEPATAN JARINGAN INTERNET REAL-TIME
     async function checkInternetSpeed() {
         const speedText = document.getElementById('netSpeedText');
         if (!navigator.onLine) {
@@ -1410,10 +1392,9 @@
 
         try {
             const startTime = new Date().getTime();
-            // Unduh file gambar kecil untuk tes ping/kecepatan
             await fetch('https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png?t=' + startTime, { mode: 'no-cors', cache: 'no-store' });
             const endTime = new Date().getTime();
-            const duration = (endTime - startTime) / 1000; // detik
+            const duration = (endTime - startTime) / 1000;
             
             if (duration < 0.3) {
                 speedText.innerText = "Cepat (4G/WiFi)";
@@ -1501,6 +1482,14 @@
         });
     }
 
+    let searchDebounceTimer = null;
+    function filterTableItemsDebounced() {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => {
+            filterTableItems();
+        }, 120);
+    }
+
     function filterTableItems() {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
 
@@ -1524,6 +1513,23 @@
         });
 
         renderTableDaily(filteredDaily);
+    }
+
+    function executeSearchWithAnimation() {
+        const btn = document.getElementById('btnSearchAction');
+        const icon = document.getElementById('searchBtnIcon');
+        const text = document.getElementById('searchBtnText');
+
+        btn.disabled = true;
+        icon.className = "fa-solid fa-spinner fa-spin";
+        text.innerText = "Mencari...";
+
+        setTimeout(() => {
+            filterTableItems();
+            icon.className = "fa-solid fa-magnifying-glass";
+            text.innerText = "Cari Data";
+            btn.disabled = false;
+        }, 350);
     }
 
     function loadMasterDataList() {
@@ -1637,8 +1643,8 @@
                 img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200;
-                    const MAX_HEIGHT = 1200;
+                    const MAX_WIDTH = 1000;
+                    const MAX_HEIGHT = 1000;
                     let width = img.width;
                     let height = img.height;
 
@@ -1663,11 +1669,11 @@
                     const dateObj = new Date(selectedDate + 'T00:00:00');
                     const dateStr = dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
                     const timeStr = new Date().toLocaleTimeString('id-ID');
-                    const locStr = (lat && lng) ? `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)} (SPPG KOTA SERANG SERANG SERANG 2)` : "GPS: -";
+                    const locStr = (lat && lng) ? `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)} (SPPG KOTA SERANG 2)` : "GPS: -";
 
-                    const fontSize = Math.max(16, Math.floor(width / 32));
-                    const padding = 15;
-                    const bannerHeight = (fontSize * 2.8) + (padding * 2);
+                    const fontSize = Math.max(14, Math.floor(width / 35));
+                    const padding = 12;
+                    const bannerHeight = (fontSize * 2.5) + (padding * 2);
 
                     ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
                     ctx.fillRect(0, height - bannerHeight, width, bannerHeight);
@@ -1680,7 +1686,7 @@
                     ctx.font = `${fontSize * 0.9}px Inter, sans-serif`;
                     ctx.fillText(`📍 ${locStr}`, padding, height - padding - 4);
 
-                    resolve(canvas.toDataURL('image/jpeg', 0.85));
+                    resolve(canvas.toDataURL('image/jpeg', 0.8));
                 };
                 img.onerror = error => reject(error);
             };
@@ -1688,6 +1694,7 @@
         });
     }
 
+    // DIPERBAIKI: Mengambil balasan JSON dari Apps Script (menggunakan mode cors standar agar fileId dapat diterima)
     async function uploadPhotoToGoogleDrive(base64Data, fileName, namaBarang, tanggalInput) {
         try {
             const formData = new URLSearchParams();
@@ -1698,23 +1705,22 @@
 
             const response = await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: formData
             });
 
             const result = await response.json();
-            if (result && result.status === 'success') {
-                return result;
-            } else {
-                return { fileId: '', url: '', directUrl: base64Data };
-            }
+            return {
+                fileId: result.fileId || '',
+                url: result.url || '',
+                directUrl: result.directUrl || base64Data
+            };
         } catch (e) {
-            console.warn("Gagal unggah ke Drive (CORS / Network), menggunakan penyimpanan base64 lokal:", e);
-            // Fallback: Jika terjadi hambatan CORS pada Google Apps Script, simpan base64 foto langsung
+            console.warn("Gagal unggah ke Drive, menggunakan backup lokal:", e);
             return { fileId: '', url: '', directUrl: base64Data };
         }
     }
 
+    // DIPERBAIKI: Menghapus foto dari Google Drive menggunakan ID file yang tersimpan
     async function deletePhotoFromGoogleDrive(fileId) {
         if (!fileId) return;
         try {
@@ -1724,11 +1730,11 @@
 
             await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                mode: 'no-cors',
                 body: formData
             });
         } catch (e) {
-            console.error("Gagal menghapus foto di Sistem:", e);
+            console.error("Gagal menghapus foto di Drive:", e);
         }
     }
 
@@ -1756,6 +1762,7 @@
 
         let index = 0;
         const todayStr = getFormattedDate();
+        const fragment = document.createDocumentFragment();
 
         Object.keys(dataObj).forEach(key => {
             const item = dataObj[key];
@@ -1792,21 +1799,24 @@
                     }
                 }
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${index}</td>
-                        <td><strong class="editable-item-text" data-key="${key}" data-field="nama">${escapeHtml(item.nama || '')}</strong></td>
-                        <td><span class="editable-item-text" data-key="${key}" data-field="satuan">${escapeHtml(item.satuan || '')}</span></td>
-                        <td><strong class="editable-item-text" data-key="${key}" data-field="jumlah">${item.jumlah !== undefined ? item.jumlah : 0}</strong></td>
-                        <td>${expiredDisplay}</td>
-                        <td>${photoDisplay}</td>
-                        ${!isGuest ? `<td class="text-center action-col">${actionButton}</td>` : ''}
-                    </tr>
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index}</td>
+                    <td><strong class="editable-item-text" data-key="${key}" data-field="nama">${escapeHtml(item.nama || '')}</strong></td>
+                    <td><span class="editable-item-text" data-key="${key}" data-field="satuan">${escapeHtml(item.satuan || '')}</span></td>
+                    <td><strong class="editable-item-text" data-key="${key}" data-field="jumlah">${item.jumlah !== undefined ? item.jumlah : 0}</strong></td>
+                    <td>${expiredDisplay}</td>
+                    <td>${photoDisplay}</td>
+                    ${!isGuest ? `<td class="text-center action-col">${actionButton}</td>` : ''}
                 `;
+                fragment.appendChild(tr);
             }
         });
+
         if (index === 0) {
             tbody.innerHTML = `<tr><td colspan="${isGuest ? 6 : 7}" class="empty-state"><i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.5rem; display: block;"></i>Tidak ada data stock untuk tanggal ini.</td></tr>`;
+        } else {
+            tbody.appendChild(fragment);
         }
     }
 
@@ -1850,7 +1860,7 @@
                 window.URL.revokeObjectURL(blobUrl);
             }
         } catch (err) {
-            console.error("Gagal mendownload gambar otomatis:", err);
+            console.error("Gagal mendownload gambar:", err);
             window.open(src, '_blank');
         }
     };
@@ -1859,7 +1869,6 @@
         document.getElementById('imageModal').classList.remove('active');
     };
 
-    // FITUR: KELOLA BROADCAST ADMIN & PENGECEKAN KEHADIRAN / TIDAK HADIR
     function sendAdminBroadcast() {
         const msg = document.getElementById('adminBroadcastMsg').value.trim();
         const fileInput = document.getElementById('adminAttachFile');
@@ -1881,7 +1890,7 @@
             db.ref('admin_broadcast').set(payload).then(() => {
                 document.getElementById('adminBroadcastMsg').value = '';
                 fileInput.value = '';
-                showCustomAlert('Berhasil', 'Pesan info & file profesional berhasil dikirim ke user.', 'success');
+                showCustomAlert('Berhasil', 'Pesan info berhasil dikirim ke user.', 'success');
             }).catch(err => {
                 console.error("Gagal broadcast:", err);
                 showCustomAlert('Gagal', 'Terjadi kesalahan saat mengirim info.', 'danger');
@@ -1901,7 +1910,6 @@
     }
 
     function listenToAdminFeatures() {
-        // Mendengarkan status balasan user di panel admin
         db.ref('user_reply').on('value', (snapshot) => {
             const data = snapshot.val();
             const replyBox = document.getElementById('adminUserReplyBox');
@@ -1922,10 +1930,8 @@
         db.ref('admin_broadcast').on('value', (snapshot) => {
             const data = snapshot.val();
             const submitBtn = document.getElementById('submitBtn');
-            const itemFormInput = document.getElementById('itemForm');
 
             if (data && data.active) {
-                // User harus membalas dulu untuk melanjutkan input barang
                 if (submitBtn) submitBtn.disabled = true;
 
                 let contentHtml = `<p><strong>Pesan Admin:</strong> ${escapeHtml(data.message || '-')}</p>`;
@@ -1958,7 +1964,6 @@
             timestamp: Date.now(),
             user: sessionStorage.getItem('userName') || 'AdminSo'
         }).then(() => {
-            // Nonaktifkan broadcast aktif sehingga user bisa melanjutkan input
             return db.ref('admin_broadcast/active').set(false);
         }).then(() => {
             document.getElementById('userReplyInput').value = '';
@@ -1967,20 +1972,16 @@
             if (submitBtn && isLocationValid) submitBtn.disabled = false;
             showCustomAlert('Berhasil', 'Balasan terkirim. Input barang kembali dibuka.', 'success');
         }).catch(err => {
-            console.error("Gagal kirim balasan:", err);
+            console.error('Gagal kirim balasan:', err);
             showCustomAlert('Gagal', 'Terjadi kesalahan saat mengirim balasan.', 'danger');
         });
     };
 
     function checkAndRecordAttendance() {
-        // Jika user tidak input sehari maka masuk ke laporan tidak hadir
         const todayStr = getFormattedDate();
         const userName = sessionStorage.getItem('userName');
         if (userName === 'AdminSo') {
             db.ref('stock_barang/' + todayStr).once('value', (snapshot) => {
-                const hasInputToday = snapshot.exists() && Object.keys(snapshot.val()).length > 0;
-                
-                // Cek hari sebelumnya (kemarin)
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
                 const yestStr = getFormattedDate(yesterday);
@@ -1988,7 +1989,6 @@
                 db.ref('stock_barang/' + yestStr).once('value', (snapYest) => {
                     const hasInputYest = snapYest.exists() && Object.keys(snapYest.val()).length > 0;
                     if (!hasInputYest) {
-                        // Catat ke laporan tidak hadir di Firebase
                         db.ref('attendance_reports/' + yestStr).set({
                             status: 'TIDAK HADIR / TIDAK ADA INPUT',
                             user: 'AdminSo',
@@ -2000,6 +2000,7 @@
         }
     }
 
+    // DIPERBAIKI: Menyimpan `driveFileId` dengan benar ke dalam Firebase saat submit data
     document.getElementById('itemForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const selectedDate = getCurrentSelectedDate();
@@ -2012,7 +2013,7 @@
         }
 
         if (!isLocationValid) {
-            showCustomAlert('Akses Di-Blokir', 'Aplikasi hanya dapat digunakan di lokasi SPPG KOTA SERANG SERANG SERANG 2. Aktifkan GPS dan berada di lokasi resmi!', 'danger');
+            showCustomAlert('Akses Di-Blokir', 'Aplikasi hanya dapat digunakan di lokasi SPPG KOTA SERANG 2. Aktifkan GPS dan berada di lokasi resmi!', 'danger');
             return;
         }
 
@@ -2028,7 +2029,6 @@
             return;
         }
 
-        // Khusus admin "Serang", foto bersifat opsional
         if (userName !== 'Serang' && (!fotoInput.files || fotoInput.files.length === 0)) {
             showCustomAlert('Wajib Upload Foto', 'Ambil foto menggunakan kamera terlebih dahulu!', 'warning');
             return;
@@ -2036,7 +2036,7 @@
 
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah & Memproses...`;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sedang Di Proses...`;
 
         try {
             let base64Photo = '';
@@ -2069,8 +2069,8 @@
                         satuan: satuan, 
                         jumlah: rawJumlah.trim(),
                         expiredDate: expiredDate || '',
-                        driveFileId: driveResponse.fileId,
-                        fotoDriveUrl: driveResponse.url,
+                        driveFileId: driveResponse.fileId || '',
+                        fotoDriveUrl: driveResponse.url || '',
                         fotoDriveDirect: driveResponse.directUrl || base64Photo
                     });
                 }
@@ -2079,11 +2079,11 @@
                 loadMasterDataList();
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
-                showCustomAlert('Berhasil', 'Data barang berhasil disimpan.', 'success');
+                showCustomAlert('Berhasil', 'Data barang tersimpan.', 'success');
             });
         } catch (error) {
-            console.error('Error unggah ke Sistem :', error);
-            showCustomAlert('Gagal Upload', 'Terjadi kesalahan saat unggah foto ke Sistem.', 'danger');
+            console.error('Error unggah:', error);
+            showCustomAlert('Gagal Upload', 'Terjadi kesalahan saat unggah foto.', 'danger');
             submitBtn.disabled = false;
             submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
         }
@@ -2141,6 +2141,7 @@
         document.getElementById('deleteModal').classList.remove('active'); 
     };
 
+    // DIPERBAIKI: Mengambil `driveFileId` dari database untuk menghapus file di Drive secara langsung
     document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
         if (itemKeyToDelete) {
             const selectedDate = getCurrentSelectedDate();
@@ -2155,7 +2156,7 @@
                 targetRef.remove().then(() => {
                     loadMasterDataList();
                     closeDeleteModal();
-                    showCustomAlert('Terhapus', 'Data barang dan foto berhasil dihapus.', 'success');
+                    showCustomAlert('Terhapus', 'Data barang dan foto di Google Drive berhasil dihapus.', 'success');
                 }).catch(err => {
                     console.error('Gagal menghapus data:', err);
                     showCustomAlert('Gagal', 'Terjadi kesalahan saat menghapus data.', 'danger');
@@ -2219,7 +2220,6 @@
         document.getElementById('exportModal').classList.remove('active');
     };
 
-    // PROSES EXPORT TERPISAH KHUSUS HANYA UNTUK AREA LAPORAN & DUKUNG PNG/PDF DENGAN ANIMASI & BLOB DOWNLOAD iPHONE
     window.processExportReport = function() {
         const inputName = document.getElementById('exportPetugasInput').value.trim();
         const exportFormat = document.getElementById('exportFormatSelect').value;
@@ -2281,7 +2281,7 @@
                 } else if (exportFormat === 'pdf') {
                     const { jsPDF } = window.jspdf;
                     const imgData = canvas.toDataURL('image/png');
-                    const imgWidth = 210; // Ukuran A4 standar (mm)
+                    const imgWidth = 210;
                     const pageHeight = 297;
                     const imgHeight = (canvas.height * imgWidth) / canvas.width;
                     
@@ -2290,7 +2290,6 @@
 
                     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                     
-                    // Menggunakan metode output blob untuk kompatibilitas penyimpanan langsung di iPhone/iOS
                     const pdfBlob = pdf.output('blob');
                     const blobUrl = URL.createObjectURL(pdfBlob);
                     const link = document.createElement('a');
