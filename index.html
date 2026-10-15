@@ -1475,10 +1475,14 @@
     function listenToDailyData() {
         const selectedDate = getCurrentSelectedDate();
         if (currentRef) currentRef.off();
+        
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>Memuat data stok...</td></tr>`;
+
         currentRef = db.ref('stock_barang/' + selectedDate);
         currentRef.on('value', (snapshot) => {
             rawDailyData = snapshot.val();
-            renderTableDaily(rawDailyData);
+            filterTableItems();
         });
     }
 
@@ -1487,13 +1491,16 @@
         clearTimeout(searchDebounceTimer);
         searchDebounceTimer = setTimeout(() => {
             filterTableItems();
-        }, 120);
+        }, 0);
     }
 
     function filterTableItems() {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
 
-        if (!rawDailyData) return;
+        if (!rawDailyData) {
+            renderTableDaily(null);
+            return;
+        }
 
         if (!query) {
             renderTableDaily(rawDailyData);
@@ -1529,11 +1536,11 @@
             icon.className = "fa-solid fa-magnifying-glass";
             text.innerText = "Cari Data";
             btn.disabled = false;
-        }, 350);
+        }, 50);
     }
 
     function loadMasterDataList() {
-        db.ref('stock_barang').once('value', (snapshot) => {
+        db.ref('stock_barang').on('value', (snapshot) => {
             const allDatesData = snapshot.val();
             const uniqueBarangSet = new Set();
             const uniqueSatuanSet = new Set();
@@ -1605,15 +1612,14 @@
             headerTitle: document.getElementById('invTitleHeader').innerText.trim(),
             headerSub: document.getElementById('invSubHeader').innerText.trim(),
             petugasLabel: document.getElementById('lblPetugasText').innerText.trim(),
-            petugasName: document.getElementById('valPetugasText').replace(/[()]/g, '').trim(),
+            petugasName: document.getElementById('valPetugasText').innerText.replace(/[()]/g, '').trim(),
             mengetahuiLabel: document.getElementById('lblMengetahuiText').innerText.trim(),
             jabatanLabel: document.getElementById('lblJabatanText').innerText.trim(),
-            mengetahuiName: document.getElementById('valMengetahuiName').replace(/[()]/g, '').trim()
+            mengetahuiName: document.getElementById('valMengetahuiName').innerText.replace(/[()]/g, '').trim()
         };
 
         db.ref('settings/signature').set(cfg).then(() => {
             showCustomAlert('Berhasil', 'Konfigurasi header & tanda tangan berhasil disimpan.', 'success');
-            setTimeout(() => { location.reload(); }, 1200);
         }).catch(err => {
             console.error('Gagal menyimpan:', err);
             showCustomAlert('Gagal', 'Terjadi kesalahan saat menyimpan pengaturan.', 'danger');
@@ -1643,8 +1649,8 @@
                 img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1000;
-                    const MAX_HEIGHT = 1000;
+                    const MAX_WIDTH = 900;
+                    const MAX_HEIGHT = 900;
                     let width = img.width;
                     let height = img.height;
 
@@ -1671,8 +1677,8 @@
                     const timeStr = new Date().toLocaleTimeString('id-ID');
                     const locStr = (lat && lng) ? `GPS: ${lat.toFixed(6)}, ${lng.toFixed(6)} (SPPG KOTA SERANG 2)` : "GPS: -";
 
-                    const fontSize = Math.max(14, Math.floor(width / 35));
-                    const padding = 12;
+                    const fontSize = Math.max(12, Math.floor(width / 40));
+                    const padding = 10;
                     const bannerHeight = (fontSize * 2.5) + (padding * 2);
 
                     ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
@@ -1686,7 +1692,7 @@
                     ctx.font = `${fontSize * 0.9}px Inter, sans-serif`;
                     ctx.fillText(`📍 ${locStr}`, padding, height - padding - 4);
 
-                    resolve(canvas.toDataURL('image/jpeg', 0.8));
+                    resolve(canvas.toDataURL('image/jpeg', 0.75));
                 };
                 img.onerror = error => reject(error);
             };
@@ -1694,7 +1700,6 @@
         });
     }
 
-    // DIPERBAIKI: Mengambil balasan JSON dari Apps Script (menggunakan mode cors standar agar fileId dapat diterima)
     async function uploadPhotoToGoogleDrive(base64Data, fileName, namaBarang, tanggalInput) {
         try {
             const formData = new URLSearchParams();
@@ -1715,12 +1720,11 @@
                 directUrl: result.directUrl || base64Data
             };
         } catch (e) {
-            console.warn("Gagal unggah ke Drive, menggunakan backup lokal:", e);
+            console.warn("Gagal unggah ke Sistem, menggunakan backup lokal:", e);
             return { fileId: '', url: '', directUrl: base64Data };
         }
     }
 
-    // DIPERBAIKI: Menghapus foto dari Google Drive menggunakan ID file yang tersimpan
     async function deletePhotoFromGoogleDrive(fileId) {
         if (!fileId) return;
         try {
@@ -1730,11 +1734,10 @@
 
             await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors',
                 body: formData
             });
         } catch (e) {
-            console.error("Gagal menghapus foto di Drive:", e);
+            console.error("Gagal menghapus foto di Sistem:", e);
         }
     }
 
@@ -1784,7 +1787,7 @@
                 const imgSrc = item.fotoDriveDirect || item.fotoBase64;
 
                 if (imgSrc) {
-                    photoDisplay = `<img src="${imgSrc}" class="img-preview-thumb" crossorigin="anonymous" onclick="openImageModal('${imgSrc}')" title="Klik untuk lihat foto">`;
+                    photoDisplay = `<img src="${imgSrc}" class="img-preview-thumb" crossorigin="anonymous" onclick="openImageModal('${imgSrc}')" title="Klik untuk lihat foto" loading="lazy">`;
                 }
 
                 let expiredDisplay = `<span style="color: var(--text-muted); font-size: 0.85rem;">-</span>`;
@@ -2000,7 +2003,6 @@
         }
     }
 
-    // DIPERBAIKI: Menyimpan `driveFileId` dengan benar ke dalam Firebase saat submit data
     document.getElementById('itemForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const selectedDate = getCurrentSelectedDate();
@@ -2046,6 +2048,7 @@
                 const file = fotoInput.files[0];
                 base64Photo = await convertFileToBase64WithWatermark(file, userCurrentLat, userCurrentLng);
                 const fileName = `${selectedDate}_${nama.replace(/\s+/g, '_')}_${Date.now()}.jpg`;
+                
                 driveResponse = await uploadPhotoToGoogleDrive(base64Photo, fileName, nama, selectedDate);
             }
 
@@ -2076,7 +2079,6 @@
                 }
                 
                 document.getElementById('itemForm').reset();
-                loadMasterDataList();
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<i class="fa-solid fa-plus"></i> Simpan`;
                 showCustomAlert('Berhasil', 'Data barang tersimpan.', 'success');
@@ -2123,7 +2125,6 @@
             expiredDate: expiredDate || ''
         }).then(() => {
             closeEditModal();
-            loadMasterDataList();
             showCustomAlert('Berhasil', 'Perubahan data barang berhasil disimpan.', 'success');
         }).catch(err => {
             console.error('Gagal memperbarui data:', err);
@@ -2141,26 +2142,26 @@
         document.getElementById('deleteModal').classList.remove('active'); 
     };
 
-    // DIPERBAIKI: Mengambil `driveFileId` dari database untuk menghapus file di Drive secara langsung
     document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
         if (itemKeyToDelete) {
             const selectedDate = getCurrentSelectedDate();
             const targetRef = db.ref('stock_barang/' + selectedDate + '/' + itemKeyToDelete);
             
-            targetRef.once('value', async (snapshot) => {
-                const itemData = snapshot.val();
-                if (itemData && itemData.driveFileId) {
-                    await deletePhotoFromGoogleDrive(itemData.driveFileId);
-                }
+            if (rawDailyData && rawDailyData[itemKeyToDelete]) {
+                const itemData = rawDailyData[itemKeyToDelete];
+                delete rawDailyData[itemKeyToDelete];
+                filterTableItems();
                 
-                targetRef.remove().then(() => {
-                    loadMasterDataList();
-                    closeDeleteModal();
-                    showCustomAlert('Terhapus', 'Data barang dan foto di Google Drive berhasil dihapus.', 'success');
-                }).catch(err => {
-                    console.error('Gagal menghapus data:', err);
-                    showCustomAlert('Gagal', 'Terjadi kesalahan saat menghapus data.', 'danger');
-                });
+                // Menghapus file terkait di Google Drive secara otomatis
+                if (itemData && itemData.driveFileId) {
+                    deletePhotoFromGoogleDrive(itemData.driveFileId);
+                }
+            }
+            closeDeleteModal();
+            showCustomAlert('Terhapus', 'Data barang dan foto di Sistem berhasil dihapus.', 'success');
+
+            targetRef.remove().catch(err => {
+                console.error('Gagal menghapus data di database:', err);
             });
         }
     });
